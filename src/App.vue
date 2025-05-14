@@ -1,10 +1,17 @@
 <script setup>
 import MainDashboard from './app/product-management/components/main-dashboard.component.vue';
+import Navbar from './app/shared/navbar.component.vue';
 </script>
 
 <template>
-  <MainDashboard />
+    <div class="app-container">
+        <Navbar/>
+        <div class="content">
+          <MainDashboard />
+        </div>
+    </div>
 </template>
+
 
 <style>
 html, body {
@@ -22,5 +29,33 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.content {
+  padding: 2rem;
+  padding-top: calc(70px + 2rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #666;
+  font-size: 1.2rem;
 }
 </style>
