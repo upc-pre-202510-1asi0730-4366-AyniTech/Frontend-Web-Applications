@@ -1,30 +1,58 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import Navbar from './app/shared/navbar.component.vue';
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="app-container">
+    <Navbar />
+    <div class="content">
+      <h1>Bienvenido a StockWise</h1>
+      <p>Sistema de gestión de inventario</p>
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  width: 100%;
+  height: 100%;
+  background-color: #FFF5E0;
+  overflow-x: hidden;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+#app {
+  width: 100%;
+  min-height: 100vh;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.content {
+  padding: 2rem;
+  padding-top: calc(70px + 2rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #666;
+  font-size: 1.2rem;
 }
 </style>
