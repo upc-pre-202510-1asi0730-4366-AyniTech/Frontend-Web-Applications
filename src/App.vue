@@ -1,10 +1,8 @@
 <script setup>
 import MainDashboard from './app/product-management/components/main-dashboard.component.vue';
-import Navbar from './app/shared/navbar.component.vue';
 </script>
 
 <template>
-  <Navbar />
   <MainDashboard />
 </template>
 
