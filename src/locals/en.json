@@ -1,0 +1,30 @@
+{
+  "navbar": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "search": "Search",
+    "alerts": "Alerts",
+    "support": "Support",
+    "profile": "Profile"
+  },
+  "kits": {
+    "title": "Combine Products into Kits",
+    "searchPlaceholder": "Search Products",
+    "selectForKit": "Select for kit",
+    "existingProducts": "Existing Products",
+    "product": "Product",
+    "price": "Price",
+    "inventory": "Inventory",
+    "add": "Add",
+    "createKit": "Create Kit",
+    "kitName": "Kit Name",
+    "kitDescription": "Kit Description",
+    "totalPrice": "Total Price",
+    "selectedProducts": "Selected Products",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "save": "Save Kit"
+  }
+}

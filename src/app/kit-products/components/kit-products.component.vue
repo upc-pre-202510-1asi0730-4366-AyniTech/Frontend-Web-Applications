@@ -1,24 +1,24 @@
 <template>
   <div class="combine-products">
-    <h1 class="page-title">Combinar Productos en Kits</h1>
+    <h1 class="page-title">{{ $t('kits.title') }}</h1>
 
     <div class="search-bar">
       <div class="search-input">
         <i class="pi pi-search search-icon"></i>
-        <input type="text" placeholder="Buscar Productos" />
+        <input type="text" :placeholder="$t('kits.searchPlaceholder')" />
       </div>
-      <Button class="kit-select-btn" label="Selecionar para kit" />
+      <Button class="kit-select-btn" :label="$t('kits.selectForKit')" />
     </div>
 
     <div class="products-container">
-      <h2 class="section-title">Productos existentes</h2>
+      <h2 class="section-title">{{ $t('kits.existingProducts') }}</h2>
 
       <div class="products-table">
         <div class="table-header">
-          <div class="header-producto">Producto</div>
-          <div class="header-precio">Precio</div>
-          <div class="header-inventario">Inventario</div>
-          <div class="header-anadir">Añadir</div>
+          <div class="header-producto">{{ $t('kits.product') }}</div>
+          <div class="header-precio">{{ $t('kits.price') }}</div>
+          <div class="header-inventario">{{ $t('kits.inventory') }}</div>
+          <div class="header-anadir">{{ $t('kits.add') }}</div>
         </div>
 
         <div v-for="(product, index) in products" :key="index" class="product-row">
@@ -26,7 +26,7 @@
           <div class="cell-precio">{{ product.price }}</div>
           <div class="cell-inventario">{{ product.stock }}</div>
           <div class="cell-anadir">
-            <button class="add-button">
+            <button class="add-button" @click="addToKit(index)">
               <i class="pi pi-plus"></i>
             </button>
           </div>
@@ -48,20 +48,23 @@ export default {
   data() {
     return {
       products: [
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' },
-        { name: 'Golosina', price: 's/. 10', stock: '20 Stock' }
-      ]
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
+        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'}
+      ],
+      selectedProducts: []
     }
   },
   methods: {
     addToKit(productIndex) {
       // Implementar la lógica para añadir al kit
-      console.log('Añadir producto', this.products[productIndex]);
+      const product = this.products[productIndex];
+      this.selectedProducts.push({...product, quantity: 1});
+      console.log('Producto añadido al kit', product);
     }
   }
 }
