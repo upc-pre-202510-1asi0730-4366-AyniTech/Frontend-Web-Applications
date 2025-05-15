@@ -2,16 +2,26 @@
 import { ref, onMounted } from 'vue'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
+import NewProduct from '../models/NewProduct.entity.js'
+
 const products = ref([])
+const viewMode = ref('table')
+const showAddForm = ref(false)
+const newProduct = ref(new NewProduct({}))
 
 onMounted(async () => {
   products.value = await fetchProducts()
 })
+
+const handleAddProduct = () => {
+  // Aquí iría la lógica para guardar el producto
+  console.log('Nuevo producto:', newProduct.value)
+  showAddForm.value = false
+}
 </script>
 
 <template>
   <div class="inventory-product">
-
     <h2>Inventario por producto</h2>
 
     <div class="toolbar-background">
@@ -25,7 +35,9 @@ onMounted(async () => {
           </button>
         </div>
         <input type="number" placeholder="Stock Mín" class="number-input" />
-        <button class="btn-generate">Generar Nuevo Lote</button>
+        <button class="btn-generate" @click="showAddForm = true">
+          Generar Nuevo Producto
+        </button>
       </div>
     </div>
 
@@ -52,11 +64,104 @@ onMounted(async () => {
           <div class="cell">{{ product.unidad }}</div>
           <div class="cell actions">
             <button class="action-button dark">
-              <i class="fas fa-table"></i>
-            </button>
-            <button class="action-button dark">
               <i class="fas fa-edit"></i>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ventana modal para agregar producto -->
+    <div v-if="showAddForm" class="modal-overlay">
+      <div class="modal-window">
+        <h2>Agregar Producto</h2>
+
+        <div class="form-content">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input
+                type="text"
+                v-model="newProduct.nombre"
+                class="form-input"
+                placeholder="Nombre del producto"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="tags-container">
+              <div class="tag">Golosina</div>
+              <div class="tag">Golosina</div>
+              <button class="add-tag-btn">+ Añadir</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Precio de compra</label>
+              <div class="price-input">
+                <span class="currency">$</span>
+                <input
+                    type="number"
+                    v-model="newProduct.precioCompra"
+                    class="form-input"
+                    value="00.00"
+                >
+              </div>
+            </div>
+
+            <div class="form-group half">
+              <label>Precio de venta</label>
+              <div class="price-input">
+                <span class="currency">$</span>
+                <input
+                    type="number"
+                    v-model="newProduct.precioVenta"
+                    class="form-input"
+                    value="00.00"
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cantidad</label>
+            <input
+                type="number"
+                v-model="newProduct.cantidad"
+                class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Lote</label>
+            <select v-model="newProduct.lote" class="form-input">
+              <option value="">Seleccionar lote</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de caducidad</label>
+            <input
+                type="date"
+                v-model="newProduct.fechaCaducidad"
+                class="form-input"
+                placeholder="DD/MM/AAAA"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Nota</label>
+            <textarea
+                v-model="newProduct.nota"
+                class="form-input"
+                rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button class="save-button" @click="handleAddProduct">Guardar</button>
+            <button class="cancel-button" @click="showAddForm = false">Cancelar</button>
           </div>
         </div>
       </div>
@@ -305,6 +410,144 @@ onMounted(async () => {
   .actions {
     justify-content: flex-start;
     padding-top: 0.5rem;
+  }
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-window {
+  background: #FFF5E0;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.form-content {
+  margin-top: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.half {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.tag {
+  background: #F4A460;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+}
+
+.add-tag-btn {
+  background: none;
+  border: none;
+  color: #F4A460;
+  cursor: pointer;
+}
+
+.price-input {
+  position: relative;
+}
+
+.currency {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.price-input .form-input {
+  padding-left: 2rem;
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.save-button, .cancel-button {
+  padding: 0.75rem 3rem;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.save-button {
+  background: #dc3545;
+  color: white;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+}
+
+.save-button:hover {
+  background: #c82333;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .modal-window {
+    padding: 1rem;
+    width: 95%;
   }
 }
 </style>

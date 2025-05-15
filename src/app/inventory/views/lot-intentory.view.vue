@@ -1,13 +1,39 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchLots } from '../services/lot-api.service'
+import LotComment from '../components/lot-comment.component.vue'
+import LotCard from '../components/lot-card.component.vue'
+import NewLot from '../models/NewLot.entity.js'
 
 const lots = ref([])
+const isCommentModalOpen = ref(false)
+const selectedLot = ref(null)
+const viewMode = ref('table')
+const showAddLotForm = ref(false) // nuevo
+const newLot = ref(new NewLot({})) // nuevo
 
 onMounted(async () => {
   lots.value = await fetchLots()
 })
+
+const openCommentModal = (lot) => {
+  selectedLot.value = lot
+  isCommentModalOpen.value = true
+}
+
+const closeCommentModal = () => {
+  isCommentModalOpen.value = false
+  selectedLot.value = null
+}
+
+
+const handleAddLot = () => {
+
+  console.log('Nuevo lote:', newLot.value)
+  showAddLotForm.value = false
+}
 </script>
+
 
 <template>
   <div class="inventory-lote">
@@ -26,10 +52,29 @@ onMounted(async () => {
         <input type="number" placeholder="Cantidad" class="input-field" />
         <input type="number" placeholder="Precio" class="input-field" />
         <button class="btn-generate">Generar Nuevo Lote</button>
+        <div class="view-toggle">
+          <button
+              :class="['view-btn', viewMode === 'table' ? 'active' : '']"
+              @click="viewMode = 'table'"
+              title="Vista de tabla"
+          >
+            <i class="fas fa-table"></i>
+          </button>
+          <button
+              :class="['view-btn', viewMode === 'card' ? 'active' : '']"
+              @click="viewMode = 'card'"
+              title="Vista de tarjetas"
+          >
+            <i class="fas fa-th-large"></i>
+          </button>
+        </div>
       </div>
+
+
     </div>
 
-    <div class="table-container">
+
+    <div v-if="viewMode === 'table'" class="table-container">
       <div class="table-header">
         <div class="header-cell">Proveedor</div>
         <div class="header-cell">Producto</div>
@@ -48,17 +93,116 @@ onMounted(async () => {
         <div class="cell">S/{{ lot.precio }}</div>
         <div class="cell">{{ lot.unidad }}</div>
         <div class="cell actions">
-          <button class="action-button">
-            <i class="fas fa-table"></i>
-          </button>
-          <button class="action-button">
+          <button
+              class="action-button"
+              title="Comentarios"
+              @click="openCommentModal(lot)"
+          >
             <i class="fas fa-comments"></i>
+          </button>
+          <button class="action-button" title="Editar">
+            <i class="fas fa-edit"></i>
           </button>
         </div>
       </div>
     </div>
+
+
+    <div v-else class="cards-container">
+      <LotCard
+          v-for="lot in lots"
+          :key="lot.id"
+          :lot="lot"
+          class="card-item"
+          @comment="openCommentModal"
+      />
+    </div>
+
+
+    <div v-if="showAddLotForm" class="modal-overlay">
+      <div class="modal-window">
+        <h2>Agregar Lote</h2>
+
+        <div class="form-content">
+          <div class="form-group">
+            <label>Proveedor</label>
+            <input
+                type="text"
+                v-model="newLot.proveedor"
+                class="input-field"
+                placeholder="Nombre del proveedor"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Producto</label>
+            <input
+                type="text"
+                v-model="newLot.producto"
+                class="input-field"
+                placeholder="Nombre del producto"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de entrada</label>
+            <input
+                type="date"
+                v-model="newLot.fechaEntrada"
+                class="input-field"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Cantidad</label>
+            <input
+                type="number"
+                v-model="newLot.cantidad"
+                class="input-field"
+                min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Precio por unidad</label>
+            <div class="price-input">
+              <span class="currency">S/</span>
+              <input
+                  type="number"
+                  v-model="newLot.precio"
+                  class="input-field"
+                  step="0.01"
+                  min="0"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Unidad de medida</label>
+            <input
+                type="text"
+                v-model="newLot.unidad"
+                class="input-field"
+                placeholder="Ej: kg, l, unidades"
+            >
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-generate" @click="handleAddLot">Guardar</button>
+            <button class="action-button" @click="showAddLotForm = false">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <LotComment
+        v-if="isCommentModalOpen"
+        :lot="selectedLot"
+        @close="closeCommentModal"
+    />
   </div>
 </template>
+
 
 <style scoped>
 
@@ -177,7 +321,7 @@ h2 {
   height: 36px;
   border: none;
   border-radius: 8px;
-  background: #2D2D2D;
+  background: #ff0000;
   color: white;
   display: flex;
   align-items: center;
@@ -228,6 +372,68 @@ h2 {
     font-weight: bold;
     margin-right: 1rem;
   }
+  .action-button i {
+    font-size: 1rem;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
 
+  .modal-window {
+    background: #FFF5E0;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .form-content {
+    margin-top: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .price-input {
+    position: relative;
+  }
+
+  .currency {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+  }
+
+  .price-input .input-field {
+    padding-left: 2rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+  }
 }
 </style>
