@@ -1,13 +1,30 @@
-import axios from '@/shared/http-common';
+import http from '@/shared/http-common';
+import {authHandlers} from "@iam/services/mock-api/handlers.js";
+
+const useMockAPI = import.meta.env.VITE_USE_MOCK_API === 'true';
 
 class AuthService {
-    register(userData) {
-        return axios.post('/auth/register', {
+    async register(userData){
+        if(useMockAPI){
+            return Promise.resolve(authHandlers.register( {
+                first_name: userData.firstName,
+                last_name: userData.lastName,
+                email: userData.email,
+                password: userData.password
+            }));
+        }
+        return http.post('/auth/register', {
             first_name: userData.firstName,
             last_name: userData.lastName,
             email: userData.email,
             password: userData.password
         });
+    }
+    async login(credentials) {
+        if (useMockAPI) {
+            return Promise.resolve(authHandlers.login(credentials));
+        }
+        return http.post('/auth/login', credentials);
     }
 
     registerWithGoogle(googleToken) {
