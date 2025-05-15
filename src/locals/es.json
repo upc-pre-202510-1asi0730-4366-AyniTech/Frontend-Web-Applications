@@ -1,13 +1,145 @@
 {
-  "alerts": {
-    "title": "Alerta Stock",
-    "search": "Buscar Alertas",
-    "details": "Detalles",
-    "accept": "Aceptar",
-    "report": "Ver reporte",
-    "confirmDelete": "¿Deseas eliminar el reporte?",
-    "confirmTitle": "¿Estás Seguro?",
-    "continue": "CONTINUAR",
-    "back": "VOLVER"
+  "toolbar": {
+    "back": "Volver",
+    "soport": "Soporte",
+    "language": "Idioma"
+  },
+  "register": {
+    "title": "Regístrate",
+    "firstName": "Nombres",
+    "enterNames": "Ingresa tus nombres",
+    "lastName": "Apellidos",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "conditions": "Acepto los términos y condiciones",
+    "changePlan": "Cambiar plan",
+    "login": "Iniciar sesión",
+    "account": "¿Ya tienes una cuenta? ",
+    "submit": "Registrarse"
+  },
+  "login": {
+    "login": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "remember": "Recuérdame",
+    "password?": "¿Olvidaste tu contraseña?",
+    "account": "¿No tienes cuenta?",
+    "submit": "Registrate"
+  },
+  "profile": {
+    "title": "Perfil",
+    "name": "Nombre",
+    "jobTitle": "Título Laboral",
+    "changeProfile": "Cambiar perfil",
+    "changePlan": "Cambiar plan",
+    "settings": "Ajustes",
+    "notificationPermission": "Permiso de notificación de alertas",
+    "automaticAlerts": "Alertas automáticas",
+    "multipleFormatPermission": "Permiso de envío de notificaciones en múltiples formatos",
+    "specificAlertPermission": "Permiso de configuración específica de alerta",
+    "minorRolesPermission": "Roles menores pueden recibir las alertas",
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo",
+    "welcomeMorning": "Buenos días",
+    "welcomeAfternoon": "Buenas tardes",
+    "welcomeEvening": "Buenas noches",
+    "totalProducts": "Total de Productos",
+    "providerDate": "Fecha de Proveedor",
+    "history": "Historial",
+    "inventory": "Inventario",
+    "expirationTitle": "Próximos a Caducar",
+    "addProducts": "Añadir Productos",
+    "kits": "Kits",
+    "returns": "Devolución de productos",
+    "stock": "Stock"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "products": "Productos",
+    "categories": "Categorías",
+    "suppliers": "Proveedores",
+    "search": "Buscar",
+    "alerts": "Alertas",
+    "support": "Soporte",
+    "profile": "Perfil"
+  },
+  "history": {
+    "title": "Historial",
+    "filter": {
+      "type": "Tipo de Gestión",
+      "product": "Producto",
+      "category": "Categoría",
+      "stockAverage": "Stock Promedio",
+      "search": "Buscar"
+    },
+    "card": {
+      "category": "Categoría",
+      "product": "Producto",
+      "consultDate": "Fecha de Consulta",
+      "unitPrice": "Precio Unitario",
+      "quantity": "Cantidad",
+      "total": "Total",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "modal": {
+      "editTitle": "Edición de Registro",
+      "deleteTitle": "¿Estás Seguro?",
+      "deleteMessage": "¿Deseas eliminar el reporte?",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "confirm": "Continuar",
+      "close": "Cerrar",
+      "form": {
+        "category": "Categoría",
+        "product": "Producto",
+        "date": "Fecha de Consulta",
+        "price": "Precio Unitario",
+        "quantity": "Cantidad",
+        "total": "Total"
+      }
+    }
+  },
+  "stock": {
+    "card": {
+      "stockAverage": "Stock Promedio",
+      "category": "Categoría",
+      "product": "Producto",
+      "consultDate": "Fecha de consulta",
+      "idealStock": "Stock ideal",
+      "status": "Estado",
+      "exportExcel": "Exportar a Excel",
+      "generateTicket": "Generar Ticket"
+    },
+    "modal": {
+      "excelTitle": "¿Exportar a Excel?",
+      "excelMessage": "Se generará un archivo con los datos actuales.",
+      "ticketTitle": "Ticket Promedio",
+      "ticketMessage": "¿Deseas generar el ticket para este registro?",
+      "cancel": "Cancelar",
+      "confirm": "Exportar",
+      "create": "Crear"
+    },
+    "form": {
+      "dateRange": "Rango de Fecha",
+      "product": "Producto",
+      "sales": "Cantidad de ventas",
+      "price": "Precio",
+      "ticketAverage": "Ticket promedio"
+    },
+    "alerts": {
+      "title": "Alerta Stock",
+      "search": "Buscar Alertas",
+      "details": "Detalles",
+      "accept": "Aceptar",
+      "report": "Ver reporte",
+      "confirmDelete": "¿Deseas eliminar el reporte?",
+      "confirmTitle": "¿Estás Seguro?",
+      "continue": "CONTINUAR",
+      "back": "VOLVER"
+    }
   }
 }

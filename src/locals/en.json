@@ -1,4 +1,136 @@
 {
+  "toolbar": {
+    "back": "Back",
+    "soport": "Support",
+    "language": "Language"
+  },
+  "register": {
+    "title": "Sign Up",
+    "firstName": "First Name",
+    "enterYourNames": "Enter your names",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "conditions": "I accept the terms and conditions",
+    "changePlan": "Change Plan",
+    "login": "Login",
+    "account": "Already have an account?",
+    "submit": "Register"
+  },
+  "login": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "remember": "Remember me",
+    "password?": "Forgot your password?",
+    "account":"Don't have an account?",
+    "submit": "Register"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Name",
+    "jobTitle": "Job Title",
+    "changeProfile": "Change profile",
+    "changePlan": "Change plan",
+    "settings": "Settings",
+    "notificationPermission": "Notification alert permission",
+    "automaticAlerts": "Automatic alerts",
+    "multipleFormatPermission": "Permission to send notifications in multiple formats",
+    "specificAlertPermission": "Specific alert configuration permission",
+    "minorRolesPermission": "Minor roles can receive alerts",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "welcomeMorning": "Good morning",
+    "welcomeAfternoon": "Good afternoon",
+    "welcomeEvening": "Good evening",
+    "totalProducts": "Total Products",
+    "providerDate": "Provider Date",
+    "history": "History",
+    "inventory": "Inventory",
+    "expirationTitle": "Products Expiring Soon",
+    "addProducts": "Add Products",
+    "kits": "Kits",
+    "returns": "Product Returns",
+    "stock": "Stock"
+  },
+  "navbar": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "search": "Search",
+    "alerts": "Alerts",
+    "support": "Support",
+    "profile": "Profile"
+  },
+  "history": {
+    "title": "History",
+    "filter": {
+      "type": "Management Type",
+      "product": "Product",
+      "category": "Category",
+      "stockAverage": "Stock Average",
+      "search": "Search"
+    },
+    "card": {
+      "category": "Category",
+      "product": "Product",
+      "consultDate": "Consultation Date",
+      "unitPrice": "Unit Price",
+      "quantity": "Quantity",
+      "total": "Total",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "editTitle": "Edit Record",
+      "deleteTitle": "Are you sure?",
+      "deleteMessage": "Do you want to delete this report?",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "confirm": "Continue",
+      "close": "Close",
+      "form": {
+        "category": "Category",
+        "product": "Product",
+        "date": "Consultation Date",
+        "price": "Unit Price",
+        "quantity": "Quantity",
+        "total": "Total"
+      }
+    }
+  },
+  "stock": {
+    "card": {
+      "stockAverage": "Stock Average",
+      "category": "Category",
+      "product": "Product",
+      "consultDate": "Consultation Date",
+      "idealStock": "Ideal Stock",
+      "status": "Status",
+      "exportExcel": "Export to Excel",
+      "generateTicket": "Generate Ticket"
+    },
+    "modal": {
+      "excelTitle": "Export to Excel?",
+      "excelMessage": "A file will be generated with the current data.",
+      "ticketTitle": "Average Ticket",
+      "ticketMessage": "Do you want to generate the ticket for this record?",
+      "cancel": "Cancel",
+      "confirm": "Export",
+      "create": "Create"
+    },
+    "form": {
+      "dateRange": "Date Range",
+      "product": "Product",
+      "sales": "Sales Quantity",
+      "price": "Price",
+      "ticketAverage": "Average Ticket"
+    }
+  },
   "alerts": {
     "title": "Stock Alerts",
     "search": "Search Alerts",
