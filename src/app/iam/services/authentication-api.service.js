@@ -1,6 +1,6 @@
 import http from '@/shared/http-common';
 import axios from 'axios';
-import {authHandlers} from "../../../server/handlers.js";
+import {authHandlers} from "../../../../server/handlers.js";
 
 const useMockAPI = import.meta.env.VITE_USE_MOCK_API === 'true';
 
@@ -35,5 +35,23 @@ class AuthService {
     }
 
     // Otros métodos de autenticación
+}
+export class AuthenticationApiService {
+    constructor() {
+        this.endpoint = '/users';
+    }
+
+    login(email, password) {
+        return http.get(`${this.endpoint}?email=${email}&password=${password}`);
+    }
+
+
+
+    register(name, lastname, email,  password) {
+        const user ={
+            name,  lastname,email, password };
+
+        return http.post(this.endpoint, user)
+    }
 }
 export default new AuthService();

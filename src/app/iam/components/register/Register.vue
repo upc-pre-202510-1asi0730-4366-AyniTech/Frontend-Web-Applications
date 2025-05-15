@@ -126,6 +126,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import {GoogleLogin} from "vue3-google-login";
 import {useI18n} from "vue-i18n";
+import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
 
 export default {
   components: {
@@ -134,6 +135,7 @@ export default {
   setup() {
     const router = useRouter();
     const authStore = useAuthStore();
+    const authApi = new AuthenticationApiService();
     const {locale} = useI18n()
     const toggleLanguage = () => {
       locale.value = locale.value === 'es' ? 'en' : 'es'
@@ -174,7 +176,8 @@ export default {
       }
 
       try {
-        router.push('/login');
+        await authApi.register(formData.value.nombres, formData.value.apellidos, formData.value.email, formData.value.password);
+        await router.push('/dashboard');
       } catch (error) {
         console.error('Registration error:', error);
         alert('Error en el registro. Por favor intenta nuevamente.');

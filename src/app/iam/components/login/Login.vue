@@ -75,6 +75,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.js';
 import {useI18n} from "vue-i18n";
+import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
 
 export default {
   setup() {
@@ -83,6 +84,7 @@ export default {
     const rememberMe = ref(false);
     const router = useRouter();
     const authStore = useAuthStore();
+    const authApi = new AuthenticationApiService();
     const {locale} = useI18n()
 
     const toggleLanguage = () => {
@@ -91,8 +93,14 @@ export default {
 
     const handleLogin = async () => {
       try {
-        // Simplemente redirige al dashboard sin validar credenciales
-        router.push('/dashboard');
+        const res = await authApi.login(email.value, password.value);
+
+        if (res.data.length > 0) {
+          await router.push('/dashboard');
+        }
+       else{
+         alert("Error")
+        }
       } catch (error) {
         console.error('Login error:', error);
         // Aquí  manejar el error, mostrar notificación, etc.

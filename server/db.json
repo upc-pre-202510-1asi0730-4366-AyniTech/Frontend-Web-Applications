@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "example@mail.com",
+      "password": "password123",
+      "first_name": "Test",
+      "last_name": "User"
+    },
+    {
+      "name": "asd",
+      "lastname": "sdqwe",
+      "email": "example@mail.com",
+      "password": "123",
+      "apiId": "v1",
+      "id": 2
+    },
+    {
+      "name": "CAMILA CRISTINA",
+      "lastname": "User",
+      "email": "osaosita7@gmail.com",
+      "password": "abc",
+      "apiId": "v1",
+      "id": 3
+    }
+  ]
+}
