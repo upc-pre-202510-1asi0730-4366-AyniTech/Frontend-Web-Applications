@@ -1,7 +1,7 @@
 {
   "toolbar": {
     "back": "Back",
-    "register": "Register",
+    "soport": "Soport",
     "language": "Language"
   },
   "register": {
@@ -16,6 +16,15 @@
     "changePlan": "Change Plan",
     "login": "Login",
     "account": "Already have an account?",
+    "submit": "Register"
+  },
+  "login": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "remember": "Remember me",
+    "password?": "Forgot your password?",
+    "account":"Don't have an account?",
     "submit": "Register"
   }
 }

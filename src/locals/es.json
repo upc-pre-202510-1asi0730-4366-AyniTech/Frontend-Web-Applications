@@ -1,7 +1,7 @@
 {
   "toolbar": {
     "back": "Volver",
-    "register": "Registro",
+    "soport": "Soporte",
     "language": "Idioma"
   },
   "register": {
@@ -17,5 +17,14 @@
     "login": "Iniciar sesión",
     "account": "¿Ya tienes una cuenta? ",
     "submit": "Registrarse"
+  },
+  "login": {
+    "login": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "remember": "Recuérdame",
+    "password?": "¿Olvidaste tu contraseña?",
+    "account": "¿No tienes cuenta?",
+    "submit": "Registrate"
   }
 }

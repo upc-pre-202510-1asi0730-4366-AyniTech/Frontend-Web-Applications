@@ -6,7 +6,7 @@
         </button>
 
         <div class="toolbar-spacer"></div>
-        <div class="toolbar-title">{{ $t('toolbar.register') }}</div>
+        <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
         <div class="toolbar-spacer"></div>
 
         <div class="language-switcher">
@@ -326,7 +326,6 @@ input {
   border: 1px solid #D9D593;
   border-radius: 8px;
   font-size: 1rem;
-  color: black;
 }
 
 input[type="text"],
@@ -337,6 +336,7 @@ input[type="password"] {
   font-size: 1rem;
   transition: border-color 0.3s;
   background-color: #ffffff;
+  color: black;
 }
 
 input[type="text"]:focus,
