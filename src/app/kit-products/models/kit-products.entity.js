@@ -11,7 +11,7 @@ export default class Kit {
         this.stock = stock; // Formato: 'XX Stock'
     }
 
-    // Método para convertir a un objeto plano
+    // Metodo para convertir a un objeto plano
     toJSON() {
         return {
             id: this.id,
