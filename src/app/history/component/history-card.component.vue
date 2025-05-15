@@ -103,7 +103,7 @@ function cancelarAccion() {
 }
 
 .history-card:first-of-type {
-  margin-top: 8.5rem;
+  margin-top: 0rem;
 }
 
 .cell label {

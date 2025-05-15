@@ -98,7 +98,7 @@ function filtrarResultados() {
   width: 100%;
   font-family: 'Inter', sans-serif;
   min-height: calc(100vh - 70px);
-  margin-top: 110px;
+  margin-top: 240px;
 }
 
 .toolbar {
@@ -155,6 +155,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 260px;
+  margin-top: 1rem;
 }
 </style>
