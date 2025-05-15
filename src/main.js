@@ -2,15 +2,15 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
-
-// PrimeVue imports
+import {Button} from 'primevue'
 import PrimeVue from 'primevue/config'
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primeflex/primeflex.css'
-import 'primeicons/primeicons.css'
+import i18n from "./i18n.js";
+import 'primeicons/primeicons.css';
 
 const app = createApp(App)
-
-app.use(PrimeVue)
-app.use(router)
-app.mount('#app')
+app
+    .use(PrimeVue, {ripple: true})
+    .component('pv-button', Button)
+    .use(i18n)
+    .use(router)
+    .mount('#app')

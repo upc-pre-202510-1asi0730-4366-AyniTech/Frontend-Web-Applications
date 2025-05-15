@@ -1,5 +1,4 @@
 <script setup>
-import 'primeicons/primeicons.css';
 </script>
 
 <template>
@@ -13,14 +12,14 @@ import 'primeicons/primeicons.css';
       <a href="#" class="nav-link">Categorías</a>
       <a href="#" class="nav-link">Proveedores</a>
       <a href="#" class="nav-link search">
-        <i class="pi pi-search"></i> Buscar
+        <i class="fas fa-search"></i> Buscar
       </a>
       <a href="#" class="nav-link">
-        <i class="pi pi-bell"></i> Alertas
+        <i class="fas fa-bell"></i> Alertas
       </a>
       <a href="#" class="nav-link">Soporte</a>
       <a href="#" class="nav-link user">
-        user <i class="pi pi-user"></i>
+        user <i class="fas fa-user-circle"></i>
       </a>
     </nav>
   </header>
@@ -101,8 +100,6 @@ import 'primeicons/primeicons.css';
   margin-left: 0.25rem;
 }
 
-/* Estilos para los iconos */
-.pi {
-  margin-right: 0.25rem;
-}
+/* Para agregar los iconos de Font Awesome */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 </style> 

@@ -1,0 +1,13 @@
+{
+  "dashboard": {
+    "totalProducts": "Total Productos",
+    "providerDate": "Fecha Proveedor",
+    "history": "Historial Movimientos",
+    "inventory": "Inventario",
+    "expirationTitle": "Próximos a Caducar",
+    "addProducts": "Agregar Productos",
+    "kits": "Kits Productos",
+    "returns": "Devolución de productos",
+    "stock": "Stock"
+  }
+}
