@@ -17,7 +17,7 @@ const navigateTo = (route) => {
 <template>
   <header class="dashboard-header">
     <div class="logo-container" @click="navigateTo('/dashboard')">
-      <img src="@/assets/logo.svg" alt="StockWise" class="logo" />
+      <img src="../assets/logo.svg" alt="StockWise" class="logo" />
     </div>
     <nav class="main-nav">
       <a @click="navigateTo('/dashboard')" class="nav-link">{{ $t('navbar.home') }}</a>

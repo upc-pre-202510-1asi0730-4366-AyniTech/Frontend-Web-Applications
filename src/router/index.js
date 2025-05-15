@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Register from '@/app/iam/components/register/Register.vue';
 import Login from '@/app/iam/components/login/Login.vue';
+import MainDashboardComponent from "@/app/product-management/components/main-dashboard.component.vue";
+import {Profile} from "@iam/components/profile/index.js";
 
 const routes = [
     {
@@ -14,19 +16,15 @@ const routes = [
       component: Login
     },
     {
-        path: '/home',
-        name: 'Home',
-
-    },
-    {
       path: '/dashboard',
       name: 'Dashboard',
-      component: () => import('../app/product-management/components/main-dashboard.component.vue')
+        component: MainDashboardComponent
+
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: () => import('../app/iam/components/profile/Profile.component.vue')
+        component: Profile
     }
 ];
 
@@ -34,6 +32,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 });
+
 
 
 

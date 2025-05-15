@@ -1,4 +1,4 @@
-import Profile from './Profile.component.vue';
 
-export default Profile;
-export { Profile }; 
+import Profile from '@/app/iam/components/profile/Profile.component.vue';
+export { Profile };
+export default  Profile;

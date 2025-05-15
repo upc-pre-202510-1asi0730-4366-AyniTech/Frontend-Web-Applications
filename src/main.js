@@ -10,7 +10,7 @@ import {Button} from 'primevue'
 import PrimeVue from 'primevue/config'
 import i18n from "./i18n.js";
 import 'primeicons/primeicons.css';
-import NavbarComponent from './app/shared/navbar.component.vue'
+import NavbarComponent from '@shared/navbar.component.vue'
 
 const app = createApp(App)
 

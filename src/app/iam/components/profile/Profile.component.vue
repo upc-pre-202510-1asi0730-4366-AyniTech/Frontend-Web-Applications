@@ -8,7 +8,7 @@
           <h1>{{ $t('profile.title') }}</h1>
           
           <div class="profile-avatar">
-            <img src="@/app/iam/assets/default-avatar.svg" alt="foto de perfil" class="avatar-image" />            
+            <img src='@/assets/default-avatar.svg' alt="foto de perfil" class="avatar-image" />
             <button class="edit-avatar-btn">
               <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
             </button>
