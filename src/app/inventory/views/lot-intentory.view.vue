@@ -1,19 +1,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchLots } from '../services/lot-api.service'
+
 import LotComment from '../components/lot-comment.component.vue'
 import LotCard from '../components/lot-card.component.vue'
 import NewLot from '../models/NewLot.entity.js'
+import AddLot from '../components/add-lot.component.vue'
 
 const lots = ref([])
 const isCommentModalOpen = ref(false)
 const selectedLot = ref(null)
 const viewMode = ref('table')
-const showAddLotForm = ref(false) // nuevo
-const newLot = ref(new NewLot({})) // nuevo
+const showAddLotForm = ref(false)
 
 onMounted(async () => {
-  lots.value = await fetchLots()
 })
 
 const openCommentModal = (lot) => {
@@ -26,10 +25,8 @@ const closeCommentModal = () => {
   selectedLot.value = null
 }
 
-
-const handleAddLot = () => {
-
-  console.log('Nuevo lote:', newLot.value)
+const handleAddLot = (newLot) => {
+  console.log('Nuevo lote:', newLot)
   showAddLotForm.value = false
 }
 </script>
@@ -51,7 +48,7 @@ const handleAddLot = () => {
         </div>
         <input type="number" placeholder="Cantidad" class="input-field" />
         <input type="number" placeholder="Precio" class="input-field" />
-        <button class="btn-generate">Generar Nuevo Lote</button>
+        <button class="btn-generate" @click="showAddLotForm = true">Generar Nuevo Lote</button>
         <div class="view-toggle">
           <button
               :class="['view-btn', viewMode === 'table' ? 'active' : '']"
@@ -119,81 +116,11 @@ const handleAddLot = () => {
     </div>
 
 
-    <div v-if="showAddLotForm" class="modal-overlay">
-      <div class="modal-window">
-        <h2>Agregar Lote</h2>
-
-        <div class="form-content">
-          <div class="form-group">
-            <label>Proveedor</label>
-            <input
-                type="text"
-                v-model="newLot.proveedor"
-                class="input-field"
-                placeholder="Nombre del proveedor"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Producto</label>
-            <input
-                type="text"
-                v-model="newLot.producto"
-                class="input-field"
-                placeholder="Nombre del producto"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Fecha de entrada</label>
-            <input
-                type="date"
-                v-model="newLot.fechaEntrada"
-                class="input-field"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Cantidad</label>
-            <input
-                type="number"
-                v-model="newLot.cantidad"
-                class="input-field"
-                min="0"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Precio por unidad</label>
-            <div class="price-input">
-              <span class="currency">S/</span>
-              <input
-                  type="number"
-                  v-model="newLot.precio"
-                  class="input-field"
-                  step="0.01"
-                  min="0"
-              >
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Unidad de medida</label>
-            <input
-                type="text"
-                v-model="newLot.unidad"
-                class="input-field"
-                placeholder="Ej: kg, l, unidades"
-            >
-          </div>
-
-          <div class="form-actions">
-            <button class="btn-generate" @click="handleAddLot">Guardar</button>
-            <button class="action-button" @click="showAddLotForm = false">Cancelar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AddLot
+        :is-open="showAddLotForm"
+        @close="showAddLotForm = false"
+        @save="handleAddLot"
+    />
 
     <LotComment
         v-if="isCommentModalOpen"

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import Navbar from './app/shared/navbar.component.vue';
-import ProductInventory from "./app/inventory/views/product-inventory.vue";
+import ProductInventoryView from "./app/inventory/views/product-inventory.view.vue";
 import LotInventory from "./app/inventory/views/lot-intentory.view.vue";
 
 const currentView = ref('product'); // 'product' o 'lot'
@@ -26,7 +26,7 @@ const currentView = ref('product'); // 'product' o 'lot'
         </button>
       </div>
 
-      <component :is="currentView === 'product' ? ProductInventory : LotInventory" />
+      <component :is="currentView === 'product' ? ProductInventoryView : LotInventory" />
     </div>
   </div>
 </template>

@@ -14,7 +14,7 @@ onMounted(async () => {
 })
 
 const handleAddProduct = () => {
-  // Aquí iría la lógica para guardar el producto
+
   console.log('Nuevo producto:', newProduct.value)
   showAddForm.value = false
 }
@@ -71,7 +71,6 @@ const handleAddProduct = () => {
       </div>
     </div>
 
-    <!-- Ventana modal para agregar producto -->
     <div v-if="showAddForm" class="modal-overlay">
       <div class="modal-window">
         <h2>Agregar Producto</h2>
