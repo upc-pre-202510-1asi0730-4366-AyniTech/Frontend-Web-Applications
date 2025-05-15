@@ -1,5 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import Profile from './app/iam/components/profile';
 </script>
 
 <template>
@@ -22,7 +23,7 @@ body {
 
 #app {
   min-height: 100vh;
-  padding: 1rem;
+  padding: 2rem 0 0 0;
   display: flex;
 }
 </style>

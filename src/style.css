@@ -37,6 +37,6 @@ html, body {
 
 
 body, #app {
-  background-color: white !important; /* Fuerza fondo blanco */
+  background-color: #fff6e6  !important; /* Fuerza fondo blanco */
   color: black !important; /* Fuerza texto negro */
 }

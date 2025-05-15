@@ -26,5 +26,18 @@
     "password?": "¿Olvidaste tu contraseña?",
     "account": "¿No tienes cuenta?",
     "submit": "Registrate"
+  },
+  "profile": {
+    "title": "Perfil",
+    "name": "Nombre",
+    "jobTitle": "Título Laboral",
+    "changeProfile": "Cambiar perfil",
+    "changePlan": "Cambiar plan",
+    "settings": "Ajustes",
+    "notificationPermission": "Permiso de notificación de alertas",
+    "automaticAlerts": "Alertas automáticas",
+    "multipleFormatPermission": "Permiso de envío de notificaciones en múltiples formatos",
+    "specificAlertPermission": "Permiso de configuración específica de alerta",
+    "minorRolesPermission": "Roles menores pueden recibir las alertas"
   }
 }

@@ -1,7 +1,7 @@
 {
   "toolbar": {
     "back": "Back",
-    "soport": "Soport",
+    "soport": "Support",
     "language": "Language"
   },
   "register": {
@@ -26,5 +26,18 @@
     "password?": "Forgot your password?",
     "account":"Don't have an account?",
     "submit": "Register"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Name",
+    "jobTitle": "Job Title",
+    "changeProfile": "Change profile",
+    "changePlan": "Change plan",
+    "settings": "Settings",
+    "notificationPermission": "Notification alert permission",
+    "automaticAlerts": "Automatic alerts",
+    "multipleFormatPermission": "Permission to send notifications in multiple formats",
+    "specificAlertPermission": "Specific alert configuration permission",
+    "minorRolesPermission": "Minor roles can receive alerts"
   }
 }
