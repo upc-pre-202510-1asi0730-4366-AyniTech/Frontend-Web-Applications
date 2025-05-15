@@ -1,6 +1,7 @@
 export default class Lot {
     constructor({ id, proveedor, producto, fechaEntrada, cantidad, precio, unidad }) {
-        this.id = id
+
+        this.id = id;
         this.proveedor = proveedor
         this.producto = producto
         this.fechaEntrada = fechaEntrada
