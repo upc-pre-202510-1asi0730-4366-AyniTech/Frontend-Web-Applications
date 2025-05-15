@@ -3,7 +3,7 @@
     <div class="alert-grid">
       <div class="field">
         <label>Categoría de alerta</label>
-        <div class="value tipo">{{ alert.alert_type }}</div>
+        <div class="value">{{ alert.alert_type }}</div>
       </div>
       <div class="field">
         <label>Categoría de producto</label>
@@ -37,11 +37,16 @@ export default {
 <style scoped>
 .alert-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px #d8d8d8;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   border-left: 5px solid #ffa500;
+  transition: transform 0.2s ease;
+}
+
+.alert-card:hover {
+  transform: translateY(-2px);
 }
 
 .alert-grid {
@@ -60,10 +65,12 @@ export default {
 
 .value {
   background-color: #fff3cd;
-  padding: 0.4rem 0.6rem;
-  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
   margin-top: 0.25rem;
   font-size: 0.95rem;
+  line-height: 1.2;
+  min-height: 2.2rem;
 }
 
 .actions {
@@ -76,10 +83,13 @@ export default {
 .btn {
   padding: 0.4rem 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: bold;
   cursor: pointer;
   color: white;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
 }
 
 .btn-dark {

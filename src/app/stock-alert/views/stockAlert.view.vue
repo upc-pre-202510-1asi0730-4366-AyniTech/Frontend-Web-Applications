@@ -1,3 +1,23 @@
+<template>
+  <div class="alert-container">
+    <h2 class="page-title">Alerta Stock</h2>
+
+    <div class="search-bar">
+      <i class="pi pi-search"></i>
+      <input
+          v-model="search"
+          type="text"
+          placeholder="Buscar Alertas"
+          class="search-input"
+      />
+    </div>
+
+    <div v-for="alert in filteredAlerts" :key="alert.id">
+      <StockAlertCard :alert="alert" @view="showDetails" @delete="deleteAlert" />
+    </div>
+  </div>
+</template>
+
 <script>
 import StockAlertCard from "../components/stockAlert-card.component.vue";
 
@@ -5,6 +25,7 @@ export default {
   components: { StockAlertCard },
   data() {
     return {
+      search: "",
       alerts: [
         {
           id: 1,
@@ -36,6 +57,13 @@ export default {
       ]
     };
   },
+  computed: {
+    filteredAlerts() {
+      return this.alerts.filter(a =>
+          a.product_name.toLowerCase().includes(this.search.toLowerCase())
+      );
+    }
+  },
   methods: {
     showDetails(alert) {
       alert("Detalles: " + alert.details);
@@ -47,11 +75,51 @@ export default {
 };
 </script>
 
-<template>
-  <div class="p-6">
-    <h2 class="text-2xl font-bold mb-4">Alerta Stock</h2>
-    <div v-for="alert in alerts" :key="alert.id">
-      <StockAlertCard :alert="alert" @view="showDetails" @delete="deleteAlert" />
-    </div>
-  </div>
-</template>
+<style scoped>
+.alert-container {
+  background-color: #FFF5E0;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.page-title {
+  text-align: left;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #2e2e2e;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  border: 2px solid #f29c1f;
+  border-radius: 10px;
+  background-color: #fff8e1;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+.search-bar i {
+  color: #f29c1f;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+}
+</style>
+<style>
+body {
+  background-color: #FFF5E0;
+}
+</style>
+
