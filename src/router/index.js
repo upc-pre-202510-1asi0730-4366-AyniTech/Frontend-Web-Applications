@@ -12,12 +12,20 @@ const routes = [
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+        path: '/home',
+        name: 'Home',
+
     }
+
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes
 });
+
+
 
 export default router;

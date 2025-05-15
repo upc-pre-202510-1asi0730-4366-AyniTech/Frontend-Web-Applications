@@ -1,0 +1,5 @@
+{
+  "/auth/*": "/$1",
+  "/auth/register": "/users",
+  "/auth/login": "/users?email=:email&password=:password"
+}
