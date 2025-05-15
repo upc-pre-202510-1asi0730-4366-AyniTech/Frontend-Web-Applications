@@ -29,6 +29,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .app-container {
@@ -36,17 +37,19 @@ html, body {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .content {
-  padding: 2rem;
-  padding-top: calc(70px + 2rem);
+  margin-top: 70px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: 0;
 }
 
 h1 {
