@@ -1,0 +1,13 @@
+{
+  "alerts": {
+    "title": "Alerta Stock",
+    "search": "Buscar Alertas",
+    "details": "Detalles",
+    "accept": "Aceptar",
+    "report": "Ver reporte",
+    "confirmDelete": "¿Deseas eliminar el reporte?",
+    "confirmTitle": "¿Estás Seguro?",
+    "continue": "CONTINUAR",
+    "back": "VOLVER"
+  }
+}
