@@ -1,0 +1,21 @@
+{
+  "toolbar": {
+    "back": "Volver",
+    "register": "Registro",
+    "language": "Idioma"
+  },
+  "register": {
+    "title": "Regístrate",
+    "firstName": "Nombres",
+    "enterNames": "Ingresa tus nombres",
+    "lastName": "Apellidos",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "conditions": "Acepto los términos y condiciones",
+    "changePlan": "Cambiar plan",
+    "login": "Iniciar sesión",
+    "account": "¿Ya tienes una cuenta? ",
+    "submit": "Registrarse"
+  }
+}

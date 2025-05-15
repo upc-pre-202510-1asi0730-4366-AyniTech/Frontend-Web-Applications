@@ -1,0 +1,21 @@
+{
+  "toolbar": {
+    "back": "Back",
+    "register": "Register",
+    "language": "Language"
+  },
+  "register": {
+    "title": "Sign Up",
+    "firstName": "First Name",
+    "enterYourNames": "Enter your names",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "conditions": "I accept the terms and conditions",
+    "changePlan": "Change Plan",
+    "login": "Login",
+    "account": "Already have an account?",
+    "submit": "Register"
+  }
+}
