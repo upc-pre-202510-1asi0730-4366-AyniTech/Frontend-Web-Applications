@@ -1,24 +1,6 @@
 <template>
-    
+  <NavbarComponent />  
   <div class="profile-wrapper">
-    <!-- Barra de herramientas -->
-    <div class="profile-toolbar">
-      <button @click="$router.back()" class="toolbar-button">
-        &larr; {{ $t('toolbar.back') }}
-      </button>
-
-      <div class="toolbar-spacer"></div>
-      <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
-      <div class="toolbar-spacer"></div>
-
-      <div class="language-switcher">
-        <button @click="toggleLanguage" class="language-button">
-          <span class="language-icon">🌐</span>
-          <span class="language-text">{{ $t('toolbar.language') }}</span>
-        </button>
-      </div>
-    </div>
-
     <!-- Contenido principal -->
     <div class="profile-content">
       <div class="profile-container">
@@ -53,6 +35,7 @@
           <div class="profile-actions">
             <button class="action-btn change-profile-btn">{{ $t('profile.changeProfile') }}</button>
             <button class="action-btn change-plan-btn">{{ $t('profile.changePlan') }}</button>
+            <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
           </div>
         </div>
         
@@ -114,10 +97,12 @@
 <script>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 export default {
   setup() {
     const { locale } = useI18n();
+    const router = useRouter();
     
     const toggleLanguage = () => {
       locale.value = locale.value === 'es' ? 'en' : 'es';
@@ -136,10 +121,16 @@ export default {
       minorRolesPermission: false
     });
     
+    const logout = () => {
+      // Aquí podría ir la lógica para cerrar sesión, limpiar datos, etc.
+      router.push('/');
+    };
+    
     return {
       toggleLanguage,
       userData,
-      settings
+      settings,
+      logout
     };
   }
 };
@@ -151,76 +142,39 @@ export default {
   flex-direction: column;
   min-height: 50vh;
   background-color: #FFF6E6;
-}
-
-.profile-toolbar {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-}
-
-.toolbar-button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: #333;
-}
-
-.toolbar-spacer {
-  flex: 1;
-}
-
-.toolbar-title {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.language-switcher {
-  display: flex;
-}
-
-.language-button {
-  display: flex;
-  align-items: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-}
-
-.language-icon {
-  margin-right: 0.5rem;
+  padding-top: 80px; /* Para dejar espacio para el navbar fijo */
 }
 
 .profile-content {
   display: flex;
   justify-content: center;
   flex: 1;
-  padding: 2rem;
-  margin-top: 4rem;
 }
 
 .profile-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   display: flex;
   flex-direction: row;
   gap: 2rem;
 }
 
-.profile-section {
+.profile-section, .settings-section {
   background-color: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  min-width: 380px;
+  flex: 1;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.profile-section:hover, .settings-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -277,26 +231,38 @@ export default {
 .info-row {
   display: flex;
   align-items: center;
+  margin-bottom: 0.5rem;
+  width: 100%;
 }
 
 .info-label {
   font-weight: 500;
   width: 150px;
+  color: #666;
 }
 
 .info-value {
   flex: 1;
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
 }
 
 .edit-info-btn {
   background: none;
   border: none;
   cursor: pointer;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.edit-info-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .profile-actions {
@@ -304,16 +270,23 @@ export default {
   gap: 1rem;
   width: 100%;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .action-btn {
   padding: 0.8rem;
-  border-radius: 5px;
+  border-radius: 8px;
   border: none;
   font-weight: 500;
   cursor: pointer;
   text-align: center;
   width: 100%;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.action-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .change-profile-btn {
@@ -321,16 +294,27 @@ export default {
   color: white;
 }
 
+.change-profile-btn:hover {
+  background-color: #b71c1c;
+}
+
 .change-plan-btn {
   background-color: #E67E22;
   color: white;
 }
 
-.settings-section {
-  background-color: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.change-plan-btn:hover {
+  background-color: #d35400;
+}
+
+.logout-btn {
+  background-color: #747474;
+  color: white;
+  margin-top: 1rem;
+}
+
+.logout-btn:hover {
+  background-color: #D32F2F;
 }
 
 .settings-header {
@@ -338,6 +322,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .settings-header h2 {
@@ -360,17 +346,28 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
 }
 
 .setting-text {
   font-size: 1rem;
+  color: #333;
+  line-height: 1.4;
+  flex: 1;
+  padding-right: 1rem;
 }
 
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 24px;
+  width: 56px;
+  height: 28px;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -386,7 +383,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #ddd;
   transition: .4s;
   border-radius: 34px;
 }
@@ -394,13 +391,14 @@ export default {
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
   background-color: white;
   transition: .4s;
   border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 input:checked + .toggle-slider {
@@ -408,6 +406,6 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider:before {
-  transform: translateX(26px);
+  transform: translateX(28px);
 }
 </style> 

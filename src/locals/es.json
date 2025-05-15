@@ -38,17 +38,32 @@
     "automaticAlerts": "Alertas automáticas",
     "multipleFormatPermission": "Permiso de envío de notificaciones en múltiples formatos",
     "specificAlertPermission": "Permiso de configuración específica de alerta",
-    "minorRolesPermission": "Roles menores pueden recibir las alertas"
+    "minorRolesPermission": "Roles menores pueden recibir las alertas",
+    "logout": "Cerrar sesión"
   },
   "dashboard": {
-    "totalProducts": "Total Productos",
-    "providerDate": "Fecha Proveedor",
-    "history": "Historial Movimientos",
+    "welcome": "Bienvenido de nuevo",
+    "welcomeMorning": "Buenos días",
+    "welcomeAfternoon": "Buenas tardes",
+    "welcomeEvening": "Buenas noches",
+    "totalProducts": "Total de Productos",
+    "providerDate": "Fecha de Proveedor",
+    "history": "Historial",
     "inventory": "Inventario",
     "expirationTitle": "Próximos a Caducar",
-    "addProducts": "Agregar Productos",
-    "kits": "Kits Productos",
+    "addProducts": "Añadir Productos",
+    "kits": "Kits",
     "returns": "Devolución de productos",
     "stock": "Stock"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "products": "Productos",
+    "categories": "Categorías",
+    "suppliers": "Proveedores",
+    "search": "Buscar",
+    "alerts": "Alertas",
+    "support": "Soporte",
+    "profile": "Perfil"
   }
 }

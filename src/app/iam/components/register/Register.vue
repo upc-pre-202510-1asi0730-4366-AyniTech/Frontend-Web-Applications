@@ -160,11 +160,8 @@ export default {
     });
     const handleGoogleSignIn = async (response) => {
       try {
-        const {credentials} = response;
-        const userData = await authStore.registerWithGoogle(credential);
-
         router.push('/login');
-      }catch(error) {
+      } catch(error) {
         console.error('Google Sign-In error:', error);
         alert('Error al registrarse con Google. Por favor intenta nuevamente.');
       }
@@ -177,14 +174,7 @@ export default {
       }
 
       try {
-        await authStore.register({
-          firstName: formData.value.nombres,
-          lastName: formData.value.apellidos,
-          email: formData.value.email,
-          password: formData.value.password
-        });
-
-        router.push('/');
+        router.push('/login');
       } catch (error) {
         console.error('Registration error:', error);
         alert('Error en el registro. Por favor intenta nuevamente.');
@@ -205,7 +195,7 @@ export default {
 <style scoped>
 .register-wrapper {
   min-height: 200vh;
-  background-color: #F5E1A4;
+  background-color: #FFF5E0;
 }
 
 .register-toolbar {
@@ -216,7 +206,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: #f5e1a4;
+  background: #feeac5;
   color: #000000;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -252,7 +242,7 @@ export default {
 }
 
 .language-button:hover {
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 249, 231, 0.982);
 }
 
 .language-icon {
@@ -289,7 +279,7 @@ export default {
   flex: 1;
   width: 100%;
   max-width: 400px;
-  background-color: #f5e1a4;
+  background-color: #FFF5E0;
   padding: 3rem;
   display: flex;
   flex-direction: column;

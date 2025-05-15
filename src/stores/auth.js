@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import AuthService from '@iam/services/authentication-api.service.js'
+import AuthService from '@/app/iam/services/authentication-api.service.js'
 import {useRouter} from "vue-router";
 
 

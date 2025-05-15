@@ -91,12 +91,8 @@ export default {
 
     const handleLogin = async () => {
       try {
-        await authStore.login({
-          email: email.value,
-          password: password.value,
-          remember: rememberMe.value
-        });
-        router.push('/');
+        // Simplemente redirige al dashboard sin validar credenciales
+        router.push('/dashboard');
       } catch (error) {
         console.error('Login error:', error);
         // Aquí  manejar el error, mostrar notificación, etc.
@@ -104,8 +100,8 @@ export default {
     };
 
     const loginWithGoogle = () => {
-      // Implementar lógica de autenticación con Google
-      console.log('Login with Google');
+      // Redirige directamente al dashboard
+      router.push('/dashboard');
     };
 
     return {
@@ -123,7 +119,7 @@ export default {
 <style scoped>
 .register-wrapper {
   min-height: 200vh;
-  background-color: #F5E1A4;
+  background-color: #FFF5E0;
 }
 .register-toolbar {
   position: fixed;
@@ -133,7 +129,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: #f5e1a4;
+  background: #feeac5;
   color: #000000;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);

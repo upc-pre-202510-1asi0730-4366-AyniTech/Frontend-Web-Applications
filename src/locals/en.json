@@ -38,17 +38,32 @@
     "automaticAlerts": "Automatic alerts",
     "multipleFormatPermission": "Permission to send notifications in multiple formats",
     "specificAlertPermission": "Specific alert configuration permission",
-    "minorRolesPermission": "Minor roles can receive alerts"
+    "minorRolesPermission": "Minor roles can receive alerts",
+    "logout": "Logout"
   },
   "dashboard": {
+    "welcome": "Welcome back",
+    "welcomeMorning": "Good morning",
+    "welcomeAfternoon": "Good afternoon",
+    "welcomeEvening": "Good evening",
     "totalProducts": "Total Products",
     "providerDate": "Provider Date",
-    "history": "History Movements",
+    "history": "History",
     "inventory": "Inventory",
     "expirationTitle": "Products Expiring Soon",
     "addProducts": "Add Products",
-    "kits": "Product Kits",
+    "kits": "Kits",
     "returns": "Product Returns",
     "stock": "Stock"
+  },
+  "navbar": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "search": "Search",
+    "alerts": "Alerts",
+    "support": "Support",
+    "profile": "Profile"
   }
 }

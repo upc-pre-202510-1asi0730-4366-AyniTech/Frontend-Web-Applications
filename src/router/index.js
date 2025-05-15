@@ -22,8 +22,12 @@ const routes = [
       path: '/dashboard',
       name: 'Dashboard',
       component: () => import('../app/product-management/components/main-dashboard.component.vue')
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: () => import('../app/iam/components/profile/Profile.component.vue')
     }
-
 ];
 
 const router = createRouter({

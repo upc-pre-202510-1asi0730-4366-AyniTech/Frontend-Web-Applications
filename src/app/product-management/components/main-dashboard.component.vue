@@ -1,6 +1,12 @@
 <template>
+  <NavbarComponent />
   <div class="dashboard">
     <div class="dashboard-content">
+      <div class="welcome-section">
+        <h1 class="welcome-title">{{ $t('dashboard.welcome') }}</h1>
+        <p class="welcome-subtitle">{{ getWelcomeMessage() }}</p>
+      </div>
+      
       <div class="stats-container">
         <div class="stat-card">
           <div class="stat-icon">
@@ -86,28 +92,90 @@
 <script>
 // Importación de PrimeIcons
 import 'primeicons/primeicons.css'
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'MainDashboard',
+  setup() {
+    const { t } = useI18n();
+    
+    const getWelcomeMessage = () => {
+      const hour = new Date().getHours();
+      
+      if (hour < 12) {
+        return t('dashboard.welcomeMorning');
+      } else if (hour < 18) {
+        return t('dashboard.welcomeAfternoon');
+      } else {
+        return t('dashboard.welcomeEvening');
+      }
+    };
+    
+    return {
+      getWelcomeMessage
+    };
+  },
   data() {
     return {
-    }
+      expiringProducts: [
+        {
+          name: 'Leche Deslactosada',
+          expirationDate: '15/03/2024'
+        }
+      ]
+    };
   },
   methods: {
+    navigateTo(route) {
+      console.log(`Navigating to ${route}`);
+    }
   }
 }
 </script>
 
 <style scoped>
 .dashboard {
-  padding: 3em 0 0 0;
+  padding-top: 3rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  padding-bottom: 3rem;
   font-family: 'Arial', sans-serif;
   width: 100%;
   display: flex;
-  gap: 8em;
+  gap: 5em;
   flex-direction: row;
   background-color: #FFF5E0;
   position: relative;
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  font-size: 1.5rem;
+  color: #666;
+  margin: 0;
+}
+
+.welcome-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: #E67E22;
+  border-radius: 2px;
 }
 
 .dashboard-content {
@@ -269,6 +337,7 @@ export default {
   margin-right: 1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   max-width: 450px;
+  margin-top: 3em;
 }
 
 .product-cards {

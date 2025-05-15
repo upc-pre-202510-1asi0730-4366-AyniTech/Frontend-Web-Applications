@@ -1,5 +1,6 @@
 import http from '@/shared/http-common';
-import {authHandlers} from "@iam/services/mock-api/handlers.js";
+import axios from 'axios';
+import {authHandlers} from "./mock-api/handlers.js";
 
 const useMockAPI = import.meta.env.VITE_USE_MOCK_API === 'true';
 
