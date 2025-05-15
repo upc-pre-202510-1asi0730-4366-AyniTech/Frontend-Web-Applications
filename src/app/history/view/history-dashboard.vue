@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchProductHistory } from '../services/history-api.service'
-import { fetchStockSummary } from '../services/stock-api.service'
-import HistoryCard from '../component/history-card.component.vue'
-import StockCard from '../component/stock-card.component.vue'
+import { fetchProductHistory } from '@/app/history/services/history-api.service'
+import { fetchStockSummary } from '@/app/history/services/stock-api.service'
+import HistoryCard from '@/app/history/component/history-card.component.vue'
+import StockCard from '@/app/history/component/stock-card.component.vue'
 
 const tipoGestion = ref('Producto')
 const fecha = ref('')
@@ -55,6 +55,7 @@ function filtrarResultados() {
 </script>
 
 <template>
+  <NavbarComponent />
   <div class="dashboard-container">
     <h2>Historial</h2>
 
@@ -96,24 +97,25 @@ function filtrarResultados() {
 
 .dashboard-container {
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Arial', sans-serif;
   min-height: calc(100vh - 70px);
-  margin-top: 240px;
+  padding: 3em; /* Espacio para el navbar global */
 }
 
 .toolbar {
   position: sticky;
-  top: 70px;
+  top: 70px;        /* sigue pegado justo debajo del navbar */
   z-index: 10;
   background-color: #EE7F27;
   padding: 1rem 2rem;
   display: flex;
-  margin-left: calc(-50vw + 50%);
   justify-content: space-between;
   align-items: center;
-  width: 97.5vw;
+  /* Compensa los 3em de padding horizontal del padre */
+  margin: 0 -3em;
   gap: 1rem;
 }
+
 
 h2 {
   margin-bottom: 1rem;

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import ModalConfirmExcelStock from '../../shared/modal.confirm.excel.stock.vue'
-import ModalConfirmTicketStock from '../../shared/modal.confirm.ticket.stock.vue'
+import ModalConfirmExcelStock from '@/shared/modal.confirm.excel.stock.vue'
+import ModalConfirmTicketStock from '@/shared/modal.confirm.ticket.stock.vue'
 
 const props = defineProps({
   s: Object

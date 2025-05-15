@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import ModalConfirmEditHistory from '../../shared/modal.confirm.edit.history.vue'
-import ModalConfirmDeleteHistory from '../../shared/modal.confirm.delete.history.vue'
+import ModalConfirmEditHistory from '@/shared/modal.confirm.edit.history.vue'
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue'
 
 const props = defineProps({ h: Object })
 

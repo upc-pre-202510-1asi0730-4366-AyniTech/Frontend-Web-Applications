@@ -25,6 +25,11 @@ const routes = [
       path: '/profile',
       name: 'Profile',
         component: Profile
+    },
+    {
+      path: '/history',
+      name: 'History',
+      component: () => import('@/app/history/view/history-dashboard.vue')
     }
 ];
 
