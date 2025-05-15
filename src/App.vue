@@ -1,11 +1,11 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import Profile from './app/iam/components/profile';
 </script>
 
 <template>
   <div id="app">
     <router-view/>
+
   </div>
 </template>
 
