@@ -39,5 +39,16 @@
     "multipleFormatPermission": "Permiso de envío de notificaciones en múltiples formatos",
     "specificAlertPermission": "Permiso de configuración específica de alerta",
     "minorRolesPermission": "Roles menores pueden recibir las alertas"
+  },
+  "dashboard": {
+    "totalProducts": "Total Productos",
+    "providerDate": "Fecha Proveedor",
+    "history": "Historial Movimientos",
+    "inventory": "Inventario",
+    "expirationTitle": "Próximos a Caducar",
+    "addProducts": "Agregar Productos",
+    "kits": "Kits Productos",
+    "returns": "Devolución de productos",
+    "stock": "Stock"
   }
 }

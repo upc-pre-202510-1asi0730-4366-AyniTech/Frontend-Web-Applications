@@ -39,5 +39,16 @@
     "multipleFormatPermission": "Permission to send notifications in multiple formats",
     "specificAlertPermission": "Specific alert configuration permission",
     "minorRolesPermission": "Minor roles can receive alerts"
+  },
+  "dashboard": {
+    "totalProducts": "Total Products",
+    "providerDate": "Provider Date",
+    "history": "History Movements",
+    "inventory": "Inventory",
+    "expirationTitle": "Products Expiring Soon",
+    "addProducts": "Add Products",
+    "kits": "Product Kits",
+    "returns": "Product Returns",
+    "stock": "Stock"
   }
 }
