@@ -1,21 +1,21 @@
 <template>
   <div class="register-wrapper">
-      <div class="register-toolbar">
-        <button @click="$router.back()" class="toolbar-button">
-          &larr; {{ $t('toolbar.back') }}
+    <div class="register-toolbar">
+      <button @click="$router.back()" class="toolbar-button">
+        &larr; {{ $t('toolbar.back') }}
+      </button>
+
+      <div class="toolbar-spacer"></div>
+      <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
+      <div class="toolbar-spacer"></div>
+
+      <div class="language-switcher">
+        <button @click="toggleLanguage" class="language-button">
+          <span class="language-icon">🌐</span>
+          <span class="language-text">{{ $t('toolbar.language') }}</span>
         </button>
-
-        <div class="toolbar-spacer"></div>
-        <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
-        <div class="toolbar-spacer"></div>
-
-        <div class="language-switcher">
-          <button @click="toggleLanguage" class="language-button">
-            <span class="language-icon">🌐</span>
-            <span class="language-text">{{ $t('toolbar.language') }}</span>
-          </button>
-        </div>
       </div>
+    </div>
 
     <div class="register-content">
 
@@ -25,97 +25,97 @@
         </button>
       </div>
 
-  <div class="register-container">
-    <h1>{{ $t('register.title') }}</h1>
+      <div class="register-container">
+        <h1>{{ $t('register.title') }}</h1>
 
-    <form @submit.prevent="handleSubmit" class="register-form">
-      <div class="form-group">
-        <label>{{ $t('register.firstName') }}</label>
-        <input
-            type="text"
-            id ="nombres"
-            v-model="formData.nombres"
-            placeholder= "Ingresa tus nombres"
-            required
-        >
-      </div>
+        <form @submit.prevent="handleSubmit" class="register-form">
+          <div class="form-group">
+            <label>{{ $t('register.firstName') }}</label>
+            <input
+                type="text"
+                id ="nombres"
+                v-model="formData.nombres"
+                placeholder= "Ingresa tus nombres"
+                required
+            >
+          </div>
 
-      <div class="form-group">
-        <label>{{ $t('register.lastName') }}</label>
-        <input
-            type="text"
-            id="apellidos"
-            v-model="formData.apellidos"
-            placeholder="Ingresa tus apellidos"
-            required
-        >
-      </div>
+          <div class="form-group">
+            <label>{{ $t('register.lastName') }}</label>
+            <input
+                type="text"
+                id="apellidos"
+                v-model="formData.apellidos"
+                placeholder="Ingresa tus apellidos"
+                required
+            >
+          </div>
 
-      <div class="form-group">
-        <label>{{ $t('register.email') }}</label>
-        <input
-            type="email"
-            id="email"
-            v-model="formData.email"
-            placeholder="Ingresa tu correo electrónico"
-            required
-        >
-      </div>
+          <div class="form-group">
+            <label>{{ $t('register.email') }}</label>
+            <input
+                type="email"
+                id="email"
+                v-model="formData.email"
+                placeholder="Ingresa tu correo electrónico"
+                required
+            >
+          </div>
 
-      <div class="form-group">
-        <label>{{ $t('register.password') }}</label>
-        <input
-            type="password"
-            id="password"
-            v-model="formData.password"
-            placeholder="Ingresa tu contraseña"
-            required
-        >
-      </div>
+          <div class="form-group">
+            <label>{{ $t('register.password') }}</label>
+            <input
+                type="password"
+                id="password"
+                v-model="formData.password"
+                placeholder="Ingresa tu contraseña"
+                required
+            >
+          </div>
 
-      <div class="form-group">
-        <label>{{ $t('register.confirmPassword') }}</label>
-        <input
-            type="password"
-            id="confirmPassword"
-            v-model="formData.confirmPassword"
-            placeholder="Ingresa tu contraseña"
-            required
-        >
-      </div>
+          <div class="form-group">
+            <label>{{ $t('register.confirmPassword') }}</label>
+            <input
+                type="password"
+                id="confirmPassword"
+                v-model="formData.confirmPassword"
+                placeholder="Ingresa tu contraseña"
+                required
+            >
+          </div>
 
-      <div class="checkbox-group">
-        <input
-            type="checkbox"
-            id="terms"
-            v-model="formData.acceptedTerms"
-            required
-        >
-        <label>{{ $t('register.conditions') }}</label>
-      </div>
+          <div class="checkbox-group">
+            <input
+                type="checkbox"
+                id="terms"
+                v-model="formData.acceptedTerms"
+                required
+            >
+            <label>{{ $t('register.conditions') }}</label>
+          </div>
 
-      <div class="social-login">
-        <div class="divider">
-          <span class="divider-line"></span>
-          <span class="divider-text">o</span>
-          <span class="divider-line"></span>
+          <div class="social-login">
+            <div class="divider">
+              <span class="divider-line"></span>
+              <span class="divider-text">o</span>
+              <span class="divider-line"></span>
+            </div>
+
+            <GoogleLogin
+                :callback="handleGoogleSignIn"
+                :buttonConfig="googleButtonConfig"
+                class="google-login-btn"
+            />
+          </div>
+
+          <button type="submit" class="submit-btn">{{ $t('register.submit') }}
+          </button>
+        </form>
+
+        <div class="login-link">
+          {{ $t('register.account') }} <router-link to="/login">{{ $t('register.login') }}</router-link>
         </div>
-
-        <GoogleLogin
-            :callback="handleGoogleSignIn"
-            :buttonConfig="googleButtonConfig"
-            class="google-login-btn"
-        />
       </div>
-
-      <button type="submit" class="submit-btn">{{ $t('register.submit') }}
-      </button>
-    </form>
-
-    <div class="login-link">
-      {{ $t('register.account') }} <router-link to="/login">{{ $t('register.login') }}</router-link>
-    </div>
-  </div>
     </div>
   </div>
 </template>

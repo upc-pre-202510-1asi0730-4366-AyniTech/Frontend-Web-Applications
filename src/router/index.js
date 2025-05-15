@@ -4,7 +4,7 @@ import Login from '@/app/iam/components/login/Login.vue';
 
 const routes = [
     {
-        path: '/register',
+        path: '/',
         name: 'Register',
         component: Register
     },

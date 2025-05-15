@@ -64,7 +64,7 @@
     </form>
 
     <div class="register-link">
-      {{ $t('login.account') }} <router-link to="/register">{{ $t('login.submit') }}</router-link>
+      {{ $t('login.account') }} <router-link to="/">{{ $t('login.submit') }}</router-link>
     </div>
   </div>
   </div>
