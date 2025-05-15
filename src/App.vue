@@ -1,13 +1,13 @@
 <script setup>
-import Navbar from './app/shared/navbar.component.vue';
+import Navbar from './app/shared/navbar.component.vue'
+import HistoryDashboard from './app/history/view/history-dashboard.vue'
 </script>
 
 <template>
   <div class="app-container">
     <Navbar />
     <div class="content">
-      <h1>Bienvenido a StockWise</h1>
-      <p>Sistema de gestión de inventario</p>
+      <HistoryDashboard />
     </div>
   </div>
 </template>
