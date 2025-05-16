@@ -194,8 +194,10 @@ export default {
 
 <style scoped>
 .register-wrapper {
-  min-height: 200vh;
+  min-height: 100vh;
   background-color: #FFF5E0;
+  display: flex;
+  flex-direction: column;
 }
 
 .register-toolbar {
@@ -216,12 +218,22 @@ export default {
 .toolbar-button {
   background: none;
   border: none;
-  color: #302325;
+  color: #333;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   margin-right: auto;
 }
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-title {
+  font-weight: 600;
+  color: #333;
+}
+
 .language-selector {
   margin-left: auto;
   margin-right: 1rem;
@@ -254,9 +266,12 @@ export default {
   font-weight: 600;
   margin-left: 1rem;
 }
+
 .register-content {
   display: flex;
-  height: calc(100vh - 60px);
+  margin-top: 60px;
+  flex: 1;
+  padding: 2rem 0;
 }
 
 /* Sección de imagen */
@@ -267,6 +282,7 @@ export default {
   align-items: center;
   justify-content: center;
   position: relative;
+  padding: 2rem;
 }
 
 .hero-image {
@@ -278,20 +294,21 @@ export default {
 .register-container {
   flex: 1;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   background-color: #FFF5E0;
-  padding: 3rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: 0 auto;
 }
 
 h1 {
-  color: #302325;
+  color: #333;
   margin-bottom: 2rem;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 700;
   text-align: left;
-
 }
 .register-form {
   max-width: 400px;
@@ -306,7 +323,7 @@ h1 {
 label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #302325;
+  color: #333;
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -356,7 +373,7 @@ input[type="password"]:focus {
 }
 
 .submit-btn {
-  background-color: #bc162a;
+  background-color: #c1121f;
   color: #ffffff;
   width: 100%;
   padding: 1rem;
@@ -365,18 +382,25 @@ input[type="password"]:focus {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
   margin-top: 1rem;
-  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submit-btn:hover {
-  background-color: #ee7f27;
+  background-color: #9e1223;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.login-link {
+  margin-top: 1.5rem;
+  color: #333;
+  text-align: center;
+}
 
 .login-link a {
-  color: #646cff;
+  color: #c1121f;
   text-decoration: none;
   font-weight: 600;
   margin-left: 0.3rem;
@@ -411,27 +435,38 @@ input[type="password"]:focus {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .register-wrapper {
+  .register-content {
     flex-direction: column;
     height: auto;
+    padding: 1rem;
   }
 
   .register-hero {
     padding: 1rem;
-    height: 200px;
+    height: auto;
+    flex: 0 0 auto;
+    margin-bottom: 2rem;
+  }
+
+  .hero-image {
+    max-width: 60%;
+    max-height: 200px;
   }
 
   .register-container {
-    padding: 2rem;
+    padding: 1.5rem;
+    max-width: 100%;
   }
 
   h1 {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
+    text-align: center;
   }
 
   .submit-btn, .google-btn {
-    padding: 1rem;
+    padding: 0.8rem;
   }
+
   .change-plan-btn {
     position: relative;
     bottom: auto;
@@ -444,18 +479,20 @@ input[type="password"]:focus {
   bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #ee7f27;
+  background-color: #c1121f;
   color: white;
   padding: 8px 20px;
   border: none;
   border-radius: 20px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .change-plan-btn:hover {
   background-color: #9e1223;
   transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 </style>

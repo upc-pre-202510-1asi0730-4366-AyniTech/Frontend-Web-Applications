@@ -140,7 +140,7 @@ export default {
 .profile-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 50vh;
+  min-height: 100vh;
   background-color: #FFF6E6;
   padding-top: 80px; /* Para dejar espacio para el navbar fijo */
 }
@@ -149,6 +149,7 @@ export default {
   display: flex;
   justify-content: center;
   flex: 1;
+  padding: 2rem;
 }
 
 .profile-container {
@@ -157,6 +158,8 @@ export default {
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .profile-section, .settings-section {
@@ -164,7 +167,7 @@ export default {
   border-radius: 15px;
   padding: 2.5rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  min-width: 380px;
+  min-width: 300px;
   flex: 1;
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -185,6 +188,8 @@ export default {
   font-size: 1.8rem;
   margin: 0;
   align-self: flex-start;
+  font-weight: 700;
+  color: #333;
 }
 
 .profile-avatar {
@@ -290,31 +295,31 @@ export default {
 }
 
 .change-profile-btn {
-  background-color: #D32F2F;
+  background-color: #c1121f;
   color: white;
 }
 
 .change-profile-btn:hover {
-  background-color: #b71c1c;
+  background-color: #9e1223;
 }
 
 .change-plan-btn {
-  background-color: #E67E22;
+  background-color: #c1121f;
   color: white;
 }
 
 .change-plan-btn:hover {
-  background-color: #d35400;
+  background-color: #9e1223;
 }
 
 .logout-btn {
-  background-color: #747474;
+  background-color: #6c757d;
   color: white;
   margin-top: 1rem;
 }
 
 .logout-btn:hover {
-  background-color: #D32F2F;
+  background-color: #c1121f;
 }
 
 .settings-header {
@@ -402,10 +407,38 @@ export default {
 }
 
 input:checked + .toggle-slider {
-  background-color: #4CAF50;
+  background-color: #c1121f;
 }
 
 input:checked + .toggle-slider:before {
   transform: translateX(28px);
+}
+
+@media (max-width: 768px) {
+  .profile-content {
+    padding: 1rem;
+  }
+
+  .profile-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .profile-section, .settings-section {
+    min-width: 100%;
+    padding: 1.5rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    margin-top: 0.5rem;
+  }
+
+  .info-label {
+    width: 120px;
+  }
 }
 </style> 

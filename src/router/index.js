@@ -30,6 +30,11 @@ const routes = [
       path: '/history',
       name: 'History',
       component: () => import('@/app/history/view/history-dashboard.vue')
+    },
+    {
+      path: '/inventory',
+      name: 'Inventory',
+      component: () => import('@/app/inventory/views/inventory.route.vue')
     }
 ];
 

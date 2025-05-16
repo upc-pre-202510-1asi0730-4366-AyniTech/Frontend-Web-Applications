@@ -118,9 +118,12 @@ export default {
 
 <style scoped>
 .register-wrapper {
-  min-height: 200vh;
+  min-height: 100vh;
   background-color: #FFF5E0;
+  display: flex;
+  flex-direction: column;
 }
+
 .register-toolbar {
   position: fixed;
   top: 0;
@@ -145,6 +148,15 @@ export default {
   cursor: pointer;
   margin-right: auto;
 }
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-title {
+  font-weight: 600;
+}
+
 .language-selector {
   margin-left: auto;
   margin-right: 1rem;
@@ -171,16 +183,24 @@ export default {
 .language-icon {
   font-size: 1.1rem;
 }
+
 .login-container {
   max-width: 400px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  margin-top: 80px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 h1 {
-  color: #302325;
+  color: #333;
   margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .login-form {
@@ -197,8 +217,8 @@ h1 {
 }
 
 label {
-  color: #302325;
-  font-weight: bold;
+  color: #333;
+  font-weight: 600;
 }
 
 input[type="email"],
@@ -229,9 +249,10 @@ input[type="password"]:focus {
 }
 
 .forgot-password {
-  color: #020fff;
+  color: #c1121f;
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .forgot-password:hover {
@@ -239,18 +260,21 @@ input[type="password"]:focus {
 }
 
 .login-button {
-  background-color: #EE7F27;
+  background-color: #c1121f;
   color: white;
   padding: 0.8rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .login-button:hover {
-  background-color: #BC162A;
+  background-color: #9e1223;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .divider {
@@ -283,17 +307,20 @@ input[type="password"]:focus {
   justify-content: center;
   gap: 0.5rem;
   background-color: white;
-  color: #302325;
+  color: #333;
   padding: 0.8rem;
-  border: 1px solid #D9D593;
-  border-radius: 4px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .google-button:hover {
-  background-color: #F5E1A4;
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .google-button img {
@@ -303,16 +330,41 @@ input[type="password"]:focus {
 
 .register-link {
   margin-top: 1.5rem;
-  color: #302325;
+  color: #333;
 }
 
 .register-link a {
-  color: #BC162A;
+  color: #c1121f;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .register-link a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1.5rem;
+    margin-top: 70px;
+  }
+
+  .login-form {
+    gap: 1rem;
+  }
+
+  .options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .forgot-password {
+    align-self: flex-end;
+  }
+
+  h1 {
+    margin-bottom: 1.5rem;
+  }
 }
 </style>

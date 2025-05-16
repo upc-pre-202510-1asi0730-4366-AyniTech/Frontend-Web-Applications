@@ -5,11 +5,10 @@ import { RouterView } from 'vue-router'
 <template>
   <div id="app">
     <router-view/>
-
   </div>
 </template>
 
-<style scoped>
+<style>
 :root {
   color-scheme: light;
 }
@@ -17,13 +16,27 @@ import { RouterView } from 'vue-router'
 body {
   color: #212529;
   margin: 0;
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   line-height: 1.5;
+  background-color: #FFF5E0;
 }
 
 #app {
   min-height: 100vh;
-  padding: 2rem 0 0 0;
-  display: flex;
+}
+
+/* Estilos globales para tipografía consistente */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, select, textarea, label {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Estilos para enlaces, botones, etc. para mantener consistencia */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: 'Arial', sans-serif;
 }
 </style>
