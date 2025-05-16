@@ -24,7 +24,7 @@ const navigateTo = (route) => {
       <a class="nav-link search">
         <i class="pi pi-search"></i> {{ $t('navbar.search') }}
       </a>
-      <a class="nav-link">
+      <a @click="navigateTo('/alerts')" class="nav-link alerts">
         <i class="pi pi-bell"></i> {{ $t('navbar.alerts') }}
       </a>
       <a class="nav-link">{{ $t('navbar.support') }}</a>

@@ -35,7 +35,14 @@ const routes = [
       path: '/inventory',
       name: 'Inventory',
       component: () => import('@/app/inventory/views/inventory.route.vue')
+
+    },
+    {	
+        path: '/alerts',
+        name: 'StockAlert',
+        component: () => import('@/app/stock-alert/views/stockAlert.view.vue')
     }
+
 ];
 
 const router = createRouter({
