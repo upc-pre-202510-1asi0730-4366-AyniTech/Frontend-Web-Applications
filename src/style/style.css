@@ -1,0 +1,7 @@
+body {
+    margin: 0;
+    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
