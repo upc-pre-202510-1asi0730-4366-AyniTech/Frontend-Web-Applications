@@ -55,7 +55,6 @@ function filtrarResultados() {
 </script>
 
 <template>
-  <NavbarComponent />
   <div class="dashboard-container">
     <h2>Historial</h2>
 

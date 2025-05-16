@@ -1,9 +1,18 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
+import NavbarComponent from './shared/navbar.component.vue';
+import { computed } from 'vue';
+
+const route = useRoute();
+const showNavbar = computed(() => {
+  // No mostrar navbar en login o register
+  return !['Login', 'Register'].includes(route.name);
+});
 </script>
 
 <template>
   <div id="app">
+    <NavbarComponent v-if="showNavbar" />
     <router-view/>
   </div>
 </template>

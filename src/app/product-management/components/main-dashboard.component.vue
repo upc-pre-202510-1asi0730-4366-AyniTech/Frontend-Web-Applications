@@ -1,5 +1,4 @@
 <template>
-  <NavbarComponent />
   <div class="dashboard">
     <div class="dashboard-content">
       <div class="welcome-section">

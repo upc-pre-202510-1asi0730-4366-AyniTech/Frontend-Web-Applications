@@ -141,5 +141,23 @@
     "confirmTitle": "¿Estás Seguro?",
     "continue": "CONTINUAR",
     "back": "VOLVER"
+  },
+  "kits": {
+    "title": "Combinar Productos en Kits",
+    "searchPlaceholder": "Buscar Productos",
+    "selectForKit": "Seleccionar para kit",
+    "existingProducts": "Productos existentes",
+    "product": "Producto",
+    "price": "Precio",
+    "inventory": "Inventario",
+    "add": "Añadir",
+    "createKit": "Crear Kit",
+    "kitName": "Nombre del Kit",
+    "kitDescription": "Descripción del Kit",
+    "totalPrice": "Precio Total",
+    "selectedProducts": "Productos Seleccionados",
+    "quantity": "Cantidad",
+    "remove": "Quitar",
+    "save": "Guardar Kit"
   }
 }

@@ -1,5 +1,4 @@
 <template>
-  <NavbarComponent />
   <div class="alert-container">
     <h2 class="page-title">Alerta Stock</h2>
 
@@ -21,10 +20,9 @@
 
 <script>
 import StockAlertCard from "../components/stockAlert-card.component.vue";
-import NavbarComponent from "@/shared/navbar.component.vue";
 
 export default {
-  components: { StockAlertCard, NavbarComponent },
+  components: { StockAlertCard },
   data() {
     return {
       search: "",

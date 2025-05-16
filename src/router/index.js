@@ -18,8 +18,7 @@ const routes = [
     {
       path: '/dashboard',
       name: 'Dashboard',
-        component: MainDashboardComponent
-
+        component: () => import('../app/product-management/components/main-dashboard.component.vue')
     },
     {
       path: '/profile',
@@ -37,20 +36,37 @@ const routes = [
       component: () => import('@/app/inventory/views/inventory.route.vue')
 
     },
-    {	
+    {    
         path: '/alerts',
         name: 'StockAlert',
         component: () => import('@/app/stock-alert/views/stockAlert.view.vue')
+    },
+    {
+        path: '/kits',
+        name: 'KitsProducts',
+        component: () => import('../app/kit-products/components/kit-products.component.vue')
+    },
+    {
+        path: '/alertas',
+        name: 'Alertas',
+        component: () => import('@/app/stock-alert/views/stockAlert.view.vue')
+    },
+    {
+        path: '/buscar',
+        name: 'Buscar',
+        component: () => import('../app/product-management/components/main-dashboard.component.vue') // Temporalmente redirige al dashboard
+    },
+    {
+        path: '/soporte',
+        name: 'Soporte',
+        component: () => import('../app/product-management/components/main-dashboard.component.vue') // Temporalmente redirige al dashboard
     }
-
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes
 });
-
-
 
 
 export default router;

@@ -1,14 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
+import 'primeicons/primeicons.css'
 import { useRouter } from 'vue-router';
-import 'primeicons/primeicons.css';
 
-const { t, locale } = useI18n();
 const router = useRouter();
-
-const toggleLanguage = () => {
-  locale.value = locale.value === 'es' ? 'en' : 'es';
-};
 
 const navigateTo = (route) => {
   router.push(route);
@@ -18,26 +12,20 @@ const navigateTo = (route) => {
 <template>
   <header class="dashboard-header">
     <div class="logo-container" @click="navigateTo('/dashboard')">
-      <img src="../assets/logo.svg" alt="StockWise" class="logo" />
+      <img src="../../assets/logo.svg" alt="StockWise" class="logo" />
     </div>
     <nav class="main-nav">
-      <a @click="navigateTo('/dashboard')" class="nav-link">{{ $t('navbar.home') }}</a>
+      <a @click="navigateTo('/dashboard')" class="nav-link">Inicio</a>
       <a @click="navigateTo('/buscar')" class="nav-link search">
-        <i class="pi pi-search"></i> {{ $t('navbar.search') }}
+        <i class="fas fa-search"></i> Buscar
       </a>
-      <a @click="navigateTo('/alertas')" class="nav-link alerts">
-        <i class="pi pi-bell"></i> {{ $t('navbar.alerts') }}
+      <a @click="navigateTo('/alertas')" class="nav-link">
+        <i class="fas fa-bell"></i> Alerta Stock
       </a>
-      <a @click="navigateTo('/soporte')" class="nav-link">{{ $t('navbar.support') }}</a>
-      
+      <a @click="navigateTo('/soporte')" class="nav-link">Soporte</a>
       <a @click="navigateTo('/profile')" class="nav-link user">
-        {{ $t('navbar.profile') }} <i class="pi pi-user"></i>
+        user
       </a>
-      <div class="language-switcher">
-        <button @click="toggleLanguage" class="language-button">
-          <span class="language-icon">🌐</span>
-        </button>
-      </div>
     </nav>
   </header>
 </template>
@@ -117,31 +105,6 @@ const navigateTo = (route) => {
 .user i {
   font-size: 1.2rem;
   margin-left: 0.25rem;
-}
-
-.language-switcher {
-  margin: 0 0.5rem;
-}
-
-.language-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.language-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.language-icon {
-  font-size: 1.1rem;
 }
 
 /* Para agregar los iconos de Font Awesome */

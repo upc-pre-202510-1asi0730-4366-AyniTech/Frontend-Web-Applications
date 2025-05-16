@@ -363,66 +363,66 @@ h2 {
   }
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
 
-.modal-window {
-  background: #FFF5E0;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
+  .modal-window {
+    background: #FFF5E0;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+  }
 
-.form-content {
-  margin-top: 1rem;
-}
+  .form-content {
+    margin-top: 1rem;
+  }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
 
-.form-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
 
-.price-input {
-  position: relative;
-}
+  .price-input {
+    position: relative;
+  }
 
-.currency {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-}
+  .currency {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+  }
 
-.price-input .input-field {
-  padding-left: 2rem;
-}
+  .price-input .input-field {
+    padding-left: 2rem;
+  }
 
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-weight: 500;
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
 }
 
 @media (max-width: 768px) {

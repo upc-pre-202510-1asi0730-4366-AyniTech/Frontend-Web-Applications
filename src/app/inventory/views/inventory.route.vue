@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-import NavbarComponent from '@/shared/navbar.component.vue';
 import ProductInventoryView from "./product-inventory.view.vue";
 import LotInventory from "./lot-intentory.view.vue";
 
@@ -9,7 +8,6 @@ const currentView = ref('product'); // 'product' o 'lot'
 
 <template>
   <div class="app-container">
-    <NavbarComponent />
     <div class="content">
       <div class="view-selector">
         <button
