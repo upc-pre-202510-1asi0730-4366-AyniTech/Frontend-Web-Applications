@@ -48,20 +48,19 @@ export default {
   data() {
     return {
       products: [
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'}
+        {name: 'Jugo de Naranja', price: 's/. 3.50', stock: '30 Stock'},
+        {name: 'Jugo de Mango', price: 's/. 3.50', stock: '15 Stock'},
+        {name: 'Leche Entera', price: 's/. 4.20', stock: '25 Stock'},
+        {name: 'Galletas de chocolate', price: 's/. 2.50', stock: '6 Stock'},
+        {name: 'Fideos', price: 's/. 2', stock: '34 Stock'},
+        {name: 'Jugo de Mandarina', price: 's/. 3.50', stock: '35 Stock'},
+        {name: 'Jugo de Durazno', price: 's/. 3.50', stock: '11 Stock'}
       ],
       selectedProducts: []
     }
   },
   methods: {
     addToKit(productIndex) {
-      // Implementar la lógica para añadir al kit
       const product = this.products[productIndex];
       this.selectedProducts.push({...product, quantity: 1});
       console.log('Producto añadido al kit', product);
