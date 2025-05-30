@@ -1,13 +1,14 @@
 <template>
+  <NavbarComponent/>
   <div class="alert-container">
-    <h2 class="page-title">Alerta Stock</h2>
+    <h2 class="page-title">{{ $t('alerts.title') }}</h2>
 
     <div class="search-bar">
       <i class="pi pi-search"></i>
       <input
           v-model="search"
           type="text"
-          placeholder="Buscar Alertas"
+          :placeholder="$t('alerts.search')"
           class="search-input"
       />
     </div>
@@ -20,9 +21,25 @@
 
 <script>
 import StockAlertCard from "../components/stockAlert-card.component.vue";
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 export default {
   components: { StockAlertCard },
+
+  setup() {
+    const { locale } = useI18n();
+    const router = useRouter();
+
+    const toggleLanguage = () => {
+      locale.value = locale.value === 'es' ? 'en' : 'es';
+    };
+
+    return {
+      toggleLanguage
+    };
+  },
+
   data() {
     return {
       search: "",
@@ -115,6 +132,10 @@ export default {
   outline: none;
   font-size: 1rem;
   width: 100%;
+}
+.search-input::placeholder {
+  color: #555;
+  opacity: 1;
 }
 </style>
 <style>

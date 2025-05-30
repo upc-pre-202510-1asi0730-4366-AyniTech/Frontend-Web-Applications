@@ -3,7 +3,7 @@ import Register from '@/app/iam/components/register/Register.vue';
 import Login from '@/app/iam/components/login/Login.vue';
 import MainDashboardComponent from "@/app/product-management/components/main-dashboard.component.vue";
 import {Profile} from "@iam/components/profile/index.js";
-
+import stockAlertView from "@/app/stock-alert/views/stockAlert.view.vue";
 const routes = [
     {
         path: '/',
@@ -34,7 +34,7 @@ const routes = [
     {
         path: '/alerts',
         name: 'StockAlert',
-        component: () => import('@/app/stock-alert/views/stockAlert.view.vue')
+        component: stockAlertView
     }
 
 ];
