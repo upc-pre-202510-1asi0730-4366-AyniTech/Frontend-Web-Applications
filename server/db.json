@@ -1,0 +1,339 @@
+{
+  "inventories": [
+    {
+      "id": 2,
+      "category": "Limpieza",
+      "product": "Lavavajillas",
+      "entryDate": "2025-04-30T00:00:00.000Z",
+      "quantity": 72,
+      "unitPrice": 40.45,
+      "minStock": 8,
+      "unit": "kg",
+      "supplier": "Campos Verdes SAC"
+    },
+    {
+      "id": 3,
+      "category": "Granos",
+      "product": "Frijoles negros",
+      "entryDate": "2025-05-08T00:00:00.000Z",
+      "quantity": 55,
+      "unitPrice": 23.56,
+      "minStock": 14,
+      "unit": "kg",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 4,
+      "category": "Snacks",
+      "product": "Chifles",
+      "entryDate": "2025-04-16T00:00:00.000Z",
+      "quantity": 32,
+      "unitPrice": 22.5,
+      "minStock": 18,
+      "unit": "pack",
+      "supplier": "Campos Verdes SAC"
+    },
+    {
+      "id": 5,
+      "category": "Snacks",
+      "product": "Galletas",
+      "entryDate": "2025-04-08T00:00:00.000Z",
+      "quantity": 99,
+      "unitPrice": 28.64,
+      "minStock": 14,
+      "unit": "unidad",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 6,
+      "category": "Limpieza",
+      "product": "Cloro",
+      "entryDate": "2025-04-28T00:00:00.000Z",
+      "quantity": 94,
+      "unitPrice": 3.03,
+      "minStock": 9,
+      "unit": "kg",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 7,
+      "category": "Verduras",
+      "product": "Zanahoria",
+      "entryDate": "2025-04-05T00:00:00.000Z",
+      "quantity": 65,
+      "unitPrice": 29.13,
+      "minStock": 10,
+      "unit": "unidad",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 8,
+      "category": "Bebidas",
+      "product": "Jugo de naranja",
+      "entryDate": "2025-04-15T00:00:00.000Z",
+      "quantity": 19,
+      "unitPrice": 39.52,
+      "minStock": 16,
+      "unit": "kg",
+      "supplier": "AgroPerú"
+    },
+    {
+      "id": 9,
+      "category": "Snacks",
+      "product": "Barra de cereal",
+      "entryDate": "2025-04-01T00:00:00.000Z",
+      "quantity": 14,
+      "unitPrice": 9.36,
+      "minStock": 12,
+      "unit": "litros",
+      "supplier": "Global Snacks"
+    },
+    {
+      "id": 10,
+      "category": "Granos",
+      "product": "Lentejas",
+      "entryDate": "2025-04-24T00:00:00.000Z",
+      "quantity": 47,
+      "unitPrice": 46.56,
+      "minStock": 12,
+      "unit": "kg",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 11,
+      "category": "Lácteos",
+      "product": "Mantequilla",
+      "entryDate": "2025-04-24T00:00:00.000Z",
+      "quantity": 69,
+      "unitPrice": 34.15,
+      "minStock": 14,
+      "unit": "pack",
+      "supplier": "CleanHouse Pro"
+    },
+    {
+      "id": 12,
+      "category": "Bebidas",
+      "product": "Café en botella",
+      "entryDate": "2025-04-18T00:00:00.000Z",
+      "quantity": 23,
+      "unitPrice": 36.99,
+      "minStock": 13,
+      "unit": "kg",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 13,
+      "category": "Frutas",
+      "product": "Naranja",
+      "entryDate": "2025-04-29T00:00:00.000Z",
+      "quantity": 39,
+      "unitPrice": 23.77,
+      "minStock": 10,
+      "unit": "kg",
+      "supplier": "Global Snacks"
+    },
+    {
+      "id": 14,
+      "category": "Snacks",
+      "product": "Chifles",
+      "entryDate": "2025-05-01T00:00:00.000Z",
+      "quantity": 23,
+      "unitPrice": 50,
+      "minStock": 17,
+      "unit": "pack",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 15,
+      "category": "Snacks",
+      "product": "Papas fritas",
+      "entryDate": "2025-04-22T00:00:00.000Z",
+      "quantity": 24,
+      "unitPrice": 37.41,
+      "minStock": 16,
+      "unit": "unidad",
+      "supplier": "FreshFruit Export"
+    },
+    {
+      "id": 16,
+      "category": "Verduras",
+      "product": "Tomate",
+      "entryDate": "2025-04-15T00:00:00.000Z",
+      "quantity": 66,
+      "unitPrice": 29.57,
+      "minStock": 9,
+      "unit": "kg",
+      "supplier": "CleanHouse Pro"
+    },
+    {
+      "id": 17,
+      "category": "Bebidas",
+      "product": "Jugo de naranja",
+      "entryDate": "2025-04-26T00:00:00.000Z",
+      "quantity": 91,
+      "unitPrice": 8.27,
+      "minStock": 15,
+      "unit": "pack",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 18,
+      "category": "Verduras",
+      "product": "Tomate",
+      "entryDate": "2025-04-29T00:00:00.000Z",
+      "quantity": 83,
+      "unitPrice": 38.05,
+      "minStock": 19,
+      "unit": "unidad",
+      "supplier": "FreshFruit Export"
+    },
+    {
+      "id": 19,
+      "category": "Frutas",
+      "product": "Plátano",
+      "entryDate": "2025-05-10T00:00:00.000Z",
+      "quantity": 89,
+      "unitPrice": 26.05,
+      "minStock": 14,
+      "unit": "litros",
+      "supplier": "CleanHouse Pro"
+    },
+    {
+      "id": 20,
+      "category": "Bebidas",
+      "product": "Café en botella",
+      "entryDate": "2025-04-24T00:00:00.000Z",
+      "quantity": 86,
+      "unitPrice": 39.39,
+      "minStock": 11,
+      "unit": "unidad",
+      "supplier": "EcoAndes"
+    },
+    {
+      "id": 21,
+      "category": "Limpieza",
+      "product": "Limpiador multiusos",
+      "entryDate": "2025-05-04T00:00:00.000Z",
+      "quantity": 33,
+      "unitPrice": 25.89,
+      "minStock": 8,
+      "unit": "litros",
+      "supplier": "EcoAndes"
+    },
+    {
+      "id": 22,
+      "category": "Lácteos",
+      "product": "Queso fresco",
+      "entryDate": "2025-05-11T00:00:00.000Z",
+      "quantity": 62,
+      "unitPrice": 12.04,
+      "minStock": 12,
+      "unit": "pack",
+      "supplier": "Campos Verdes SAC"
+    },
+    {
+      "id": 23,
+      "category": "Verduras",
+      "product": "Espinaca",
+      "entryDate": "2025-04-29T00:00:00.000Z",
+      "quantity": 77,
+      "unitPrice": 36.75,
+      "minStock": 17,
+      "unit": "litros",
+      "supplier": "Global Snacks"
+    },
+    {
+      "id": 24,
+      "category": "Lácteos",
+      "product": "Leche entera",
+      "entryDate": "2025-04-19T00:00:00.000Z",
+      "quantity": 94,
+      "unitPrice": 26.83,
+      "minStock": 7,
+      "unit": "pack",
+      "supplier": "Distribuidora Lima"
+    },
+    {
+      "id": 25,
+      "category": "Frutas",
+      "product": "Manzana",
+      "entryDate": "2025-04-03T00:00:00.000Z",
+      "quantity": 85,
+      "unitPrice": 18.21,
+      "minStock": 6,
+      "unit": "kg",
+      "supplier": "Campos Verdes SAC"
+    },
+    {
+      "id": 26,
+      "category": "Limpieza",
+      "product": "Limpiador multiusos",
+      "entryDate": "2025-04-12T00:00:00.000Z",
+      "quantity": 80,
+      "unitPrice": 8.59,
+      "minStock": 19,
+      "unit": "litros",
+      "supplier": "FreshFruit Export"
+    },
+    {
+      "id": 27,
+      "category": "Limpieza",
+      "product": "Limpiador multiusos",
+      "entryDate": "2025-04-15T00:00:00.000Z",
+      "quantity": 26,
+      "unitPrice": 42.01,
+      "minStock": 12,
+      "unit": "unidad",
+      "supplier": "Campos Verdes SAC"
+    },
+    {
+      "id": 28,
+      "category": "Frutas",
+      "product": "Plátano",
+      "entryDate": "2025-04-13T00:00:00.000Z",
+      "quantity": 85,
+      "unitPrice": 6.51,
+      "minStock": 7,
+      "unit": "unidad",
+      "supplier": "EcoAndes"
+    },
+    {
+      "id": 29,
+      "category": "Snacks",
+      "product": "Galletas",
+      "entryDate": "2025-04-19T00:00:00.000Z",
+      "quantity": 38,
+      "unitPrice": 29.05,
+      "minStock": 14,
+      "unit": "kg",
+      "supplier": "EcoAndes"
+    },
+    {
+      "id": 30,
+      "category": "Frutas",
+      "product": "Mango",
+      "entryDate": "2025-04-14T00:00:00.000Z",
+      "quantity": 46,
+      "unitPrice": 33.86,
+      "minStock": 5,
+      "unit": "pack",
+      "supplier": "CleanHouse Pro"
+    }
+  ],
+  "comments": [
+    {
+      "id": 2,
+      "lotId": 2,
+      "product": "Lavavajillas",
+      "user": "henry",
+      "text": "jijija"
+    },
+    {
+      "id": 3,
+      "lotId": 2,
+      "product": "Lavavajillas",
+      "user": "User",
+      "text": "ya"
+    }
+  ]
+}
