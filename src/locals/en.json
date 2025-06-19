@@ -133,6 +133,10 @@
   },
   "alerts": {
     "title": "Stock Alerts",
+    "catalert": "Alert category",
+    "catproduct": "Product Category",
+    "product": "Product",
+    "date": "Alert date",
     "search": "Search Alerts",
     "details": "Details",
     "accept": "Accept",

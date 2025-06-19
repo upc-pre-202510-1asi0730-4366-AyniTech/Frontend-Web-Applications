@@ -133,6 +133,10 @@
   },
   "alerts": {
     "title": "Alerta Stock",
+    "catalert": "Categoría de alerta",
+    "catproduct": "Categoría de producto",
+    "product": "Producto",
+    "date": "Fecha de alerta",
     "search": "Buscar Alertas",
     "details": "Detalles",
     "accept": "Aceptar",
