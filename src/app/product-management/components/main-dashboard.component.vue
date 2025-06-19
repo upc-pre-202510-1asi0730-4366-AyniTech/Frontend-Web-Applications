@@ -1,5 +1,4 @@
 <template>
-  <NavbarComponent />
   <div class="dashboard">
     <div class="dashboard-content">
       <div class="welcome-section">
@@ -93,11 +92,13 @@
 // Importación de PrimeIcons
 import 'primeicons/primeicons.css'
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'MainDashboard',
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
     
     const getWelcomeMessage = () => {
       const hour = new Date().getHours();
@@ -111,8 +112,24 @@ export default {
       }
     };
     
+    const navigateTo = (route) => {
+      console.log(`Navigating to ${route}`);
+      if (route === 'history') {
+        router.push('/history');
+      } else if (route === 'inventory') {
+        router.push('/inventory');
+      } else if (route === 'add-product') {
+        router.push('/add-product');
+      } else if (route === 'kits') {
+        router.push('/kits');
+      } else if (route === 'returns') {
+        router.push('/returns');
+      }
+    };
+    
     return {
-      getWelcomeMessage
+      getWelcomeMessage,
+      navigateTo
     };
   },
   data() {
@@ -124,11 +141,6 @@ export default {
         }
       ]
     };
-  },
-  methods: {
-    navigateTo(route) {
-      console.log(`Navigating to ${route}`);
-    }
   }
 }
 </script>

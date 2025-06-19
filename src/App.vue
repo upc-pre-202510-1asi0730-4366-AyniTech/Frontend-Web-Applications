@@ -1,15 +1,23 @@
 <script setup>
-import { RouterView } from 'vue-router'
-import Profile from './app/iam/components/profile';
+import { RouterView, useRoute } from 'vue-router'
+import NavbarComponent from './shared/navbar.component.vue';
+import { computed } from 'vue';
+
+const route = useRoute();
+const showNavbar = computed(() => {
+  // No mostrar navbar en login o register
+  return !['Login', 'Register'].includes(route.name);
+});
 </script>
 
 <template>
   <div id="app">
+    <NavbarComponent v-if="showNavbar" />
     <router-view/>
   </div>
 </template>
 
-<style scoped>
+<style>
 :root {
   color-scheme: light;
 }
@@ -17,13 +25,27 @@ import Profile from './app/iam/components/profile';
 body {
   color: #212529;
   margin: 0;
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   line-height: 1.5;
+  background-color: #FFF5E0;
 }
 
 #app {
   min-height: 100vh;
-  padding: 2rem 0 0 0;
-  display: flex;
+}
+
+/* Estilos globales para tipografía consistente */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, select, textarea, label {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Estilos para enlaces, botones, etc. para mantener consistencia */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: 'Arial', sans-serif;
 }
 </style>
