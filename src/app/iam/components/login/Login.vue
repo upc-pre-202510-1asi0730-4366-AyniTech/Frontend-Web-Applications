@@ -75,7 +75,8 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.js';
 import {useI18n} from "vue-i18n";
-import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
+import authApi from "@iam/services/authentication-api.service.js";
+//import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
 
 export default {
   setup() {
@@ -84,7 +85,6 @@ export default {
     const rememberMe = ref(false);
     const router = useRouter();
     const authStore = useAuthStore();
-    const authApi = new AuthenticationApiService();
     const {locale} = useI18n()
 
     const toggleLanguage = () => {
@@ -93,17 +93,15 @@ export default {
 
     const handleLogin = async () => {
       try {
-        const res = await authApi.login(email.value, password.value);
-
-        if (res.data.length > 0) {
+        const res = await authApi.login({ email: email.value, password: password.value });
+        if (res.user) {
           await router.push('/dashboard');
-        }
-       else{
-         alert("Error")
+        } else {
+          alert("Correo o contraseña incorrectos");
         }
       } catch (error) {
-        console.error('Login error:', error);
-        // Aquí  manejar el error, mostrar notificación, etc.
+        console.error('Error en login:', error);
+        alert("Error en login: " + (error.message || error));
       }
     };
 

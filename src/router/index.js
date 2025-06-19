@@ -60,6 +60,11 @@ const routes = [
         path: '/soporte',
         name: 'Soporte',
         component: () => import('../app/product-management/components/main-dashboard.component.vue') // Temporalmente redirige al dashboard
+    },
+    {
+        path: '/seleccionar-plan',
+        name: 'PlanSelector',
+        component: () => import('@/app/iam/components/register/PlanSelector.vue')
     }
 ];
 

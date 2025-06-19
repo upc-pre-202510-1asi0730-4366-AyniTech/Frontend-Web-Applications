@@ -34,7 +34,7 @@
           
           <div class="profile-actions">
             <button class="action-btn change-profile-btn">{{ $t('profile.changeProfile') }}</button>
-            <button class="action-btn change-plan-btn">{{ $t('profile.changePlan') }}</button>
+            <button class="action-btn change-plan-btn" @click="goToPlanSelector">{{ $t('profile.changePlan') }}</button>
             <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
           </div>
         </div>
@@ -125,12 +125,17 @@ export default {
       // Aquí podría ir la lógica para cerrar sesión, limpiar datos, etc.
       router.push('/');
     };
+
+    const goToPlanSelector = () => {
+      router.push('/seleccionar-plan');
+    };
     
     return {
       toggleLanguage,
       userData,
       settings,
-      logout
+      logout,
+      goToPlanSelector
     };
   }
 };

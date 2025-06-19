@@ -21,7 +21,8 @@
 
       <div class="register-hero">
         <img src="@/assets/image4.png" alt="Ilustración de registro" class="hero-image">
-        <button class="change-plan-btn">{{ $t('register.changePlan') }}
+        <button class="change-plan-btn" @click="goToPlanSelector">
+          {{ $t('register.changePlan') }}
         </button>
       </div>
 
@@ -126,7 +127,8 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import {GoogleLogin} from "vue3-google-login";
 import {useI18n} from "vue-i18n";
-import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
+import authApi from "@iam/services/authentication-api.service.js";
+//import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
 
 export default {
   components: {
@@ -135,7 +137,7 @@ export default {
   setup() {
     const router = useRouter();
     const authStore = useAuthStore();
-    const authApi = new AuthenticationApiService();
+    //const authApi = new AuthenticationApiService();
     const {locale} = useI18n()
     const toggleLanguage = () => {
       locale.value = locale.value === 'es' ? 'en' : 'es'
@@ -176,12 +178,25 @@ export default {
       }
 
       try {
-        await authApi.register(formData.value.nombres, formData.value.apellidos, formData.value.email, formData.value.password);
+        await authApi.register(
+          formData.value.nombres,
+          formData.value.apellidos,
+          formData.value.email,
+          formData.value.password
+        );
         await router.push('/dashboard');
       } catch (error) {
-        console.error('Registration error:', error);
-        alert('Error en el registro. Por favor intenta nuevamente.');
+        if (error.message && error.message.includes('Email already registered')) {
+          alert('El correo ya está registrado. Serás redirigido al login.');
+          await router.push('/login');
+        } else {
+          alert('Error en el registro. Por favor intenta nuevamente.');
+        }
       }
+    };
+
+    const goToPlanSelector = () => {
+      router.push('/seleccionar-plan');
     };
 
     return {
@@ -189,7 +204,8 @@ export default {
       handleSubmit,
       googleButtonConfig,
       handleGoogleSignIn,
-      toggleLanguage
+      toggleLanguage,
+      goToPlanSelector
     };
   }
 };

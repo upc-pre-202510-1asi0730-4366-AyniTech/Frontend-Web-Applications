@@ -1,6 +1,7 @@
 import http from '@/shared/http-common';
 import axios from 'axios';
 import {authHandlers} from "../../../../server/handlers.js";
+import authApi from "@iam/services/authentication-api.service.js";
 
 const useMockAPI = import.meta.env.VITE_USE_MOCK_API === 'true';
 
@@ -42,7 +43,7 @@ export class AuthenticationApiService {
     }
 
     login(email, password) {
-        return http.get(`${this.endpoint}?email=${email}&password=${password}`);
+        return http.post('/auth/login', { email, password });
     }
 
 
