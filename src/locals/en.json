@@ -163,5 +163,71 @@
     "quantity": "Quantity",
     "remove": "Remove",
     "save": "Save Kit"
+  },
+  "products": {
+    "title": "Add Product",
+    "searchPlaceholder": "Search Products",
+    "filter": "Filter",
+    "stock": "Stock",
+    "detail": "Detail",
+    "selectTag": "Select tag",
+    "datePlaceholder": "DD/MM/YYYY",
+    "labels": {
+      "label": "Label",
+      "quantity": "Quantity",
+      "date": "Date",
+      "notes": "Notes"
+    },
+    "tags": {
+      "sweet": "Sweet",
+      "filled": "Filled",
+      "salty": "Salty",
+      "chocolate": "Chocolate",
+      "vanilla": "Vanilla",
+      "cookies": "Cookies"
+    },
+    "actions": {
+      "duplicate": "Duplicate",
+      "delete": "Delete"
+    }
+  },
+  "addProduct": {
+    "title": "Add Product",
+    "labels": {
+      "name": "Name",
+      "tags": "Tags",
+      "buyPrice": "Purchase price",
+      "sellPrice": "Selling price",
+      "quantity": "Quantity",
+      "batch": "Batch",
+      "expiryDate": "Expiry date",
+      "notes": "Notes"
+    },
+    "addTag": "Add",
+    "selectQuantity": "Select quantity",
+    "selectBatch": "Select batch",
+    "datePlaceholder": "DD/MM/YYYY",
+    "save": "Save",
+    "selectTag": "Select Tag",
+    "customTagPlaceholder": "Custom tag...",
+    "add": "Add",
+    "validationError": "Please complete the required fields",
+    "saveSuccess": "Product saved successfully",
+    "tags": {
+      "sweet": "Sweet",
+      "salty": "Salty",
+      "filled": "Filled",
+      "chocolate": "Chocolate",
+      "vanilla": "Vanilla",
+      "cookies": "Cookies"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close"
   }
 }

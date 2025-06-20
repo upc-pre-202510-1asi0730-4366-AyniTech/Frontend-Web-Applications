@@ -163,5 +163,71 @@
     "quantity": "Cantidad",
     "remove": "Quitar",
     "save": "Guardar Kit"
+  },
+  "products": {
+    "title": "Agregar Producto",
+    "searchPlaceholder": "Buscar Productos",
+    "filter": "Filtro",
+    "stock": "Stock",
+    "detail": "Detalle",
+    "selectTag": "Seleccionar etiqueta",
+    "datePlaceholder": "DD/MM/AAAA",
+    "labels": {
+      "label": "Etiqueta",
+      "quantity": "Cantidad",
+      "date": "Fecha",
+      "notes": "Notas"
+    },
+    "tags": {
+      "sweet": "Dulce",
+      "filled": "Rellenas",
+      "salty": "Salado",
+      "chocolate": "Chocolate",
+      "vanilla": "Vainilla",
+      "cookies": "Galletas"
+    },
+    "actions": {
+      "duplicate": "Duplicar",
+      "delete": "Eliminar"
+    }
+  },
+  "addProduct": {
+    "title": "Agregar Producto",
+    "labels": {
+      "name": "Nombre",
+      "tags": "Etiquetas",
+      "buyPrice": "Precio de compra",
+      "sellPrice": "Precio de venta",
+      "quantity": "Cantidad",
+      "batch": "Lote",
+      "expiryDate": "Fecha de caducidad",
+      "notes": "Nota"
+    },
+    "addTag": "Añadir",
+    "selectQuantity": "Seleccionar cantidad",
+    "selectBatch": "Seleccionar lote",
+    "datePlaceholder": "DD/MM/AAAA",
+    "save": "Guardar",
+    "selectTag": "Seleccionar Etiqueta",
+    "customTagPlaceholder": "Etiqueta personalizada...",
+    "add": "Agregar",
+    "validationError": "Por favor completa los campos obligatorios",
+    "saveSuccess": "Producto guardado exitosamente",
+    "tags": {
+      "sweet": "Dulce",
+      "salty": "Salado",
+      "filled": "Rellenas",
+      "chocolate": "Chocolate",
+      "vanilla": "Vainilla",
+      "cookies": "Galletas"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "close": "Cerrar"
   }
 }

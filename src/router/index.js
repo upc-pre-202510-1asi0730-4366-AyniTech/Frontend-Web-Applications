@@ -66,6 +66,16 @@ const routes = [
         path: '/seleccionar-plan',
         name: 'PlanSelector',
         component: () => import('@/app/iam/components/register/PlanSelector.vue')
+    },
+    {
+        path: '/products',
+        name: 'ProductList',
+        component: () => import('@/app/add-products/components/list-product/list-product.component.vue')
+    },
+    {
+        path: '/add-product',
+        name: 'AddProduct',
+        component: () => import('@/app/add-products/components/add-product/add-product.component.vue')
     }
 ];
 
