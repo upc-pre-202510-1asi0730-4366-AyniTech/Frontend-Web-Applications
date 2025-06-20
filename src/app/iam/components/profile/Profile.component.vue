@@ -8,19 +8,31 @@
           <h1>{{ $t('profile.title') }}</h1>
           
           <div class="profile-avatar">
-            <img src='@/assets/default-avatar.svg' alt="foto de perfil" class="avatar-image" />
-            <button class="edit-avatar-btn">
+            <img :src="avatarUrl" alt="foto de perfil" class="avatar-image" />
+            <button class="edit-avatar-btn" @click="triggerAvatarUpload">
               <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
             </button>
+            <input type="file" ref="avatarInput" @change="onAvatarChange" accept="image/*" style="display: none;" />
           </div>
           
           <div class="profile-info">
             <div class="info-row">
               <span class="info-label">{{ $t('profile.name') }}:</span>
-              <span class="info-value">{{ userData.name }}</span>
-              <button class="edit-info-btn">
-                <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
-              </button>
+              <template v-if="!isEditingName">
+                <span class="info-value">{{ userData.name }}</span>
+                <button class="edit-info-btn" @click="startEditingName">
+                  <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
+                </button>
+              </template>
+              <template v-else>
+                <div class="edit-name-container">
+                  <input type="text" v-model="newName" @keyup.enter="saveName" class="info-input" />
+                  <div class="edit-name-actions">
+                    <button class="btn-save" @click="saveName">Guardar</button>
+                    <button class="btn-cancel" @click="cancelEditingName">Cancelar</button>
+                  </div>
+                </div>
+              </template>
             </div>
             
             <div class="info-row">
@@ -98,6 +110,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import defaultAvatar from '@/assets/default-avatar.svg';
 
 export default {
   setup() {
@@ -113,6 +126,39 @@ export default {
       jobTitle: 'Administrador'
     });
     
+    const isEditingName = ref(false);
+    const newName = ref('');
+
+    const startEditingName = () => {
+      isEditingName.value = true;
+      newName.value = userData.value.name;
+    };
+
+    const saveName = () => {
+      userData.value.name = newName.value;
+      isEditingName.value = false;
+      // Aquí se podría llamar a una API para guardar el nombre
+    };
+    
+    const cancelEditingName = () => {
+      isEditingName.value = false;
+    };
+    
+    const avatarInput = ref(null);
+    const avatarUrl = ref(defaultAvatar);
+
+    const triggerAvatarUpload = () => {
+      avatarInput.value.click();
+    };
+
+    const onAvatarChange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        avatarUrl.value = URL.createObjectURL(file);
+        // Aquí se podría subir el archivo al servidor
+      }
+    };
+
     const settings = ref({
       notificationPermission: true,
       automaticAlerts: false,
@@ -135,7 +181,16 @@ export default {
       userData,
       settings,
       logout,
-      goToPlanSelector
+      goToPlanSelector,
+      isEditingName,
+      newName,
+      startEditingName,
+      saveName,
+      cancelEditingName,
+      avatarInput,
+      avatarUrl,
+      triggerAvatarUpload,
+      onAvatarChange
     };
   }
 };
@@ -243,12 +298,17 @@ export default {
   align-items: center;
   margin-bottom: 0.5rem;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .info-label {
   font-weight: 500;
   width: 150px;
   color: #666;
+  flex: 1;
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
 }
 
 .info-value {
@@ -256,6 +316,59 @@ export default {
   font-weight: 600;
   color: #333;
   font-size: 1.1rem;
+}
+
+.edit-name-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.info-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-name-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-save, .btn-cancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.btn-save {
+  color: white;
+  background-color: #ee7f27;
+}
+
+.btn-save:hover {
+  background-color: #9e1223;
+}
+
+.btn-cancel {
+  color: #6c757d;
+  background-color: #f1f1f1;
+}
+
+.btn-cancel:hover {
+  background-color: #e0e0e0;
 }
 
 .edit-info-btn {
