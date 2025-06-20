@@ -54,7 +54,7 @@
                 id="buyPrice"
                 type="number"
                 step="0.01"
-                v-model="product.buyPrice"
+                v-model.number="product.buyPrice"
                 class="form-input price"
                 placeholder="00.00"
             />
@@ -69,7 +69,7 @@
                 id="sellPrice"
                 type="number"
                 step="0.01"
-                v-model="product.sellPrice"
+                v-model.number="product.sellPrice"
                 class="form-input price"
                 placeholder="00.00"
             />
@@ -79,20 +79,13 @@
 
       <div class="form-group">
         <label for="quantity">{{ $t('addProduct.labels.quantity') }}</label>
-        <select
+        <input
             id="quantity"
-            v-model="product.quantity"
-            class="form-select"
+            type="number"
+            v-model.number="product.quantity"
+            class="form-input"
             required
-        >
-          <option value="">{{ $t('addProduct.selectQuantity') }}</option>
-          <option value="1">1</option>
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
+        />
       </div>
 
       <div class="form-group">
@@ -113,11 +106,9 @@
         <label for="expiryDate">{{ $t('addProduct.labels.expiryDate') }}</label>
         <input
             id="expiryDate"
-            type="text"
+            type="date"
             v-model="product.expiryDate"
-            :placeholder="$t('addProduct.datePlaceholder')"
             class="form-input"
-            pattern="\d{2}/\d{2}/\d{4}"
         />
       </div>
 
@@ -188,8 +179,8 @@ export default {
       product: {
         name: '',
         tags: [],
-        buyPrice: '',
-        sellPrice: '',
+        buyPrice: null,
+        sellPrice: null,
         quantity: '',
         batch: '',
         expiryDate: '',
@@ -213,8 +204,24 @@ export default {
         return;
       }
 
-      // Aquí normalmente harías la llamada al servicio para guardar
-      console.log('Saving product:', this.product);
+      // Get products from localStorage
+      let products = JSON.parse(localStorage.getItem('products')) || [];
+
+      // Create new product
+      const newProduct = {
+        id: Date.now(), // Simple way to generate a unique ID
+        name: this.product.name,
+        category: 'Golosina', // Hardcoding for now as it's not in the form
+        stock: this.product.quantity,
+        quantity: this.product.quantity,
+        expiryDate: this.product.expiryDate,
+        notes: this.product.notes,
+        tags: this.product.tags,
+      };
+
+      // Add new product and save back to localStorage
+      products.push(newProduct);
+      localStorage.setItem('products', JSON.stringify(products));
 
       // Simular guardado exitoso
       alert(this.$t('addProduct.saveSuccess'));
@@ -249,39 +256,31 @@ export default {
 <style scoped>
 /* Asegurar que el fondo cubra toda la página */
 .add-product-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  padding: 6rem;
-  background-color: #FFF5E0;
-  overflow-y: auto;
+  padding: 2rem;
+  background-color: white;
   font-family: 'Arial', sans-serif;
   box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .form-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid #f97316;
   padding-bottom: 1rem;
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: bold;
   color: #333;
   margin: 0;
 }
 
 .product-form {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -298,11 +297,14 @@ export default {
 .form-input, .form-select, .form-textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s;
   box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  color-scheme: light;
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
@@ -313,7 +315,7 @@ export default {
 
 .form-row {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .half-width {
@@ -330,8 +332,6 @@ export default {
   position: absolute;
   left: 0.75rem;
   color: #666;
-  font-weight: bold;
-  z-index: 1;
 }
 
 .form-input.price {
@@ -339,22 +339,24 @@ export default {
 }
 
 .tags-section {
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 1rem;
-  background: #f9f9f9;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .selected-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .tag {
-  background: #f97316;
-  color: white;
+  background: #FEF3C7;
+  color: #92400E;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -366,7 +368,7 @@ export default {
 .remove-tag {
   background: none;
   border: none;
-  color: white;
+  color: #92400E;
   cursor: pointer;
   font-size: 1.2rem;
   line-height: 1;
@@ -375,19 +377,17 @@ export default {
 }
 
 .add-tag-button {
-  background: white;
-  color: #f97316;
-  border: 2px dashed #f97316;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+  background: none;
+  color: #007bff;
+  border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: all 0.3s;
+  text-decoration: underline;
+  padding: 0;
 }
 
 .add-tag-button:hover {
-  background: #f97316;
-  color: white;
+  color: #0056b3;
 }
 
 .form-textarea {
@@ -396,7 +396,9 @@ export default {
 }
 
 .save-button {
-  width: 100%;
+  display: block;
+  width: auto;
+  min-width: 200px;
   background: #c41e3a;
   color: white;
   border: none;
@@ -406,7 +408,7 @@ export default {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-top: 1rem;
+  margin: 2rem auto 0 auto;
 }
 
 .save-button:hover {
@@ -441,14 +443,16 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .modal-header h3 {
   margin: 0;
   color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .close-button {
@@ -463,6 +467,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .tag-options {
@@ -473,17 +479,18 @@ export default {
 }
 
 .tag-option {
-  background: #f0f0f0;
-  border: 2px solid #ddd;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
   border-radius: 20px;
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
+  color: #9ca3af;
 }
 
 .tag-option:hover {
-  background: #e0e0e0;
+  background: #e5e7eb;
 }
 
 .tag-option.selected {
@@ -495,31 +502,38 @@ export default {
 .custom-tag-section {
   display: flex;
   gap: 0.5rem;
-  padding-top: 1rem;
+  padding-top: 1.5rem;
   border-top: 1px solid #eee;
 }
 
 .custom-tag-input {
   flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
+  padding: 0.75rem;
+  border: none;
   border-radius: 4px;
   font-size: 0.9rem;
+  background-color: #4b5563;
+  color: white;
+}
+
+.custom-tag-input::placeholder {
+  color: #d1d5db;
 }
 
 .add-custom-tag {
-  background: #4ade80;
+  background: #34d399;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   cursor: pointer;
   font-size: 0.9rem;
   white-space: nowrap;
+  font-weight: bold;
 }
 
 .add-custom-tag:hover {
-  background: #22c55e;
+  background: #10b981;
 }
 
 @media (max-width: 768px) {
@@ -528,14 +542,23 @@ export default {
   }
 
   .product-form {
-    padding: 1rem;
+    padding: 0;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
   }
 
   .form-row {
     flex-direction: column;
+    gap: 1.5rem;
   }
 
   .half-width {
+    width: 100%;
+  }
+
+  .save-button {
     width: 100%;
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app-container">
     <!-- Navbar (ya tienes este componente) -->
     <Navbar v-if="showNavbar" />
 
@@ -111,19 +111,16 @@ html, body {
   /* Remover el background del body para que cada página controle su fondo */
 }
 
-#app {
-  min-height: 100vh;
-  height: 100%;
+#app-container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 .main-content {
   flex: 1;
-  width: 100%;
-  min-height: 100vh; /* Asegurar que ocupe toda la altura */
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
+  padding-top: 2rem;
 }
 
 .main-content.with-navbar {

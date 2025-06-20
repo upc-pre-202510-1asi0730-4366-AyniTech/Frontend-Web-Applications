@@ -1,29 +1,32 @@
 <template>
   <div class="product-list-container">
     <div class="header-section">
-      <h1 class="page-title">{{ $t('products.title') }}</h1>
-      <button
-          class="add-button"
-          @click="goToAddProduct"
-      >
-        +
-      </button>
-    </div>
-
-    <div class="search-section">
-      <div class="search-container">
-        <i class="search-icon">🔍</i>
-        <input
-            type="text"
-            :placeholder="$t('products.searchPlaceholder')"
-            v-model="searchTerm"
-            class="search-input"
-        />
+      <h1 class="page-title">Agregar Producto</h1>
+      <div class="actions-container">
+        <button
+            class="add-button"
+            @click="goToAddProduct"
+        >
+          +
+        </button>
+        <div class="search-container">
+          <i class="search-icon">🔍</i>
+          <input
+              type="text"
+              :placeholder="$t('products.searchPlaceholder')"
+              v-model="searchTerm"
+              class="search-input"
+          />
+        </div>
+        <button class="filter-button">
+          <i class="filter-icon">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 12H11V10H7V12ZM0 0V2H18V0H0ZM3 7H15V5H3V7Z" fill="#4B5563"/>
+            </svg>
+          </i>
+          <span>{{ $t('products.filter') }}</span>
+        </button>
       </div>
-      <button class="filter-button">
-        <i class="filter-icon">⚙️</i>
-        {{ $t('products.filter') }}
-      </button>
     </div>
 
     <div class="products-grid">
@@ -35,15 +38,23 @@
         <div class="product-header">
           <h3 class="product-name">{{ product.name }}</h3>
           <div class="stock-info">
-            <i class="stock-icon">🛒</i>
+            <i class="stock-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </i>
             <span>{{ product.stock }} {{ $t('products.stock') }}</span>
           </div>
         </div>
 
         <div class="product-body">
           <div class="product-category">
-            <span class="category-tag">{{ product.category }}</span>
-            <button class="add-icon" @click="addToCart(product)">+</button>
+            <span class="category-tag">
+              {{ product.category }}
+              <button class="add-icon" @click="addToCart(product)">+</button>
+            </span>
           </div>
 
           <button
@@ -75,7 +86,7 @@
               >
                 {{ tag }}
               </span>
-              <select v-model="selectedTag" class="tag-select">
+              <select v-model="selectedTag" class="tag-select" :disabled="!isEditing">
                 <option value="">{{ $t('products.selectTag') }}</option>
                 <option value="Dulce">{{ $t('products.tags.sweet') }}</option>
                 <option value="Rellenas">{{ $t('products.tags.filled') }}</option>
@@ -96,9 +107,8 @@
           <div class="form-group">
             <label>{{ $t('products.labels.date') }}</label>
             <input
-                type="text"
+                type="date"
                 v-model="editingProduct.expiryDate"
-                :placeholder="$t('products.datePlaceholder')"
                 :disabled="!isEditing"
                 class="form-input"
             />
@@ -114,6 +124,13 @@
           </div>
 
           <div class="modal-actions">
+            <button
+                type="submit"
+                class="save-button"
+                v-if="isEditing"
+            >
+              Guardar Cambios
+            </button>
             <button
                 type="button"
                 class="duplicate-button"
@@ -145,39 +162,11 @@ export default {
       isEditing: false,
       selectedTag: '',
       editingProduct: {},
-      products: [
-        {
-          id: 1,
-          name: 'Galleta',
-          category: 'Golosina',
-          stock: 20,
-          quantity: 50,
-          expiryDate: '25/12/2024',
-          notes: '',
-          tags: ['Dulce', 'Rellenas']
-        },
-        {
-          id: 2,
-          name: 'Galleta',
-          category: 'Golosina',
-          stock: 20,
-          quantity: 30,
-          expiryDate: '20/01/2025',
-          notes: '',
-          tags: ['Dulce']
-        },
-        {
-          id: 3,
-          name: 'Galleta',
-          category: 'Golosina',
-          stock: 20,
-          quantity: 40,
-          expiryDate: '15/02/2025',
-          notes: '',
-          tags: ['Rellenas']
-        }
-      ]
+      products: []
     }
+  },
+  created() {
+    this.loadProducts();
   },
   computed: {
     filteredProducts() {
@@ -189,6 +178,47 @@ export default {
     }
   },
   methods: {
+    loadProducts() {
+      const initialProducts = [
+        {
+          id: 1,
+          name: 'Galleta',
+          category: 'Golosina',
+          stock: 20,
+          quantity: 50,
+          expiryDate: '2024-12-25',
+          notes: '',
+          tags: ['Dulce', 'Rellenas']
+        },
+        {
+          id: 2,
+          name: 'Galleta',
+          category: 'Golosina',
+          stock: 20,
+          quantity: 30,
+          expiryDate: '2025-01-20',
+          notes: '',
+          tags: ['Dulce']
+        },
+        {
+          id: 3,
+          name: 'Galleta',
+          category: 'Golosina',
+          stock: 20,
+          quantity: 40,
+          expiryDate: '2025-02-15',
+          notes: '',
+          tags: ['Rellenas']
+        }
+      ];
+
+      let products = JSON.parse(localStorage.getItem('products'));
+      if (!products || products.length === 0) {
+        products = initialProducts;
+        localStorage.setItem('products', JSON.stringify(products));
+      }
+      this.products = products;
+    },
     goToAddProduct() {
       this.$router.push('/add-product');
     },
@@ -209,17 +239,37 @@ export default {
       console.log('Added to cart:', product);
     },
     saveProduct() {
-      // Lógica para guardar el producto
-      console.log('Saving product:', this.editingProduct);
+      if (!this.editingProduct) return;
+
+      this.editingProduct.stock = this.editingProduct.quantity;
+
+      const updatedProducts = this.products.map(p =>
+        p.id === this.editingProduct.id ? this.editingProduct : p
+      );
+      this.products = updatedProducts;
+      localStorage.setItem('products', JSON.stringify(this.products));
       this.closeEditModal();
     },
     duplicateProduct() {
-      // Lógica para duplicar el producto
-      console.log('Duplicating product:', this.editingProduct);
+      let products = JSON.parse(localStorage.getItem('products')) || [];
+      const productToDuplicate = this.products.find(p => p.id === this.editingProduct.id);
+      if (productToDuplicate) {
+        const newProduct = {
+          ...productToDuplicate,
+          id: Date.now(),
+          name: `${productToDuplicate.name} (Copia)`
+        };
+        products.push(newProduct);
+        localStorage.setItem('products', JSON.stringify(products));
+        this.products = products;
+      }
+      this.closeEditModal();
     },
     deleteProduct() {
-      // Lógica para eliminar el producto
-      console.log('Deleting product:', this.editingProduct);
+      let products = JSON.parse(localStorage.getItem('products')) || [];
+      const updatedProducts = products.filter(p => p.id !== this.editingProduct.id);
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
+      this.products = updatedProducts;
       this.closeEditModal();
     }
   }
@@ -229,8 +279,8 @@ export default {
 <style scoped>
 .product-list-container {
   padding: 2.5rem;
-  background-color: #FFF5E0;
-  width: 60vw;
+  background-color: white;
+  width: 100%;
   height: 100vh;
   overflow-y: auto;
   font-family: 'Arial', sans-serif;
@@ -238,40 +288,38 @@ export default {
 }
 
 .header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2rem;
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: bold;
   color: #333;
-  margin: 0;
+  margin: 0 0 1rem 0;
+  text-align: left;
+}
+
+.actions-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .add-button {
   background: #c41e3a;
   color: white;
   border: none;
-  border-radius: 8px;
-  width: 50px;
+  border-radius: 9999px;
+  width: 120px;
   height: 40px;
   font-size: 1.5rem;
   cursor: pointer;
   transition: background-color 0.3s;
+  padding-bottom: 4px;
 }
 
 .add-button:hover {
   background: #a01729;
-}
-
-.search-section {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  align-items: center;
 }
 
 .search-container {
@@ -279,10 +327,10 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  background: white;
+  background: #FEF3C7;
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #FDE68A;
 }
 
 .search-icon {
@@ -295,44 +343,46 @@ export default {
   outline: none;
   flex: 1;
   font-size: 1rem;
+  background-color: transparent;
 }
 
 .filter-button {
-  background: #666;
-  color: white;
-  border: none;
+  background: #FEF3C7;
+  color: #4B5563;
+  border: 1px solid #FDE68A;
   border-radius: 8px;
-  padding: 0.7rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   transition: background-color 0.3s;
+  font-weight: bold;
 }
 
 .filter-button:hover {
-  background: #555;
+  background: #FDE68A;
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  margin-bottom: 2rem; /* Asegurar espacio al final */
+  margin-bottom: 2rem;
 }
 
 .product-card {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 2px solid #f0b27a;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 2px solid #f97316;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .product-header {
@@ -357,6 +407,11 @@ export default {
   font-size: 0.9rem;
 }
 
+.stock-icon {
+  display: flex;
+  align-items: center;
+}
+
 .product-body {
   display: flex;
   justify-content: space-between;
@@ -370,25 +425,29 @@ export default {
 }
 
 .category-tag {
-  background: #e8f4f8;
-  color: #2c5282;
+  background: #FEF3C7;
+  color: #92400E;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .add-icon {
-  background: #4ade80;
-  color: white;
+  background: transparent;
+  color: #92400E;
   border: none;
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 0.5rem;
+  padding: 0;
 }
 
 .detail-button {
@@ -435,13 +494,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e5e7eb;
   padding-bottom: 1rem;
 }
 
 .modal-header h2 {
   margin: 0;
   color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .edit-icon {
@@ -462,6 +523,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -471,14 +534,17 @@ export default {
 
 .form-input, .form-textarea {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 1rem;
+  background-color: white;
+  color: #333;
 }
 
 .form-input:disabled, .form-textarea:disabled {
-  background: #f5f5f5;
-  color: #666;
+  background: #f3f4f6;
+  color: #6b7280;
+  opacity: 0.7;
 }
 
 .form-textarea {
@@ -516,6 +582,22 @@ export default {
   border-top: 1px solid #eee;
 }
 
+.save-button {
+  flex: 1;
+  background: #4ade80;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.save-button:hover {
+  background: #22c55e;
+}
+
 .duplicate-button {
   flex: 1;
   background: white;
@@ -529,8 +611,7 @@ export default {
 }
 
 .duplicate-button:hover {
-  background: #c41e3a;
-  color: white;
+  background: #fef2f2;
 }
 
 .delete-button {
@@ -553,11 +634,12 @@ export default {
 @media (max-width: 768px) {
   .product-list-container {
     padding: 1rem;
+    width: 100%;
   }
 
-  .search-section {
+  .actions-container {
     flex-direction: column;
-    gap: 0.5rem;
+    align-items: stretch;
   }
 
   .products-grid {

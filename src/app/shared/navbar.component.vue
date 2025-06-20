@@ -1,27 +1,43 @@
 <script setup>
-import 'primeicons/primeicons.css'
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import 'primeicons/primeicons.css';
+
+const { t, locale } = useI18n();
+const router = useRouter();
+
+const toggleLanguage = () => {
+  locale.value = locale.value === 'es' ? 'en' : 'es';
+};
+
+const navigateTo = (route) => {
+  router.push(route);
+};
 </script>
 
 <template>
   <header class="dashboard-header">
-    <div class="logo-container">
-      <img src="../../assets/logo.svg" alt="StockWise" class="logo" />
+    <div class="logo-container" @click="navigateTo('/dashboard')">
+      <img src="../assets/logo.svg" alt="StockWise" class="logo" />
     </div>
     <nav class="main-nav">
-      <a href="#" class="nav-link">Inicio</a>
-      <a href="#" class="nav-link">Productos</a>
-      <a href="#" class="nav-link">Categorías</a>
-      <a href="#" class="nav-link">Proveedores</a>
-      <a href="#" class="nav-link search">
-        <i class="fas fa-search"></i> Buscar
+      <a @click="navigateTo('/dashboard')" class="nav-link">{{ $t('navbar.home') }}</a>
+      <a @click="navigateTo('/buscar')" class="nav-link search">
+        <i class="pi pi-search"></i> {{ $t('navbar.search') }}
       </a>
-      <a href="#" class="nav-link">
-        <i class="fas fa-bell"></i> Alertas
+      <a @click="navigateTo('/alertas')" class="nav-link alerts">
+        <i class="pi pi-bell"></i> {{ $t('navbar.alerts') }}
       </a>
-      <a href="#" class="nav-link">Soporte</a>
-      <a href="#" class="nav-link user">
-        user <i class="fas fa-user-circle"></i>
+      <a @click="navigateTo('/soporte')" class="nav-link">{{ $t('navbar.support') }}</a>
+
+      <a @click="navigateTo('/profile')" class="nav-link user">
+        {{ $t('navbar.profile') }} <i class="pi pi-user"></i>
       </a>
+      <div class="language-switcher">
+        <button @click="toggleLanguage" class="language-button">
+          <span class="language-icon">🌐</span>
+        </button>
+      </div>
     </nav>
   </header>
 </template>
@@ -48,6 +64,7 @@ import 'primeicons/primeicons.css'
 .logo-container {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .logo {
@@ -89,6 +106,7 @@ import 'primeicons/primeicons.css'
   transition: all 0.2s ease;
   white-space: nowrap;
   font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .nav-link:hover {
@@ -101,6 +119,31 @@ import 'primeicons/primeicons.css'
   margin-left: 0.25rem;
 }
 
+.language-switcher {
+  margin: 0 0.5rem;
+}
+
+.language-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.language-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.language-icon {
+  font-size: 1.1rem;
+}
+
 /* Para agregar los iconos de Font Awesome */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
-</style> 
+</style>
