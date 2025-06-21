@@ -11,9 +11,12 @@
             id="productName"
             type="text"
             v-model="product.name"
+            @input="validateName"
             class="form-input"
+            :class="{ 'error': nameError }"
             required
         />
+        <span v-if="nameError" class="error-message">{{ nameError }}</span>
       </div>
 
       <div class="form-group">
@@ -54,11 +57,14 @@
                 id="buyPrice"
                 type="number"
                 step="0.01"
+                min="0"
                 v-model.number="product.buyPrice"
                 class="form-input price"
+                :class="{ 'error': buyPriceError }"
                 placeholder="00.00"
             />
           </div>
+          <span v-if="buyPriceError" class="error-message">{{ buyPriceError }}</span>
         </div>
 
         <div class="form-group half-width">
@@ -69,11 +75,14 @@
                 id="sellPrice"
                 type="number"
                 step="0.01"
+                min="0"
                 v-model.number="product.sellPrice"
                 class="form-input price"
+                :class="{ 'error': sellPriceError }"
                 placeholder="00.00"
             />
           </div>
+          <span v-if="sellPriceError" class="error-message">{{ sellPriceError }}</span>
         </div>
       </div>
 
@@ -82,10 +91,13 @@
         <input
             id="quantity"
             type="number"
+            min="1"
             v-model.number="product.quantity"
             class="form-input"
+            :class="{ 'error': quantityError }"
             required
         />
+        <span v-if="quantityError" class="error-message">{{ quantityError }}</span>
       </div>
 
       <div class="form-group">
@@ -94,12 +106,14 @@
             id="batch"
             v-model="product.batch"
             class="form-select"
+            :class="{ 'error': batchError }"
         >
           <option value="">{{ $t('addProduct.selectBatch') }}</option>
           <option value="LOTE001">LOTE001</option>
           <option value="LOTE002">LOTE002</option>
           <option value="LOTE003">LOTE003</option>
         </select>
+        <span v-if="batchError" class="error-message">{{ batchError }}</span>
       </div>
 
       <div class="form-group">
@@ -109,7 +123,9 @@
             type="date"
             v-model="product.expiryDate"
             class="form-input"
+            :class="{ 'error': expiryDateError }"
         />
+        <span v-if="expiryDateError" class="error-message">{{ expiryDateError }}</span>
       </div>
 
       <div class="form-group">
@@ -122,8 +138,8 @@
         ></textarea>
       </div>
 
-      <button type="submit" class="save-button">
-        {{ $t('addProduct.save') }}
+      <button type="submit" class="save-button" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Guardando...' : $t('addProduct.save') }}
       </button>
     </form>
 
@@ -170,12 +186,21 @@
 </template>
 
 <script>
+import ProductApiService from '../../services/product-api.service.js';
+
 export default {
   name: 'AddProduct',
   data() {
     return {
       showTagModal: false,
       customTag: '',
+      isSubmitting: false,
+      nameError: '',
+      buyPriceError: '',
+      sellPriceError: '',
+      quantityError: '',
+      batchError: '',
+      expiryDateError: '',
       product: {
         name: '',
         tags: [],
@@ -197,37 +222,112 @@ export default {
     }
   },
   methods: {
-    saveProduct() {
-      // Validación básica
-      if (!this.product.name || !this.product.quantity) {
-        alert(this.$t('addProduct.validationError'));
+    validateName() {
+      const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+      if (!this.product.name.trim()) {
+        this.nameError = 'El nombre es requerido';
+      } else if (!nameRegex.test(this.product.name)) {
+        this.nameError = 'El nombre solo puede contener letras y espacios';
+      } else if (this.product.name.length < 3) {
+        this.nameError = 'El nombre debe tener al menos 3 caracteres';
+      } else {
+        this.nameError = '';
+      }
+    },
+    validatePrices() {
+      this.buyPriceError = '';
+      this.sellPriceError = '';
+      
+      if (this.product.buyPrice !== null && this.product.buyPrice < 0) {
+        this.buyPriceError = 'El precio de compra no puede ser negativo';
+      }
+      
+      if (this.product.sellPrice !== null && this.product.sellPrice < 0) {
+        this.sellPriceError = 'El precio de venta no puede ser negativo';
+      }
+      
+      if (this.product.buyPrice !== null && this.product.sellPrice !== null) {
+        if (this.product.sellPrice <= this.product.buyPrice) {
+          this.sellPriceError = 'El precio de venta debe ser mayor al precio de compra';
+        }
+      }
+    },
+    validateQuantity() {
+      if (!this.product.quantity || this.product.quantity <= 0) {
+        this.quantityError = 'La cantidad debe ser mayor a 0';
+      } else if (!Number.isInteger(this.product.quantity)) {
+        this.quantityError = 'La cantidad debe ser un número entero';
+      } else {
+        this.quantityError = '';
+      }
+    },
+    validateBatch() {
+      if (!this.product.batch) {
+        this.batchError = 'Debe seleccionar un lote';
+      } else {
+        this.batchError = '';
+      }
+    },
+    validateExpiryDate() {
+      if (this.product.expiryDate) {
+        const today = new Date();
+        const expiryDate = new Date(this.product.expiryDate);
+        if (expiryDate <= today) {
+          this.expiryDateError = 'La fecha de vencimiento debe ser futura';
+        } else {
+          this.expiryDateError = '';
+        }
+      } else {
+        this.expiryDateError = '';
+      }
+    },
+    validateForm() {
+      this.validateName();
+      this.validatePrices();
+      this.validateQuantity();
+      this.validateBatch();
+      this.validateExpiryDate();
+      
+      return !this.nameError && !this.buyPriceError && !this.sellPriceError && 
+             !this.quantityError && !this.batchError && !this.expiryDateError;
+    },
+    async saveProduct() {
+      if (!this.validateForm()) {
+        alert('Por favor, corrija los errores en el formulario');
         return;
       }
 
-      // Get products from localStorage
-      let products = JSON.parse(localStorage.getItem('products')) || [];
+      if (this.product.tags.length === 0) {
+        alert('Debe agregar al menos una etiqueta');
+        return;
+      }
 
-      // Create new product
-      const newProduct = {
-        id: Date.now(), // Simple way to generate a unique ID
-        name: this.product.name,
-        category: 'Golosina', // Hardcoding for now as it's not in the form
-        stock: this.product.quantity,
-        quantity: this.product.quantity,
-        expiryDate: this.product.expiryDate,
-        notes: this.product.notes,
-        tags: this.product.tags,
-      };
+      this.isSubmitting = true;
 
-      // Add new product and save back to localStorage
-      products.push(newProduct);
-      localStorage.setItem('products', JSON.stringify(products));
+      try {
+        const productData = {
+          name: this.product.name.trim(),
+          category: 'Golosina',
+          stock: this.product.quantity,
+          quantity: this.product.quantity,
+          buyPrice: this.product.buyPrice,
+          sellPrice: this.product.sellPrice,
+          batch: this.product.batch,
+          expiryDate: this.product.expiryDate,
+          notes: this.product.notes.trim(),
+          tags: this.product.tags
+        };
 
-      // Simular guardado exitoso
-      alert(this.$t('addProduct.saveSuccess'));
-
-      // Regresar a la lista de productos
-      this.$router.push('/products');
+        await ProductApiService.createProduct(productData);
+        
+        alert('Producto guardado exitosamente');
+        this.$router.push('/products');
+      } catch (error) {
+        console.error('Error al guardar producto:', error);
+        alert('Error al guardar el producto. Por favor, intente nuevamente.');
+      } finally {
+        this.isSubmitting = false;
+      }
     },
     addTag(tagKey) {
       if (!this.product.tags.includes(tagKey)) {
@@ -248,6 +348,23 @@ export default {
     closeTagModal() {
       this.showTagModal = false;
       this.customTag = '';
+    }
+  },
+  watch: {
+    'product.buyPrice'() {
+      this.validatePrices();
+    },
+    'product.sellPrice'() {
+      this.validatePrices();
+    },
+    'product.quantity'() {
+      this.validateQuantity();
+    },
+    'product.batch'() {
+      this.validateBatch();
+    },
+    'product.expiryDate'() {
+      this.validateExpiryDate();
     }
   }
 }
@@ -534,6 +651,28 @@ export default {
 
 .add-custom-tag:hover {
   background: #10b981;
+}
+
+/* Error Styles */
+.form-input.error, .form-select.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.save-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.save-button:disabled:hover {
+  background: #9ca3af;
 }
 
 @media (max-width: 768px) {

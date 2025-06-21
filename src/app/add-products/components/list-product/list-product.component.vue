@@ -18,7 +18,7 @@
               class="search-input"
           />
         </div>
-        <button class="filter-button">
+        <button class="filter-button" @click="showFilterModal = true">
           <i class="filter-icon">
             <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M7 12H11V10H7V12ZM0 0V2H18V0H0ZM3 7H15V5H3V7Z" fill="#4B5563"/>
@@ -149,10 +149,86 @@
         </form>
       </div>
     </div>
+
+    <!-- Modal de filtros -->
+    <div v-if="showFilterModal" class="modal-overlay" @click="closeFilterModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>Filtrar Productos</h3>
+          <button type="button" @click="closeFilterModal" class="close-button">×</button>
+        </div>
+
+        <div class="filter-form">
+          <div class="form-group">
+            <label>Categoría</label>
+            <input
+                type="text"
+                v-model="filters.category"
+                class="form-input"
+                placeholder="Buscar por categoría"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="tag-filters">
+              <label class="tag-checkbox">
+                <input type="checkbox" v-model="filters.tags" value="Dulce">
+                <span>Dulce</span>
+              </label>
+              <label class="tag-checkbox">
+                <input type="checkbox" v-model="filters.tags" value="Salado">
+                <span>Salado</span>
+              </label>
+              <label class="tag-checkbox">
+                <input type="checkbox" v-model="filters.tags" value="Rellenas">
+                <span>Rellenas</span>
+              </label>
+              <label class="tag-checkbox">
+                <input type="checkbox" v-model="filters.tags" value="Chocolate">
+                <span>Chocolate</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half-width">
+              <label>Stock mínimo</label>
+              <input
+                  type="number"
+                  v-model.number="filters.minStock"
+                  class="form-input"
+                  placeholder="0"
+              />
+            </div>
+            <div class="form-group half-width">
+              <label>Stock máximo</label>
+              <input
+                  type="number"
+                  v-model.number="filters.maxStock"
+                  class="form-input"
+                  placeholder="100"
+              />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" @click="applyFilters" class="apply-button">
+              Aplicar Filtros
+            </button>
+            <button type="button" @click="clearFilters" class="clear-button">
+              Limpiar Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import ProductApiService from '../../services/product-api.service.js';
+
 export default {
   name: 'ProductList',
   data() {
@@ -162,7 +238,15 @@ export default {
       isEditing: false,
       selectedTag: '',
       editingProduct: {},
-      products: []
+      products: [],
+      showFilterModal: false,
+      filters: {
+        category: '',
+        tags: [],
+        minStock: null,
+        maxStock: null
+      },
+      isLoading: false
     }
   },
   created() {
@@ -178,37 +262,58 @@ export default {
     }
   },
   methods: {
-    loadProducts() {
+    async loadProducts() {
+      this.isLoading = true;
+      try {
+        this.products = await ProductApiService.getAllProducts();
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+        // Fallback a datos locales si la API falla
+        this.loadLocalProducts();
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    loadLocalProducts() {
       const initialProducts = [
         {
           id: 1,
-          name: 'Galleta',
+          name: 'Galleta de Chocolate',
           category: 'Golosina',
           stock: 20,
           quantity: 50,
+          buyPrice: 0.50,
+          sellPrice: 1.00,
+          batch: 'LOTE001',
           expiryDate: '2024-12-25',
-          notes: '',
-          tags: ['Dulce', 'Rellenas']
+          notes: 'Galletas rellenas de chocolate',
+          tags: ['Dulce', 'Chocolate', 'Rellenas']
         },
         {
           id: 2,
-          name: 'Galleta',
+          name: 'Galleta de Vainilla',
           category: 'Golosina',
-          stock: 20,
+          stock: 15,
           quantity: 30,
+          buyPrice: 0.45,
+          sellPrice: 0.90,
+          batch: 'LOTE002',
           expiryDate: '2025-01-20',
-          notes: '',
-          tags: ['Dulce']
+          notes: 'Galletas de vainilla tradicionales',
+          tags: ['Dulce', 'Vainilla']
         },
         {
           id: 3,
-          name: 'Galleta',
+          name: 'Galleta Salada',
           category: 'Golosina',
-          stock: 20,
+          stock: 25,
           quantity: 40,
+          buyPrice: 0.40,
+          sellPrice: 0.80,
+          batch: 'LOTE003',
           expiryDate: '2025-02-15',
-          notes: '',
-          tags: ['Rellenas']
+          notes: 'Galletas saladas para aperitivos',
+          tags: ['Salado', 'Galletas']
         }
       ];
 
@@ -238,39 +343,90 @@ export default {
     addToCart(product) {
       console.log('Added to cart:', product);
     },
-    saveProduct() {
+    async saveProduct() {
       if (!this.editingProduct) return;
 
-      this.editingProduct.stock = this.editingProduct.quantity;
-
-      const updatedProducts = this.products.map(p =>
-        p.id === this.editingProduct.id ? this.editingProduct : p
-      );
-      this.products = updatedProducts;
-      localStorage.setItem('products', JSON.stringify(this.products));
-      this.closeEditModal();
-    },
-    duplicateProduct() {
-      let products = JSON.parse(localStorage.getItem('products')) || [];
-      const productToDuplicate = this.products.find(p => p.id === this.editingProduct.id);
-      if (productToDuplicate) {
-        const newProduct = {
-          ...productToDuplicate,
-          id: Date.now(),
-          name: `${productToDuplicate.name} (Copia)`
-        };
-        products.push(newProduct);
-        localStorage.setItem('products', JSON.stringify(products));
-        this.products = products;
+      try {
+        this.editingProduct.stock = this.editingProduct.quantity;
+        await ProductApiService.updateProduct(this.editingProduct.id, this.editingProduct);
+        
+        const updatedProducts = this.products.map(p =>
+          p.id === this.editingProduct.id ? this.editingProduct : p
+        );
+        this.products = updatedProducts;
+        this.closeEditModal();
+      } catch (error) {
+        console.error('Error al actualizar producto:', error);
+        alert('Error al actualizar el producto');
       }
-      this.closeEditModal();
     },
-    deleteProduct() {
-      let products = JSON.parse(localStorage.getItem('products')) || [];
-      const updatedProducts = products.filter(p => p.id !== this.editingProduct.id);
-      localStorage.setItem('products', JSON.stringify(updatedProducts));
-      this.products = updatedProducts;
-      this.closeEditModal();
+    async duplicateProduct() {
+      try {
+        const productToDuplicate = this.products.find(p => p.id === this.editingProduct.id);
+        if (productToDuplicate) {
+          const newProduct = {
+            ...productToDuplicate,
+            id: Date.now(),
+            name: `${productToDuplicate.name} (Copia)`
+          };
+          await ProductApiService.createProduct(newProduct);
+          this.products.push(newProduct);
+        }
+        this.closeEditModal();
+      } catch (error) {
+        console.error('Error al duplicar producto:', error);
+        alert('Error al duplicar el producto');
+      }
+    },
+    async deleteProduct() {
+      try {
+        await ProductApiService.deleteProduct(this.editingProduct.id);
+        this.products = this.products.filter(p => p.id !== this.editingProduct.id);
+        this.closeEditModal();
+      } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        alert('Error al eliminar el producto');
+      }
+    },
+    closeFilterModal() {
+      this.showFilterModal = false;
+    },
+    async applyFilters() {
+      try {
+        const filterParams = {};
+        
+        if (this.filters.category) {
+          filterParams.category = this.filters.category;
+        }
+        
+        if (this.filters.tags.length > 0) {
+          filterParams.tags = this.filters.tags;
+        }
+        
+        if (this.filters.minStock !== null) {
+          filterParams.minStock = this.filters.minStock;
+        }
+        
+        if (this.filters.maxStock !== null) {
+          filterParams.maxStock = this.filters.maxStock;
+        }
+        
+        this.products = await ProductApiService.getProductsByFilter(filterParams);
+        this.closeFilterModal();
+      } catch (error) {
+        console.error('Error al aplicar filtros:', error);
+        alert('Error al aplicar los filtros');
+      }
+    },
+    async clearFilters() {
+      this.filters = {
+        category: '',
+        tags: [],
+        minStock: null,
+        maxStock: null
+      };
+      await this.loadProducts();
+      this.closeFilterModal();
     }
   }
 }
@@ -628,6 +784,68 @@ export default {
 
 .delete-button:hover {
   background: #a01729;
+}
+
+/* Filter Modal Styles */
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #f3f4f6;
+  transition: background-color 0.3s;
+}
+
+.tag-checkbox:hover {
+  background: #e5e7eb;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  margin: 0;
+}
+
+.apply-button {
+  background: #4ade80;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.apply-button:hover {
+  background: #22c55e;
+}
+
+.clear-button {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.clear-button:hover {
+  background: #e5e7eb;
 }
 
 /* Responsive */
