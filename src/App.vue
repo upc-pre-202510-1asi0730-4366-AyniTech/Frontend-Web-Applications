@@ -359,4 +359,24 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+.add-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.add-cell button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 20px;
+  background: #e65100;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.add-cell button.selected {
+  background: #388e3c; /* Verde si está seleccionado */
+}
 </style>

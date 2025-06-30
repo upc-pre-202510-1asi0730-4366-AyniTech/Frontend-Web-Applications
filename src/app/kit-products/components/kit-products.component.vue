@@ -7,7 +7,7 @@
         <i class="pi pi-search search-icon"></i>
         <input type="text" :placeholder="$t('kits.searchPlaceholder')" />
       </div>
-      <Button class="kit-select-btn" :label="$t('kits.selectForKit')" />
+      <Button class="kit-select-btn" :label="$t('kits.selectForKit')" @click="registerKit" />
     </div>
 
     <div class="products-container">
@@ -21,18 +21,25 @@
           <div class="header-anadir">{{ $t('kits.add') }}</div>
         </div>
 
-        <div v-for="(product, index) in products" :key="index" class="product-row">
-          <div class="cell-producto">{{ product.name }}</div>
+        <div v-for="(product, index) in products" :key="index" 
+          class="product-row"
+          :class="{ 'selected-row': isSelected(product) }"
+        >
+          <div class="cell-producto left-align">{{ product.name }}</div>
           <div class="cell-precio">{{ product.price }}</div>
           <div class="cell-inventario">{{ product.stock }}</div>
-          <div class="cell-anadir">
-            <button class="add-button" @click="addToKit(index)">
-              <i class="pi pi-plus"></i>
-            </button>
+          <div class="add-cell">
+            <button class="add-button" @click="addToKit(product)">+</button>
           </div>
         </div>
       </div>
     </div>
+
+    <template v-if="showSuccess">
+      <div class="success-message">
+        Kit registrado exitosamente
+      </div>
+    </template>
   </div>
 </template>
 
@@ -56,15 +63,25 @@ export default {
         {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
         {name: 'Golosina', price: 's/. 10', stock: '20 Stock'}
       ],
-      selectedProducts: []
+      selectedProducts: [],
+      showSuccess: false
     }
   },
   methods: {
-    addToKit(productIndex) {
-      // Implementar la lógica para añadir al kit
-      const product = this.products[productIndex];
-      this.selectedProducts.push({...product, quantity: 1});
-      console.log('Producto añadido al kit', product);
+    addToKit(product) {
+      const index = this.selectedProducts.indexOf(product);
+      if (index === -1) {
+        this.selectedProducts.push(product);
+      } else {
+        this.selectedProducts.splice(index, 1);
+      }
+    },
+    isSelected(product) {
+      return this.selectedProducts.indexOf(product) !== -1;
+    },
+    registerKit() {
+      this.showSuccess = true;
+      setTimeout(() => { this.showSuccess = false; }, 2000);
     }
   }
 }
@@ -120,14 +137,6 @@ export default {
   color: #666;
 }
 
-:deep(.kit-select-btn) {
-  background-color: #BC162A;
-  border-color: #BC162A;
-  border-radius: 2rem;
-  padding: 0.8rem 1.5rem;
-  font-weight: 500;
-}
-
 .products-container {
   background-color: #fff;
   border-radius: 8px;
@@ -158,35 +167,47 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-.product-row {
-  display: flex;
-  padding: 0.8rem;
-  border-bottom: 1px solid #eee;
-  align-items: center;
-}
-
-.product-row:last-child {
-  border-bottom: none;
-}
-
 .header-producto, .cell-producto {
   flex: 2;
+  text-align: left;
+  padding-left: 1rem;
 }
 
 .header-precio, .cell-precio,
 .header-inventario, .cell-inventario,
-.header-anadir, .cell-anadir {
+.header-anadir, .add-cell {
   flex: 1;
   text-align: center;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  min-height: 48px;
+}
+
+.product-row > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.add-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .add-button {
   background-color: #E67E22;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%;
   width: 30px;
   height: 30px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,6 +217,33 @@ export default {
 
 .add-button:hover {
   background-color: #d35400;
+}
+
+.selected-row {
+  background-color: #D9D593 !important;
+}
+
+:deep(.kit-select-btn) {
+  background-color: #BC162A;
+  border-color: #BC162A;
+  border-radius: 2rem;
+  padding: 0.8rem 1.5rem;
+  font-weight: 500;
+  color: #fff !important;
+}
+
+.success-message {
+  position: fixed;
+  top: 90px;
+  right: 40px;
+  background: #388e3c;
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: opacity 0.3s;
 }
 
 @media (max-width: 768px) {
@@ -212,5 +260,10 @@ export default {
   .table-header, .product-row {
     font-size: 0.9rem;
   }
+}
+
+.left-align {
+  text-align: left !important;
+  justify-content: flex-start !important;
 }
 </style>
