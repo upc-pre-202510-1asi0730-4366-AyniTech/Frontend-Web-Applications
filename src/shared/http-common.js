@@ -1,12 +1,12 @@
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_CONFIG } from '../../api.config';
 
 const http = axios.create({
-    'baseURL': API_BASE_URL
+    baseURL: API_CONFIG.BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
+    }
 });
-
-http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-http.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,PATCH,OPTIONS';
 
 export default http;

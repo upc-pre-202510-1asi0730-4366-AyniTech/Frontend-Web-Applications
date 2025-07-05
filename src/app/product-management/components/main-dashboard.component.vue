@@ -1,19 +1,19 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard-container">
     <div class="dashboard-content">
       <div class="welcome-section">
-        <h1 class="welcome-title">{{ $t('dashboard.welcome') }}</h1>
+        <h1 class="welcome-title">Bienvenido de nuevo</h1>
         <p class="welcome-subtitle">{{ getWelcomeMessage() }}</p>
       </div>
-      
-      <div class="stats-container">
+
+      <div class="stats-section">
         <div class="stat-card">
           <div class="stat-icon">
-            <i class="pi pi-shopping-bag"></i>
+            <i class="pi pi-box"></i>
           </div>
           <div class="stat-info">
-            <h3 class="stat-title">{{ $t('dashboard.totalProducts') }}</h3>
-            <p class="stat-value">500</p>
+            <h3>Total de Productos</h3>
+            <p class="stat-value">{{ totalProducts }}</p>
           </div>
         </div>
 
@@ -22,584 +22,318 @@
             <i class="pi pi-calendar"></i>
           </div>
           <div class="stat-info">
-            <h3 class="stat-title">{{ $t('dashboard.providerDate') }}</h3>
-            <p class="stat-value">00/00/00</p>
+            <h3>Fecha de Proveedor</h3>
+            <p class="stat-value">{{ providerDate || '00/00/00' }}</p>
           </div>
         </div>
       </div>
 
-      <div class="action-buttons">
-        <button class="action-btn history-btn" @click="navigateTo('history')" :title="$t('dashboard.history')">
-          <i class="pi pi-chart-line"></i> {{ $t('dashboard.history') }}
+      <div class="actions-grid">
+        <button class="action-btn primary" @click="navigateTo('history')">
+          <i class="pi pi-chart-line"></i>
+          <span>Historial</span>
         </button>
 
-        <button class="action-btn inventory-btn" @click="navigateTo('inventory')" :title="$t('dashboard.inventory')">
-          <i class="pi pi-box"></i> {{ $t('dashboard.inventory') }}
-        </button>
-      </div>
-
-      <hr class="divider" />
-
-      <div class="bottom-actions">
-        <button class="add-product-btn" @click="navigateTo('add-product')" :title="$t('dashboard.addProducts')">
-          <i class="pi pi-plus"></i> {{ $t('dashboard.addProducts') }}
+        <button class="action-btn primary" @click="navigateTo('inventory')">
+          <i class="pi pi-box"></i>
+          <span>Inventario</span>
         </button>
 
-        <button class="kits-btn" @click="navigateTo('kits')" :title="$t('dashboard.kits')">
-          <i class="pi pi-shopping-cart"></i> {{ $t('dashboard.kits') }}
+        <button class="action-btn primary" @click="navigateTo('add-product')">
+          <i class="pi pi-plus"></i>
+          <span>Añadir Productos</span>
         </button>
 
-        <button class="return-btn" @click="navigateTo('returns')" :title="$t('dashboard.returns')">
-          <i class="pi pi-sync"></i> {{ $t('dashboard.returns') }}
+        <button class="action-btn secondary" @click="navigateTo('kits')">
+          <i class="pi pi-shopping-cart"></i>
+          <span>Kits</span>
+        </button>
+
+        <button class="action-btn secondary" @click="navigateTo('returns')">
+          <i class="pi pi-sync"></i>
+          <span>Devolución de productos</span>
         </button>
       </div>
     </div>
-    
-    <div class="expiring-products">
-      <h2 class="section-title">{{ $t('dashboard.expirationTitle') }}</h2>
 
-      <div class="product-cards">
-        <div class="product-card" v-for="(product, index) in expiringProducts" :key="index">
-          <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-date">
-              <i class="pi pi-calendar"></i> {{ product.expirationDate }}
-            </p>
-          </div>
-          <div class="product-stock">
-            <i class="pi pi-shopping-cart"></i> Stock
-            <span class="stock-count">5</span>
-          </div>
-        </div>
-
-        <div class="product-card">
-          <div class="product-info">
-            <h3 class="product-name">Pan Integral</h3>
-            <p class="product-date"><i class="pi pi-calendar"></i> 20/03/2024</p>
-          </div>
-          <div class="product-stock">
-            <i class="pi pi-shopping-cart"></i> Stock
-            <span class="stock-count">10</span>
+    <div class="alerts-section">
+      <div class="alerts-container">
+        <h2 class="alerts-title">
+          <i class="pi pi-exclamation-triangle"></i>
+          Próximos a Acabarse
+        </h2>
+        <div class="alerts-list">
+          <div v-for="alert in lowStockProducts" 
+               :key="alert.id" 
+               class="alert-card">
+            <div class="alert-info">
+              <span class="product-name">{{ alert.productName }}</span>
+              <span class="stock-info">
+                <i class="pi pi-shopping-cart"></i>
+                Stock: {{ alert.quantity }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-// Importación de PrimeIcons
-import 'primeicons/primeicons.css'
-import { useI18n } from 'vue-i18n';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStockAlertService } from '../../stock-alert/services/stockAlert-service';
+import 'primeicons/primeicons.css';
 
 export default {
   name: 'MainDashboard',
   setup() {
-    const { t } = useI18n();
     const router = useRouter();
+    const stockAlertService = useStockAlertService();
+    const totalProducts = ref(0);
+    const providerDate = ref(null);
+    const lowStockProducts = ref([]);
     
     const getWelcomeMessage = () => {
       const hour = new Date().getHours();
-      
-      if (hour < 12) {
-        return t('dashboard.welcomeMorning');
-      } else if (hour < 18) {
-        return t('dashboard.welcomeAfternoon');
-      } else {
-        return t('dashboard.welcomeEvening');
-      }
+      if (hour < 12) return 'Buenos días';
+      if (hour < 18) return 'Buenas tardes';
+      return 'Buenas noches';
     };
     
     const navigateTo = (route) => {
-      console.log(`Navigating to ${route}`);
-      if (route === 'history') {
-        router.push('/history');
-      } else if (route === 'inventory') {
-        router.push('/inventory');
-      } else if (route === 'add-product') {
-        router.push('/add-product');
-      } else if (route === 'kits') {
-        router.push('/kits');
-      } else if (route === 'returns') {
-        router.push('/returns');
-      }
+      router.push(`/${route}`);
     };
     
+    const fetchLowStockProducts = async () => {
+      try {
+        await stockAlertService.fetchAlerts();
+        lowStockProducts.value = stockAlertService.alerts;
+      } catch (error) {
+        console.error('Error fetching low stock products:', error);
+      }
+    };
+
+    onMounted(() => {
+      fetchLowStockProducts();
+    });
+
     return {
       getWelcomeMessage,
-      navigateTo
-    };
-  },
-  data() {
-    return {
-      expiringProducts: [
-        {
-          name: 'Leche Deslactosada',
-          expirationDate: '15/03/2024'
-        }
-      ]
+      navigateTo,
+      totalProducts,
+      providerDate,
+      lowStockProducts
     };
   }
-}
+};
 </script>
 
 <style scoped>
-.dashboard {
-  padding-top: 3rem;
-  padding-left: 3rem;
-  padding-right: 3rem;
-  padding-bottom: 3rem;
-  font-family: 'Arial', sans-serif;
-  width: 100%;
+.dashboard-container {
   display: flex;
-  gap: 5em;
-  flex-direction: row;
+  gap: 2rem;
+  padding: 5rem 4rem;
+  min-height: calc(100vh - 64px);
   background-color: #FFF5E0;
-  position: relative;
-}
-
-.welcome-section {
-  margin-bottom: 2rem;
-}
-
-.welcome-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.5rem;
-  position: relative;
-  padding-bottom: 0.5rem;
-}
-
-.welcome-subtitle {
-  font-size: 1.5rem;
-  color: #666;
-  margin: 0;
-}
-
-.welcome-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background-color: #E67E22;
-  border-radius: 2px;
 }
 
 .dashboard-content {
-  padding: 1rem;
   flex: 1;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow: visible; /* quita overflow independiente para evitar barra vertical extra */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.stats-container {
-  display: flex;
+.welcome-section {
+  margin-bottom: 1rem;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
 }
 
 .stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  flex: 1;
-  min-width: 200px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-  justify-content: center;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  margin-right: 1.5rem;
-  border-radius: 50%;
-  background-color: rgba(188, 22, 42, 0.1);
+  width: 48px;
+  height: 48px;
+  background: #BC162A;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .stat-icon i {
-  font-size: 1.8rem;
-  color: #BC162A;
+  font-size: 1.5rem;
+  color: white;
 }
 
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-title {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0;
+.stat-info h3 {
+  font-size: 0.9rem;
   color: #666;
+  margin: 0;
+  font-weight: 500;
 }
 
 .stat-value {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin: 0.5rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #333;
+  margin: 0;
 }
 
-.action-buttons {
-  display: flex;
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
 }
 
 .action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.8rem 1rem;
   border: none;
   border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 1.25rem;
+  font-size: 1rem;
   font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   cursor: pointer;
-  gap: 0.5rem;
+  transition: all 0.2s;
   color: white;
-  flex: 1;
-  min-width: 180px;
-  min-height: 45px;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-
-.action-btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.action-btn:hover:before {
-  transform: translateX(0);
-}
-
-.action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.action-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .action-btn i {
-  font-size: 1.2rem;
-}
-
-.history-btn {
-  background-color: #c1121f;
-}
-
-.inventory-btn {
-  background-color: #c1121f;
-}
-
-.divider {
-  margin: 2rem 0;
-  border: none;
-  height: 1px;
-  background-color: #ddd;
-}
-
-.section-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #333;
-  border-left: 4px solid #c1121f;
-  padding-left: 0.8rem;
 }
 
-.expiring-products {
-  padding: 2rem;
-  background-color: #fff;
+.action-btn.primary {
+  background: #BC162A;
+}
+
+.action-btn.primary:hover {
+  background: #a01223;
+}
+
+.action-btn.secondary {
+  background: #E67E22;
+}
+
+.action-btn.secondary:hover {
+  background: #d35400;
+}
+
+.alerts-section {
+  width: 300px;
+  min-width: 300px;
+}
+
+.alerts-container {
+  background: white;
   border-radius: 12px;
-  margin-right: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  max-width: 450px;
-  margin-top: 3em;
+  padding: 1.5rem;
+  position: sticky;
+  top: 2rem;
 }
 
-.product-cards {
+.alerts-title {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alerts-title i {
+  color: #BC162A;
+}
+
+.alerts-list {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
+  gap: 1rem;
 }
 
-.product-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.alert-card {
   padding: 1rem;
-  background-color: #fff;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  box-sizing: border-box;
-  transition: transform 0.2s, box-shadow 0.2s;
-  position: relative;
+  background: #f8f9fa;
+  border: 1px solid #eee;
 }
 
-.product-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-color: #c1121f;
-}
-
-.product-card:hover .product-name {
-  color: #c1121f;
+.alert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .product-name {
-  font-size: 1.1rem;
   font-weight: 500;
-  margin: 0 0 0.5rem;
   color: #333;
-  transition: color 0.2s;
 }
 
-.product-date {
-  font-size: 1rem;
-  margin: 0;
-  color: #666;
-  display: flex;
-  align-items: center;
-}
-
-.product-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-}
-
-.product-stock {
+.stock-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
   color: #BC162A;
-}
-
-.stock-count {
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-.view-details-btn {
-  background-color: transparent;
-  border: none;
-  color: #666;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.view-details-btn:hover {
-  background-color: #f1f1f1;
-  color: #c1121f;
-}
-
-.view-all-btn {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #f8f8f8;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
-  color: #666;
-}
-
-.view-all-btn:hover {
-  background-color: #f1f1f1;
-  color: #c1121f;
-}
-
-.bottom-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  width: 100%;
-}
-
-.add-product-btn, 
-.kits-btn, 
-.return-btn {
-  padding: 0.8rem;
-  border: none;
-  border-radius: 8px;
   font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-align: center;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 45px;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
 }
 
-.add-product-btn:before, 
-.kits-btn:before, 
-.return-btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
+@media (max-width: 1024px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
 
-.add-product-btn:hover:before, 
-.kits-btn:hover:before, 
-.return-btn:hover:before {
-  transform: translateX(0);
-}
+  .alerts-section {
+    width: 100%;
+    min-width: auto;
+  }
 
-.add-product-btn:hover, 
-.kits-btn:hover, 
-.return-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  .alerts-container {
+    position: static;
+  }
 }
-
-.add-product-btn:active, 
-.kits-btn:active, 
-.return-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-}
-
-.add-product-btn i,
-.kits-btn i,
-.return-btn i {
-  font-size: 1.2rem;
-}
-
-.add-product-btn {
-  background-color: #c1121f;
-  color: white;
-}
-
-.kits-btn {
-  background-color: #e67e22;
-  color: white;
-}
-
-.return-btn {
-  background-color: #e67e22;
-  color: white;
-}
-
-/* Para agregar los iconos de PrimeIcons */
-/* La importación global ya está en main.js: import 'primeicons/primeicons.css'; */
 
 @media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-    gap: 2em;
+  .dashboard-container {
+    padding: 1rem;
   }
-  
-  .expiring-products {
-    max-width: 100%;
-    margin-right: 0;
-  }
-  
-  .stats-container {
-    flex-direction: column;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-  }
-  
-  .stat-card {
-    min-width: auto;
-  }
-  
-  .action-btn {
-    min-width: auto;
-  }
-}
 
-.product-date i {
-  margin-right: 0.5rem;
-  font-size: 1rem;
-  color: #BC162A;
-}
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
 
-.product-stock i {
-  font-size: 1rem;
-  margin-right: 0.3rem;
-  color: #BC162A;
-}
-
-.pi {
-  font-family: 'primeicons';
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  display: inline-block;
-  -webkit-font-smoothing: antialiased;
+  .welcome-title {
+    font-size: 1.75rem;
+  }
 }
 </style>
 

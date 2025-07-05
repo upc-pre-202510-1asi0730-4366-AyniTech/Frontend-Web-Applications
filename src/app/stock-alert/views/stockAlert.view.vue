@@ -13,81 +13,68 @@
       />
     </div>
 
-    <div v-for="alert in filteredAlerts" :key="alert.id">
-      <StockAlertCard :alert="alert" @view="showDetails" @delete="deleteAlert" />
+    <div v-if="loading" class="loading">
+      Cargando alertas...
+    </div>
+    <div v-else-if="error" class="error">
+      {{ error }}
+    </div>
+    <div v-else>
+      <div v-for="alert in filteredAlerts" :key="alert.productName">
+        <StockAlertCard :alert="alert" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import StockAlertCard from "../components/stockAlert-card.component.vue";
+import NavbarComponent from "../../shared/navbar.component.vue";
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useStockAlertService } from '../services/stockAlert-service';
+import { onMounted, ref, computed } from 'vue';
 
 export default {
-  components: { StockAlertCard },
+  name: 'StockAlertView',
+  components: { 
+    StockAlertCard,
+    NavbarComponent
+  },
 
   setup() {
     const { locale } = useI18n();
-    const router = useRouter();
+    const stockAlertService = useStockAlertService();
+    const search = ref('');
+    const loading = ref(true);
+    const error = ref(null);
 
-    const toggleLanguage = () => {
-      locale.value = locale.value === 'es' ? 'en' : 'es';
+    const fetchAlerts = async () => {
+      try {
+        loading.value = true;
+        await stockAlertService.fetchAlerts();
+        loading.value = false;
+      } catch (err) {
+        error.value = 'Error al cargar las alertas: ' + err.message;
+        loading.value = false;
+      }
     };
 
-    return {
-      toggleLanguage
-    };
-  },
+    onMounted(() => {
+      fetchAlerts();
+    });
 
-  data() {
-    return {
-      search: "",
-      alerts: [
-        {
-          id: 1,
-          alert_type: "Stock Mínimo",
-          product_category: "Menestras",
-          product_name: "Lentejitas Garbanzo Pallares",
-          alert_date: "24/05",
-          severity: "warning",
-          details: "Stock crítico"
-        },
-        {
-          id: 2,
-          alert_type: "Stock Máximo",
-          product_category: "Menestras",
-          product_name: "Lentejitas Garbanzo Pallares",
-          alert_date: "24/05",
-          severity: "info",
-          details: "Sobre stock"
-        },
-        {
-          id: 3,
-          alert_type: "Pronto a vencer",
-          product_category: "Menestras",
-          product_name: "Lentejitas Garbanzo Pallares",
-          alert_date: "24/05",
-          severity: "danger",
-          details: "Caduca pronto"
-        }
-      ]
-    };
-  },
-  computed: {
-    filteredAlerts() {
-      return this.alerts.filter(a =>
-          a.product_name.toLowerCase().includes(this.search.toLowerCase())
+    const filteredAlerts = computed(() => {
+      return stockAlertService.alerts.filter(alert =>
+        alert.productName.toLowerCase().includes(search.value.toLowerCase())
       );
-    }
-  },
-  methods: {
-    showDetails(alert) {
-      alert("Detalles: " + alert.details);
-    },
-    deleteAlert(alert) {
-      this.alerts = this.alerts.filter(a => a.id !== alert.id);
-    }
+    });
+
+    return {
+      search,
+      loading,
+      error,
+      filteredAlerts
+    };
   }
 };
 </script>
@@ -133,11 +120,23 @@ export default {
   font-size: 1rem;
   width: 100%;
 }
+
 .search-input::placeholder {
   color: #555;
   opacity: 1;
 }
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #dc3545;
+}
 </style>
+
 <style>
 body {
   background-color: #FFF5E0;

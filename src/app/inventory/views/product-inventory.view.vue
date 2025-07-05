@@ -2,22 +2,93 @@
 import { ref, onMounted } from 'vue'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
-import NewProduct from '../models/NewProduct.entity.js'
+import ProductApiService from '../../add-products/services/product-api.service'
 
 const products = ref([])
 const viewMode = ref('table')
 const showAddForm = ref(false)
-const newProduct = ref(new NewProduct({}))
+const selectedTags = ref([])
+const categories = ref([
+  { id: 1, name: 'Bebidas' },
+  { id: 2, name: 'Lácteos' },
+  { id: 3, name: 'Panadería' },
+  { id: 4, name: 'Carnes' },
+  { id: 5, name: 'Frutas y Verduras' },
+  { id: 6, name: 'Abarrotes' },
+  { id: 7, name: 'Limpieza' },
+  { id: 8, name: 'Higiene Personal' },
+  { id: 9, name: 'Congelados' },
+  { id: 10, name: 'Snacks' }
+])
+const units = ref([])
+const availableTags = ref([])
+
+const newProduct = ref({
+  name: '',
+  description: '',
+  purchasePrice: null,
+  salePrice: null,
+  categoryId: '',
+  unitId: '',
+  internalNotes: '',
+  tagIds: []
+})
+
+const loadUnits = async () => {
+  try {
+    const response = await ProductApiService.getUnits()
+    units.value = response.data
+  } catch (error) {
+    console.error('Error al cargar unidades:', error)
+  }
+}
+
+const loadTags = async () => {
+  try {
+    const response = await ProductApiService.getTags()
+    availableTags.value = response.data
+  } catch (error) {
+    console.error('Error al cargar etiquetas:', error)
+  }
+}
+
+const getTagName = (tagId) => {
+  const tag = availableTags.value.find(t => t.id === tagId)
+  return tag ? tag.name : ''
+}
+
+const toggleTag = (tagId) => {
+  const index = selectedTags.value.indexOf(tagId)
+  if (index === -1) {
+    selectedTags.value.push(tagId)
+  } else {
+    selectedTags.value.splice(index, 1)
+  }
+  newProduct.value.tagIds = [...selectedTags.value]
+}
+
+const removeTag = (tagId) => {
+  selectedTags.value = selectedTags.value.filter(id => id !== tagId)
+  newProduct.value.tagIds = [...selectedTags.value]
+}
+
+const handleAddProduct = async () => {
+  try {
+    await ProductApiService.createProduct(newProduct.value)
+    showAddForm.value = false
+    // Recargar productos
+    products.value = await fetchProducts()
+  } catch (error) {
+    console.error('Error al guardar el producto:', error)
+    alert('Error al guardar el producto. Por favor intenta de nuevo.')
+  }
+}
 
 onMounted(async () => {
   products.value = await fetchProducts()
+  loadUnits()
+  loadTags()
 })
-
-const handleAddProduct = () => {
-
-  console.log('Nuevo producto:', newProduct.value)
-  showAddForm.value = false
-}
 </script>
 
 <template>
@@ -71,98 +142,161 @@ const handleAddProduct = () => {
       </div>
     </div>
 
+    <!-- Modal de Añadir Producto -->
     <div v-if="showAddForm" class="modal-overlay">
       <div class="modal-window">
-        <h2>Agregar Producto</h2>
-
-        <div class="form-content">
+        <h2>Añadir Producto</h2>
+        <form @submit.prevent="handleAddProduct" class="form-content">
           <div class="form-group">
-            <label>Nombre</label>
+            <label for="name">Nombre</label>
             <input
-                type="text"
-                v-model="newProduct.nombre"
-                class="form-input"
-                placeholder="Nombre del producto"
-            >
+              id="name"
+              type="text"
+              v-model="newProduct.name"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea
+              id="description"
+              v-model="newProduct.description"
+              class="form-textarea"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="purchasePrice">Precio de compra</label>
+              <div class="price-input">
+                <span class="currency">$</span>
+                <input
+                  id="purchasePrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  v-model.number="newProduct.purchasePrice"
+                  class="form-input price"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group half">
+              <label for="salePrice">Precio de venta</label>
+              <div class="price-input">
+                <span class="currency">$</span>
+                <input
+                  id="salePrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  v-model.number="newProduct.salePrice"
+                  class="form-input price"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Categoría</label>
+            <div class="custom-select">
+              <select 
+                v-model="newProduct.categoryId"
+                class="form-select"
+                required
+              >
+                <option value="" disabled selected>Selecciona una categoría</option>
+                <option 
+                  v-for="category in categories" 
+                  :key="category.id" 
+                  :value="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Unidad de medida</label>
+            <div class="custom-select">
+              <select 
+                v-model="newProduct.unitId"
+                class="form-select"
+                required
+              >
+                <option value="" disabled selected>Selecciona una unidad</option>
+                <option 
+                  v-for="unit in units" 
+                  :key="unit.id" 
+                  :value="unit.id"
+                >
+                  {{ unit.name }} ({{ unit.abbreviation }})
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="form-group">
             <label>Etiquetas</label>
             <div class="tags-container">
-              <div class="tag">Golosina</div>
-              <div class="tag">Golosina</div>
-              <button class="add-tag-btn">+ Añadir</button>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group half">
-              <label>Precio de compra</label>
-              <div class="price-input">
-                <span class="currency">$</span>
-                <input
-                    type="number"
-                    v-model="newProduct.precioCompra"
-                    class="form-input"
-                    value="00.00"
+              <div class="tags-grid">
+                <div
+                  v-for="tag in availableTags"
+                  :key="tag.id"
+                  class="tag-option"
+                  :class="{ 'selected': selectedTags.includes(tag.id) }"
+                  @click="toggleTag(tag.id)"
                 >
+                  {{ tag.name }}
+                </div>
+              </div>
+              <div class="selected-tags" v-if="selectedTags.length > 0">
+                <p class="selected-label">Etiquetas seleccionadas:</p>
+                <div class="selected-tags-grid">
+                  <span 
+                    v-for="tagId in selectedTags" 
+                    :key="tagId" 
+                    class="tag-badge"
+                  >
+                    {{ getTagName(tagId) }}
+                    <button 
+                      type="button" 
+                      class="remove-tag" 
+                      @click.stop="removeTag(tagId)"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </div>
               </div>
             </div>
-
-            <div class="form-group half">
-              <label>Precio de venta</label>
-              <div class="price-input">
-                <span class="currency">$</span>
-                <input
-                    type="number"
-                    v-model="newProduct.precioVenta"
-                    class="form-input"
-                    value="00.00"
-                >
-              </div>
-            </div>
           </div>
 
           <div class="form-group">
-            <label>Cantidad</label>
-            <input
-                type="number"
-                v-model="newProduct.cantidad"
-                class="form-input"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Lote</label>
-            <select v-model="newProduct.lote" class="form-input">
-              <option value="">Seleccionar lote</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Fecha de caducidad</label>
-            <input
-                type="date"
-                v-model="newProduct.fechaCaducidad"
-                class="form-input"
-                placeholder="DD/MM/AAAA"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Nota</label>
+            <label for="internalNotes">Notas internas</label>
             <textarea
-                v-model="newProduct.nota"
-                class="form-input"
-                rows="3"
+              id="internalNotes"
+              v-model="newProduct.internalNotes"
+              class="form-textarea"
+              rows="2"
             ></textarea>
           </div>
 
           <div class="form-actions">
-            <button class="save-button" @click="handleAddProduct">Guardar</button>
-            <button class="cancel-button" @click="showAddForm = false">Cancelar</button>
+            <button type="submit" class="save-button">
+              Guardar Producto
+            </button>
+            <button type="button" class="cancel-button" @click="showAddForm = false">
+              Cancelar
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>
@@ -433,17 +567,17 @@ h2 {
 
 .modal-window {
   background: #FFF5E0;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 2rem;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
 }
 
 .form-content {
-  margin-top: 1rem;
+  padding: 2rem;
+  border-radius: 12px;
 }
 
 .form-group {
@@ -461,40 +595,53 @@ h2 {
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  color: #333;
   font-weight: 500;
 }
 
-.form-input {
+.form-input,
+.form-textarea,
+.form-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  background: white;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background-color: white;
 }
 
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #BC162A;
+  box-shadow: 0 0 0 3px rgba(188, 22, 42, 0.1);
 }
 
-.tag {
-  background: #F4A460;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 16px;
+.custom-select {
+  position: relative;
+  width: 100%;
 }
 
-.add-tag-btn {
-  background: none;
-  border: none;
-  color: #F4A460;
-  cursor: pointer;
+.form-select {
+  appearance: none;
+  padding-right: 2.5rem;
+}
+
+.custom-select::after {
+  content: '';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #666;
+  pointer-events: none;
 }
 
 .price-input {
@@ -509,51 +656,146 @@ label {
   color: #666;
 }
 
-.price-input .form-input {
-  padding-left: 2rem;
+.price {
+  padding-left: 1.75rem;
+}
+
+.tags-container {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.tags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tag-option {
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.tag-option:hover {
+  border-color: #BC162A;
+  background: #FFF5F5;
+}
+
+.tag-option.selected {
+  background: #BC162A;
+  color: white;
+  border-color: #BC162A;
+}
+
+.selected-label {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.selected-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-badge {
+  background: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.25rem;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.remove-tag:hover {
+  background: #e2e8f0;
+  color: #BC162A;
 }
 
 .form-actions {
-  margin-top: 2rem;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
-.save-button, .cancel-button {
-  padding: 0.75rem 3rem;
-  border-radius: 24px;
+.save-button,
+.cancel-button {
+  padding: 0.75rem 2rem;
   border: none;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 1rem;
+  transition: all 0.2s;
 }
 
 .save-button {
-  background: #dc3545;
-  color: white;
-}
-
-.cancel-button {
-  background: #6c757d;
+  background: #BC162A;
   color: white;
 }
 
 .save-button:hover {
-  background: #c82333;
+  background: #a01223;
+}
+
+.cancel-button {
+  background: #e2e8f0;
+  color: #4a5568;
 }
 
 .cancel-button:hover {
-  background: #5a6268;
+  background: #cbd5e0;
 }
 
 @media (max-width: 768px) {
+  .modal-window {
+    padding: 1rem;
+    width: 95%;
+  }
+
   .form-row {
     flex-direction: column;
   }
 
-  .modal-window {
-    padding: 1rem;
-    width: 95%;
+  .tags-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .save-button,
+  .cancel-button {
+    width: 100%;
   }
 }
 </style>

@@ -1,482 +1,478 @@
 <template>
   <div class="add-product-container">
     <div class="form-header">
-      <h1 class="page-title">{{ $t('addProduct.title') }}</h1>
+      <h1 class="page-title">Añadir Producto</h1>
     </div>
 
     <form @submit.prevent="saveProduct" class="product-form">
       <div class="form-group">
-        <label for="productName">{{ $t('addProduct.labels.name') }}</label>
+        <label for="name">Nombre</label>
         <input
-            id="productName"
-            type="text"
-            v-model="product.name"
-            @input="validateName"
-            class="form-input"
-            :class="{ 'error': nameError }"
-            required
+          id="name"
+          type="text"
+          v-model="product.name"
+          class="form-input"
+          required
         />
-        <span v-if="nameError" class="error-message">{{ nameError }}</span>
       </div>
 
       <div class="form-group">
-        <label>{{ $t('addProduct.labels.tags') }}</label>
-        <div class="tags-section">
-          <div class="selected-tags">
-            <span
-                v-for="(tag, index) in product.tags"
-                :key="index"
-                class="tag"
-            >
-              {{ tag }}
-              <button
-                  type="button"
-                  @click="removeTag(index)"
-                  class="remove-tag"
-              >
-                ×
-              </button>
-            </span>
-          </div>
-          <button
-              type="button"
-              @click="showTagModal = true"
-              class="add-tag-button"
-          >
-            + {{ $t('addProduct.addTag') }}
-          </button>
-        </div>
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          v-model="product.description"
+          class="form-textarea"
+          rows="3"
+        ></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group half-width">
-          <label for="buyPrice">{{ $t('addProduct.labels.buyPrice') }}</label>
+          <label for="purchasePrice">Precio de compra</label>
           <div class="price-input">
             <span class="currency">$</span>
             <input
-                id="buyPrice"
-                type="number"
-                step="0.01"
-                min="0"
-                v-model.number="product.buyPrice"
-                class="form-input price"
-                :class="{ 'error': buyPriceError }"
-                placeholder="00.00"
+              id="purchasePrice"
+              type="number"
+              step="0.01"
+              min="0"
+              v-model.number="product.purchasePrice"
+              class="form-input price"
+              required
             />
           </div>
-          <span v-if="buyPriceError" class="error-message">{{ buyPriceError }}</span>
         </div>
 
         <div class="form-group half-width">
-          <label for="sellPrice">{{ $t('addProduct.labels.sellPrice') }}</label>
+          <label for="salePrice">Precio de venta</label>
           <div class="price-input">
             <span class="currency">$</span>
             <input
-                id="sellPrice"
-                type="number"
-                step="0.01"
-                min="0"
-                v-model.number="product.sellPrice"
-                class="form-input price"
-                :class="{ 'error': sellPriceError }"
-                placeholder="00.00"
+              id="salePrice"
+              type="number"
+              step="0.01"
+              min="0"
+              v-model.number="product.salePrice"
+              class="form-input price"
+              required
             />
           </div>
-          <span v-if="sellPriceError" class="error-message">{{ sellPriceError }}</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="quantity">{{ $t('addProduct.labels.quantity') }}</label>
-        <input
-            id="quantity"
-            type="number"
-            min="1"
-            v-model.number="product.quantity"
-            class="form-input"
-            :class="{ 'error': quantityError }"
-            required
-        />
-        <span v-if="quantityError" class="error-message">{{ quantityError }}</span>
-      </div>
-
-      <div class="form-group">
-        <label for="batch">{{ $t('addProduct.labels.batch') }}</label>
-        <select
-            id="batch"
-            v-model="product.batch"
+        <label for="category">Categoría</label>
+        <div class="custom-select">
+          <select 
+            id="category"
+            v-model="product.categoryId"
             class="form-select"
-            :class="{ 'error': batchError }"
-        >
-          <option value="">{{ $t('addProduct.selectBatch') }}</option>
-          <option value="LOTE001">LOTE001</option>
-          <option value="LOTE002">LOTE002</option>
-          <option value="LOTE003">LOTE003</option>
-        </select>
-        <span v-if="batchError" class="error-message">{{ batchError }}</span>
+            required
+          >
+            <option value="" disabled selected>Selecciona una categoría</option>
+            <option 
+              v-for="category in categories" 
+              :key="category.id" 
+              :value="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="expiryDate">{{ $t('addProduct.labels.expiryDate') }}</label>
-        <input
-            id="expiryDate"
-            type="date"
-            v-model="product.expiryDate"
-            class="form-input"
-            :class="{ 'error': expiryDateError }"
-        />
-        <span v-if="expiryDateError" class="error-message">{{ expiryDateError }}</span>
+        <label for="unit">Unidad de medida</label>
+        <div class="custom-select">
+          <select 
+            id="unit"
+            v-model="product.unitId"
+            class="form-select"
+            required
+          >
+            <option value="" disabled selected>Selecciona una unidad</option>
+            <option 
+              v-for="unit in units" 
+              :key="unit.id" 
+              :value="unit.id"
+            >
+              {{ unit.name }} ({{ unit.abbreviation }})
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="notes">{{ $t('addProduct.labels.notes') }}</label>
+        <label>Etiquetas</label>
+        <div class="tags-container">
+          <div class="tags-grid">
+            <div
+              v-for="tag in availableTags"
+              :key="tag.id"
+              class="tag-option"
+              :class="{ 'selected': selectedTags.includes(tag.id) }"
+              @click="toggleTag(tag.id)"
+            >
+              {{ tag.name }}
+            </div>
+          </div>
+          <div class="selected-tags" v-if="selectedTags.length > 0">
+            <p class="selected-label">Etiquetas seleccionadas:</p>
+            <div class="selected-tags-grid">
+              <span 
+                v-for="tagId in selectedTags" 
+                :key="tagId" 
+                class="tag-badge"
+              >
+                {{ getTagName(tagId) }}
+                <button 
+                  type="button" 
+                  class="remove-tag" 
+                  @click.stop="removeTag(tagId)"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="internalNotes">Notas internas</label>
         <textarea
-            id="notes"
-            v-model="product.notes"
-            class="form-textarea"
-            rows="4"
+          id="internalNotes"
+          v-model="product.internalNotes"
+          class="form-textarea"
+          rows="2"
         ></textarea>
       </div>
 
-      <button type="submit" class="save-button" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Guardando...' : $t('addProduct.save') }}
-      </button>
-    </form>
-
-    <!-- Modal para agregar etiquetas -->
-    <div v-if="showTagModal" class="modal-overlay" @click="closeTagModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>{{ $t('addProduct.selectTag') }}</h3>
-          <button type="button" @click="closeTagModal" class="close-button">×</button>
-        </div>
-
-        <div class="tag-options">
-          <button
-              v-for="tag in availableTags"
-              :key="tag.key"
-              type="button"
-              @click="addTag(tag.key)"
-              class="tag-option"
-              :class="{ 'selected': product.tags.includes(tag.key) }"
-          >
-            {{ $t(`addProduct.tags.${tag.key}`) }}
-          </button>
-        </div>
-
-        <div class="custom-tag-section">
-          <input
-              type="text"
-              v-model="customTag"
-              :placeholder="$t('addProduct.customTagPlaceholder')"
-              class="custom-tag-input"
-              @keyup.enter="addCustomTag"
-          />
-          <button
-              type="button"
-              @click="addCustomTag"
-              class="add-custom-tag"
-          >
-            {{ $t('addProduct.add') }}
-          </button>
-        </div>
+      <div class="form-actions">
+        <button type="submit" class="save-button" :disabled="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : 'Guardar Producto' }}
+        </button>
+        <button type="button" class="cancel-button" @click="$router.back()">
+          Cancelar
+        </button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
 <script>
+import { ref, reactive, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import ProductApiService from '../../services/product-api.service.js';
 
 export default {
   name: 'AddProduct',
-  data() {
-    return {
-      showTagModal: false,
-      customTag: '',
-      isSubmitting: false,
-      nameError: '',
-      buyPriceError: '',
-      sellPriceError: '',
-      quantityError: '',
-      batchError: '',
-      expiryDateError: '',
-      product: {
-        name: '',
-        tags: [],
-        buyPrice: null,
-        sellPrice: null,
-        quantity: '',
-        batch: '',
-        expiryDate: '',
-        notes: ''
-      },
-      availableTags: [
-        { key: 'sweet', value: 'Dulce' },
-        { key: 'salty', value: 'Salado' },
-        { key: 'filled', value: 'Rellenas' },
-        { key: 'chocolate', value: 'Chocolate' },
-        { key: 'vanilla', value: 'Vainilla' },
-        { key: 'cookies', value: 'Galletas' }
-      ]
-    }
-  },
-  methods: {
-    validateName() {
-      const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-      if (!this.product.name.trim()) {
-        this.nameError = 'El nombre es requerido';
-      } else if (!nameRegex.test(this.product.name)) {
-        this.nameError = 'El nombre solo puede contener letras y espacios';
-      } else if (this.product.name.length < 3) {
-        this.nameError = 'El nombre debe tener al menos 3 caracteres';
+  setup() {
+    const router = useRouter();
+    const isSubmitting = ref(false);
+    const selectedTags = ref([]);
+    
+    const product = reactive({
+      name: '',
+      description: '',
+      purchasePrice: null,
+      salePrice: null,
+      categoryId: '',
+      unitId: '',
+      internalNotes: '',
+      tagIds: []
+    });
+
+    const categories = ref([
+      { id: 1, name: 'Bebidas' },
+      { id: 2, name: 'Lácteos' },
+      { id: 3, name: 'Panadería' },
+      { id: 4, name: 'Carnes' },
+      { id: 5, name: 'Frutas y Verduras' },
+      { id: 6, name: 'Abarrotes' },
+      { id: 7, name: 'Limpieza' },
+      { id: 8, name: 'Higiene Personal' },
+      { id: 9, name: 'Congelados' },
+      { id: 10, name: 'Snacks' }
+    ]);
+
+    const units = ref([]);
+    const availableTags = ref([]);
+
+    const loadUnits = async () => {
+      try {
+        const response = await ProductApiService.getUnits();
+        units.value = response.data;
+      } catch (error) {
+        console.error('Error al cargar unidades:', error);
+      }
+    };
+
+    const loadTags = async () => {
+      try {
+        const response = await ProductApiService.getTags();
+        availableTags.value = response.data;
+      } catch (error) {
+        console.error('Error al cargar etiquetas:', error);
+      }
+    };
+
+    const getTagName = (tagId) => {
+      const tag = availableTags.value.find(t => t.id === tagId);
+      return tag ? tag.name : '';
+    };
+
+    const toggleTag = (tagId) => {
+      const index = selectedTags.value.indexOf(tagId);
+      if (index === -1) {
+        selectedTags.value.push(tagId);
       } else {
-        this.nameError = '';
+        selectedTags.value.splice(index, 1);
       }
-    },
-    validatePrices() {
-      this.buyPriceError = '';
-      this.sellPriceError = '';
-      
-      if (this.product.buyPrice !== null && this.product.buyPrice < 0) {
-        this.buyPriceError = 'El precio de compra no puede ser negativo';
-      }
-      
-      if (this.product.sellPrice !== null && this.product.sellPrice < 0) {
-        this.sellPriceError = 'El precio de venta no puede ser negativo';
-      }
-      
-      if (this.product.buyPrice !== null && this.product.sellPrice !== null) {
-        if (this.product.sellPrice <= this.product.buyPrice) {
-          this.sellPriceError = 'El precio de venta debe ser mayor al precio de compra';
-        }
-      }
-    },
-    validateQuantity() {
-      if (!this.product.quantity || this.product.quantity <= 0) {
-        this.quantityError = 'La cantidad debe ser mayor a 0';
-      } else if (!Number.isInteger(this.product.quantity)) {
-        this.quantityError = 'La cantidad debe ser un número entero';
-      } else {
-        this.quantityError = '';
-      }
-    },
-    validateBatch() {
-      if (!this.product.batch) {
-        this.batchError = 'Debe seleccionar un lote';
-      } else {
-        this.batchError = '';
-      }
-    },
-    validateExpiryDate() {
-      if (this.product.expiryDate) {
-        const today = new Date();
-        const expiryDate = new Date(this.product.expiryDate);
-        if (expiryDate <= today) {
-          this.expiryDateError = 'La fecha de vencimiento debe ser futura';
-        } else {
-          this.expiryDateError = '';
-        }
-      } else {
-        this.expiryDateError = '';
-      }
-    },
-    validateForm() {
-      this.validateName();
-      this.validatePrices();
-      this.validateQuantity();
-      this.validateBatch();
-      this.validateExpiryDate();
-      
-      return !this.nameError && !this.buyPriceError && !this.sellPriceError && 
-             !this.quantityError && !this.batchError && !this.expiryDateError;
-    },
-    async saveProduct() {
-      if (!this.validateForm()) {
-        alert('Por favor, corrija los errores en el formulario');
+    };
+
+    const removeTag = (tagId) => {
+      selectedTags.value = selectedTags.value.filter(id => id !== tagId);
+    };
+
+    watch(selectedTags, (newTags) => {
+      product.tagIds = [...newTags];
+    });
+
+    const saveProduct = async () => {
+      if (!product.categoryId || !product.unitId) {
+        alert('Por favor selecciona una categoría y una unidad de medida');
         return;
       }
-
-      if (this.product.tags.length === 0) {
-        alert('Debe agregar al menos una etiqueta');
-        return;
-      }
-
-      this.isSubmitting = true;
 
       try {
-        const productData = {
-          name: this.product.name.trim(),
-          category: 'Golosina',
-          stock: this.product.quantity,
-          quantity: this.product.quantity,
-          buyPrice: this.product.buyPrice,
-          sellPrice: this.product.sellPrice,
-          batch: this.product.batch,
-          expiryDate: this.product.expiryDate,
-          notes: this.product.notes.trim(),
-          tags: this.product.tags
-        };
-
-        await ProductApiService.createProduct(productData);
-        
-        alert('Producto guardado exitosamente');
-        this.$router.push('/products');
+        isSubmitting.value = true;
+        await ProductApiService.createProduct(product);
+        router.push('/inventory');
       } catch (error) {
-        console.error('Error al guardar producto:', error);
-        alert('Error al guardar el producto. Por favor, intente nuevamente.');
+        console.error('Error al guardar el producto:', error);
+        alert('Error al guardar el producto. Por favor intenta de nuevo.');
       } finally {
-        this.isSubmitting = false;
+        isSubmitting.value = false;
       }
-    },
-    addTag(tagKey) {
-      if (!this.product.tags.includes(tagKey)) {
-        this.product.tags.push(tagKey);
-      }
-      this.closeTagModal();
-    },
-    addCustomTag() {
-      if (this.customTag.trim() && !this.product.tags.includes(this.customTag.trim())) {
-        this.product.tags.push(this.customTag.trim());
-        this.customTag = '';
-        this.closeTagModal();
-      }
-    },
-    removeTag(index) {
-      this.product.tags.splice(index, 1);
-    },
-    closeTagModal() {
-      this.showTagModal = false;
-      this.customTag = '';
-    }
-  },
-  watch: {
-    'product.buyPrice'() {
-      this.validatePrices();
-    },
-    'product.sellPrice'() {
-      this.validatePrices();
-    },
-    'product.quantity'() {
-      this.validateQuantity();
-    },
-    'product.batch'() {
-      this.validateBatch();
-    },
-    'product.expiryDate'() {
-      this.validateExpiryDate();
-    }
+    };
+
+    onMounted(() => {
+      loadUnits();
+      loadTags();
+    });
+
+    return {
+      product,
+      categories,
+      units,
+      availableTags,
+      selectedTags,
+      isSubmitting,
+      getTagName,
+      removeTag,
+      toggleTag,
+      saveProduct
+    };
   }
-}
+};
 </script>
 
 <style scoped>
-/* Asegurar que el fondo cubra toda la página */
 .add-product-container {
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 2rem;
-  background-color: white;
-  font-family: 'Arial', sans-serif;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 100vh;
+  background-color: #FFF5E0;
+  min-height: calc(100vh - 64px);
 }
 
 .form-header {
-  text-align: left;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #f97316;
-  padding-bottom: 1rem;
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: bold;
+  font-size: 2rem;
   color: #333;
   margin: 0;
 }
 
 .product-form {
-  max-width: 800px;
-  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .form-group {
   margin-bottom: 1.5rem;
 }
 
-.form-group label {
-  display: block;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.form-input, .form-select, .form-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
-  background-color: white;
-  color: #333;
-  color-scheme: light;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
-}
-
 .form-row {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .half-width {
   flex: 1;
 }
 
+label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background-color: white;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #BC162A;
+  box-shadow: 0 0 0 3px rgba(188, 22, 42, 0.1);
+}
+
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  appearance: none;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #BC162A;
+  box-shadow: 0 0 0 3px rgba(188, 22, 42, 0.1);
+}
+
+.custom-select::after {
+  content: '';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #666;
+  pointer-events: none;
+}
+
+.form-select[multiple] {
+  height: auto;
+  min-height: 150px;
+  padding: 0.5rem;
+}
+
+.form-select[multiple] option {
+  padding: 0.75rem;
+  margin: 2px 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-select[multiple] option:hover {
+  background-color: #f8f9fa;
+}
+
+.form-select[multiple] option:checked {
+  background: #BC162A;
+  color: white;
+}
+
 .price-input {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .currency {
   position: absolute;
   left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: #666;
 }
 
-.form-input.price {
-  padding-left: 2rem;
+.price {
+  padding-left: 1.75rem;
 }
 
-.tags-section {
-  border: 1px solid #d1d5db;
+.tags-container {
+  background: white;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1rem;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
-.selected-tags {
+.tags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tag-option {
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.tag-option:hover {
+  border-color: #BC162A;
+  background: #FFF5F5;
+}
+
+.tag-option.selected {
+  background: #BC162A;
+  color: white;
+  border-color: #BC162A;
+}
+
+.selected-label {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.selected-tags-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.tag {
-  background: #FEF3C7;
-  color: #92400E;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+.tag-badge {
+  background: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  color: #333;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -485,194 +481,69 @@ export default {
 .remove-tag {
   background: none;
   border: none;
-  color: #92400E;
-  cursor: pointer;
-  font-size: 1.2rem;
-  line-height: 1;
+  color: #666;
+  font-size: 1.25rem;
   padding: 0;
-  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 
-.add-tag-button {
-  background: none;
-  color: #007bff;
+.remove-tag:hover {
+  background: #e2e8f0;
+  color: #BC162A;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.save-button,
+.cancel-button {
+  padding: 0.75rem 2rem;
   border: none;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: underline;
-  padding: 0;
-}
-
-.add-tag-button:hover {
-  color: #0056b3;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 100px;
+  transition: all 0.2s;
 }
 
 .save-button {
-  display: block;
-  width: auto;
-  min-width: 200px;
-  background: #c41e3a;
+  background: #BC162A;
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 1rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin: 2rem auto 0 auto;
 }
 
 .save-button:hover {
-  background: #a01729;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: 90%;
-  max-width: 400px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: #333;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tag-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tag-option {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.3s;
-  color: #9ca3af;
-}
-
-.tag-option:hover {
-  background: #e5e7eb;
-}
-
-.tag-option.selected {
-  background: #f97316;
-  color: white;
-  border-color: #f97316;
-}
-
-.custom-tag-section {
-  display: flex;
-  gap: 0.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
-}
-
-.custom-tag-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background-color: #4b5563;
-  color: white;
-}
-
-.custom-tag-input::placeholder {
-  color: #d1d5db;
-}
-
-.add-custom-tag {
-  background: #34d399;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1.5rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  font-weight: bold;
-}
-
-.add-custom-tag:hover {
-  background: #10b981;
-}
-
-/* Error Styles */
-.form-input.error, .form-select.error {
-  border-color: #dc2626;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
-}
-
-.error-message {
-  color: #dc2626;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
+  background: #a01223;
 }
 
 .save-button:disabled {
-  background: #9ca3af;
+  background: #ccc;
   cursor: not-allowed;
 }
 
-.save-button:disabled:hover {
-  background: #9ca3af;
+.cancel-button {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.cancel-button:hover {
+  background: #cbd5e0;
+}
+
+.helper-text {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
@@ -680,25 +551,25 @@ export default {
     padding: 1rem;
   }
 
-  .product-form {
-    padding: 0;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-  }
-
   .form-row {
     flex-direction: column;
-    gap: 1.5rem;
   }
 
   .half-width {
     width: 100%;
   }
 
-  .save-button {
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .save-button,
+  .cancel-button {
     width: 100%;
+  }
+
+  .tags-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
 </style>

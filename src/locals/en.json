@@ -51,7 +51,7 @@
     "providerDate": "Provider Date",
     "history": "History",
     "inventory": "Inventory",
-    "expirationTitle": "Products Expiring Soon",
+    "expirationTitle": "Products With Low Stock",
     "addProducts": "Add Products",
     "kits": "Kits",
     "returns": "Product Returns",

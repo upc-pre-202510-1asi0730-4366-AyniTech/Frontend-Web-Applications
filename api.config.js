@@ -1,7 +1,6 @@
-const config = {
-    baseURL: import.meta.env.VITE_API_URL,
-    timeout: import.meta.env.VITE_API_TIMEOUT,
-    useMock: import.meta.env.VITE_API_MOCK === 'true'
-}
-
-export default config
+export const API_CONFIG = {
+    BASE_URL: 'https://stockwise-a4g5evcsbyh9c3df.centralus-01.azurewebsites.net',
+    ENDPOINTS: {
+        ALERTS: '/api/alerts'
+    }
+};

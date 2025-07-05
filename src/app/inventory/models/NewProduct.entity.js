@@ -1,35 +1,29 @@
 export default class NewProduct {
-    constructor({
-                    id = null,
-                    categoria = '',
-                    producto = '',
-                    fechaEntrada = '',
-                    cantidad = '',
-                    precio = '00.00',
-                    stockMinimo = '',
-                    unidad = ''
-                } = {}) {
-        this.id = id
-        this.categoria = categoria
-        this.producto = producto
-        this.fechaEntrada = fechaEntrada
-        this.cantidad = cantidad
-        this.precio = precio
-        this.stockMinimo = stockMinimo
-        this.unidad = unidad
+    constructor() {
+        this.name = '';
+        this.description = '';
+        this.purchasePrice = 0;
+        this.salePrice = 0;
+        this.stock = 0;
+        this.minStock = 0;
+        this.categoryId = null;
+        this.unitId = null;
+        this.expirationDate = null;
+        this.internalNotes = '';
+        this.tagIds = [];
     }
 
     toJSON() {
         return {
-            id: this.id,
-            categoria: this.categoria,
-            producto: this.producto,
-            fechaEntrada: this.fechaEntrada,
-            cantidad: this.cantidad,
-            precio: this.precio,
-            stockMinimo: this.stockMinimo,
-            unidad: this.unidad
-        }
+            name: this.name,
+            description: this.description,
+            purchasePrice: this.purchasePrice,
+            salePrice: this.salePrice,
+            internalNotes: this.internalNotes,
+            categoryId: this.categoryId,
+            unitId: this.unitId,
+            tagIds: this.tagIds
+        };
     }
 
     static fromJSON(json) {
