@@ -1,0 +1,8 @@
+{
+  "/auth/*": "/$1",
+  "/auth/register": "/users",
+  "/auth/login": "/users?email=:email&password=:password",
+  "/api/products": "/products",
+  "/api/products/:id": "/products/:id",
+  "/api/products/filter": "/products"
+}
