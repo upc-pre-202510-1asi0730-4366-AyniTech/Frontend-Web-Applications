@@ -1,33 +1,12 @@
-import StockSummary from "../model/stock.entity.js";
+    import axios from 'axios'
+    import StockEntity from '../model/stock.entity'
 
-export async function fetchStockSummary() {
-    return [
-        new StockSummary({
-            id: 1,
-            stockPromedio: 25,
-            categoria: "Lácteos",
-            producto: "Leche",
-            fechaConsulta: "14/04",
-            stockIdeal: 15,
-            estado: "Estable"
-        }),
-        new StockSummary({
-            id: 2,
-            stockPromedio: 5,
-            categoria: "Enlatados",
-            producto: "Atún",
-            fechaConsulta: "12/04",
-            stockIdeal: 10,
-            estado: "Estable"
-        }),
-        new StockSummary({
-            id: 3,
-            stockPromedio: 30,
-            categoria: "Cereales",
-            producto: "Avena",
-            fechaConsulta: "13/04",
-            stockIdeal: 20,
-            estado: "Estable"
-        })
-    ]
-}
+    const api = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        timeout: import.meta.env.VITE_API_TIMEOUT || 5000
+    })
+
+    export async function fetchStockSummary() {
+        const response = await api.get('/api/v1/reports/stock-average')
+        return response.data.map(item => new StockEntity(item))
+    }

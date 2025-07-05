@@ -1,24 +1,18 @@
+// models/kit-products.entity.js
 export default class Kit {
-    constructor({
-                    id = null,
-                    name = '',
-                    price = '00.00',
-                    stock = '',
-                }) {
+    constructor({ id = null, name = '', price = 's/. 00.00', stock = '' }) {
         this.id = id;
         this.name = name;
-        this.price = price; // Formato: 's/. XX'
-        this.stock = stock; // Formato: 'XX Stock'
+        this.price = price;
+        this.stock = stock;
     }
 
-    // Metodo para convertir a un objeto plano
     toJSON() {
         return {
             id: this.id,
             name: this.name,
             price: this.price,
-            stock: this.stock,
+            stock: this.stock
         };
     }
 }
-

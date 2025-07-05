@@ -21,7 +21,7 @@
           <div class="header-anadir">{{ $t('kits.add') }}</div>
         </div>
 
-        <div v-for="(product, index) in products" :key="index" 
+        <div v-for="(product, index) in products" :key="index"
           class="product-row"
           :class="{ 'selected-row': isSelected(product) }"
         >
@@ -42,30 +42,23 @@
     </template>
   </div>
 </template>
-
 <script>
 import 'primeicons/primeicons.css';
 import Button from 'primevue/button';
+import { fetchCombos } from '../services/kit-products-api.service.js';
 
 export default {
   name: 'KitsProducts',
-  components: {
-    Button
-  },
+  components: { Button },
   data() {
     return {
-      products: [
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'},
-        {name: 'Golosina', price: 's/. 10', stock: '20 Stock'}
-      ],
+      products: [],
       selectedProducts: [],
       showSuccess: false
-    }
+    };
+  },
+  async mounted() {
+    this.products = await fetchCombos();
   },
   methods: {
     addToKit(product) {
@@ -84,7 +77,7 @@ export default {
       setTimeout(() => { this.showSuccess = false; }, 2000);
     }
   }
-}
+};
 </script>
 
 <style scoped>

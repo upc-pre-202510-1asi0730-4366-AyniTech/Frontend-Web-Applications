@@ -1,22 +1,28 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchProducts } from '../services/product-api.service'
-import ProductCard from '../components/product-card.component.vue'
-import NewProduct from '../models/NewProduct.entity.js'
+import { fetchProductInventory } from '@/app/inventory/services/product-api.service.js'
 
 const products = ref([])
-const viewMode = ref('table')
 const showAddForm = ref(false)
-const newProduct = ref(new NewProduct({}))
+const isLoading = ref(true)
+const error = ref(null)
+
 
 onMounted(async () => {
-  products.value = await fetchProducts()
+  try {
+    const data = await fetchProductInventory()
+    console.log('Datos cargados:', data)
+    products.value = data
+  } catch (err) {
+    error.value = 'Error al cargar productos'
+  } finally {
+    isLoading.value = false
+  }
 })
 
-const handleAddProduct = () => {
 
-  console.log('Nuevo producto:', newProduct.value)
-  showAddForm.value = false
+function toggleForm() {
+  showAddForm.value = !showAddForm.value
 }
 </script>
 
@@ -34,6 +40,8 @@ const handleAddProduct = () => {
             <i class="fas fa-calendar"></i>
           </button>
         </div>
+        <input type="number" placeholder="Cantidad por unidad" class="number-input" />
+        <input type="number" placeholder="Precio por unidad" class="number-input" />
         <input type="number" placeholder="Stock Mín" class="number-input" />
         <button class="btn-generate" @click="showAddForm = true">
           Generar Nuevo Producto
@@ -56,8 +64,8 @@ const handleAddProduct = () => {
       <div v-for="product in products" :key="product.id" class="table-row-container">
         <div class="table-row data">
           <div class="cell">{{ product.categoria }}</div>
-          <div class="cell">{{ product.nombre }}</div>
-          <div class="cell">{{ product.fechaEntrada }}</div>
+          <div class="cell">{{ product.producto }}</div>
+          <div class="cell">{{ product.fechaEntrada  }}</div>
           <div class="cell">{{ product.cantidad }}</div>
           <div class="cell">S/{{ product.precio }}</div>
           <div class="cell">{{ product.stockMinimo }}</div>

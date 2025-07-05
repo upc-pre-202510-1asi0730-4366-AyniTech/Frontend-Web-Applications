@@ -1,70 +1,22 @@
-import httpInstance from '../../shared/services/http.instance.js'
+import axios from 'axios'
 import NewLot from '../models/NewLot.entity.js'
 
-/**
- * @class LotService
- * @description Service for managing lot-related API operations
- */
-export class LotService {
-    /** @type {string} API endpoint path */
-    resourceEndpoint = import.meta.env.VITE_LOT_ENDPOINT_PATH
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    timeout: import.meta.env.VITE_API_TIMEOUT || 5000
+})
 
-    /**
-     * Retrieves all lots
-     * @returns {Promise<NewLot[]>}
-     */
-    async getAll() {
-        const res = await httpInstance.get(this.resourceEndpoint)
-        return res.data.map(lot => new NewLot(lot))
-    }
+export async function fetchLotInventory() {
+    const response = await api.get('/api/v1/inventory/by-batch')
+    return response.data.map(l => NewLot.fromJSON(l)) // 🟢 Aquí también
+}
 
-    /**
-     * Retrieves a lot by ID
-     * @param {string} id
-     * @returns {Promise<NewLot>}
-     */
-    async getById(id) {
-        const res = await httpInstance.get(`${this.resourceEndpoint}/${id}`)
-        return new NewLot(res.data)
-    }
+export async function fetchLotInventoryById(id) {
+    const response = await api.get(`/api/v1/inventory/by-batch/${id}`)
+    return NewLot.fromJSON(response.data)
+}
 
-    /**
-     * Creates a new lot
-     * @param {NewLot} lot
-     * @returns {Promise<NewLot>}
-     */
-    async create(lot) {
-        const res = await httpInstance.post(this.resourceEndpoint, lot)
-        return new NewLot(res.data)
-    }
-
-    /**
-     * Updates a lot by ID
-     * @param {string} id
-     * @param {NewLot} lot
-     * @returns {Promise<NewLot>}
-     */
-    async update(id, lot) {
-        const res = await httpInstance.put(`${this.resourceEndpoint}/${id}`, lot)
-        return new NewLot(res.data)
-    }
-
-    /**
-     * Deletes a lot by ID
-     * @param {string} id
-     * @returns {Promise<void>}
-     */
-    async delete(id) {
-        await httpInstance.delete(`${this.resourceEndpoint}/${id}`)
-    }
-
-    /**
-     * Retrieves lots by supplier (proveedor)
-     * @param {string} proveedor
-     * @returns {Promise<NewLot[]>}
-     */
-    async getByProveedor(proveedor) {
-        const res = await httpInstance.get(`${this.resourceEndpoint}?proveedor=${proveedor}`);
-        return res.data.map(l => new NewLot(l));
-    }
+export async function createLotInventory(payload) {
+    const response = await api.post('/api/v1/inventory/by-batch', payload)
+    return NewLot.fromJSON(response.data)
 }

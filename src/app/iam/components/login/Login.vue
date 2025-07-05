@@ -48,9 +48,12 @@
           <label>{{ $t('login.remember') }}</label>
         </div>
 
-        <router-link to="/forgot-password" class="forgot-password">
-          {{ $t('login.password?') }}
-        </router-link>
+        <!--
+ <router-link to="/forgot-password" class="forgot-password">
+   {{ $t('login.password?') }}
+ </router-link>
+ -->
+
       </div>
 
       <button type="submit" class="login-button">{{ $t('login.login') }}</button>
@@ -93,7 +96,10 @@ export default {
 
     const handleLogin = async () => {
       try {
-        const res = await authApi.login({ email: email.value, password: password.value });
+        const credentials = { email: email.value, password: password.value };
+        console.log('Enviando credenciales:', credentials);
+
+        const res = await authApi.login(credentials);
         if (res.user) {
           await router.push('/dashboard');
         } else {
@@ -104,6 +110,7 @@ export default {
         alert("Error en login: " + (error.message || error));
       }
     };
+
 
     const loginWithGoogle = () => {
       // Redirige directamente al dashboard

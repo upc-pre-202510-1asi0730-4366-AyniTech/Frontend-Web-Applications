@@ -12,20 +12,22 @@ export default class NewLot {
         this.proveedor = proveedor
         this.producto = producto
         this.fechaEntrada = fechaEntrada
+            ? new Date(fechaEntrada).toLocaleDateString('es-PE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            })
+            : ''
         this.cantidad = cantidad
         this.precio = precio
         this.unidad = unidad
     }
 
     toJSON() {
-        return {
-            id: this.id,
-            proveedor: this.proveedor,
-            producto: this.producto,
-            fechaEntrada: this.fechaEntrada,
-            cantidad: this.cantidad,
-            precio: this.precio,
-            unidad: this.unidad
-        }
+        return { ...this }
+    }
+
+    static fromJSON(json) {
+        return new NewLot(json)
     }
 }

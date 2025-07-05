@@ -3,16 +3,26 @@ import { ref, onMounted } from 'vue'
 
 import LotComment from '../components/lot-comment.component.vue'
 import LotCard from '../components/lot-card.component.vue'
-import NewLot from '../models/NewLot.entity.js'
 import AddLot from '../components/add-lot.component.vue'
+import { fetchLotInventory } from '../services/lot-api.service.js'
 
 const lots = ref([])
 const isCommentModalOpen = ref(false)
 const selectedLot = ref(null)
-const viewMode = ref('table')
+const viewMode = ref('table') // puedes cambiar a 'cards' si prefieres
 const showAddLotForm = ref(false)
+const isLoading = ref(true)
+const error = ref(null)
 
 onMounted(async () => {
+  try {
+    const data = await fetchLotInventory()
+    lots.value = data
+  } catch (err) {
+    error.value = 'Error al cargar los lotes'
+  } finally {
+    isLoading.value = false
+  }
 })
 
 const openCommentModal = (lot) => {
@@ -21,12 +31,12 @@ const openCommentModal = (lot) => {
 }
 
 const closeCommentModal = () => {
-  isCommentModalOpen.value = false
   selectedLot.value = null
+  isCommentModalOpen.value = false
 }
 
 const handleAddLot = (newLot) => {
-  console.log('Nuevo lote:', newLot)
+  lots.value.push(newLot) // opcional: agregar el nuevo lote al array
   showAddLotForm.value = false
 }
 </script>

@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@primevue/themes": "^4.3.4",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "json-server": "^1.0.0-alpha.23",
     "pinia": "^3.0.2",
     "primeflex": "^4.0.0",

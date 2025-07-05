@@ -1,4 +1,4 @@
-import http from '@/shared/http-common';
+/*import http from '@/shared/http-common';
 import axios from 'axios';
 import {authHandlers} from "../../../../server/handlers.js";
 import authApi from "@iam/services/authentication-api.service.js";
@@ -55,4 +55,39 @@ export class AuthenticationApiService {
         return http.post(this.endpoint, user)
     }
 }
-export default new AuthService();
+export default new AuthService();*/
+
+import http from '@/shared/http-common';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+const SIGN_IN = import.meta.env.VITE_SIGN_IN_PATH
+const SIGN_UP = import.meta.env.VITE_SIGN_UP_PATH
+
+export default class AuthenticationApiService {
+    /**
+     * Login user
+     * @param {{email: string, password: string}} credentials
+     * @returns {Promise<any>}
+     */
+    static async login(credentials) {
+        const url = `${API_BASE}${SIGN_IN}`; // ej: http://localhost:3000/api/sign-in
+        const res = await http.post(url, credentials);
+        return res.data;
+    }
+
+
+    /**
+     * Register user
+     * @param {string} name
+     * @param {string} lastname
+     * @param {string} email
+     * @param {string} password
+     * @returns {Promise<any>}
+     */
+    static async register(name, lastname, email, password) {
+        const url = `${API_BASE}${SIGN_UP}`
+        const user = { name, lastname, email, password }
+        const res = await http.post(url, user)
+        return res.data
+    }
+}
