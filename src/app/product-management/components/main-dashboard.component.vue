@@ -49,10 +49,7 @@
           <span>Kits</span>
         </button>
 
-        <button class="action-btn secondary" @click="navigateTo('returns')">
-          <i class="pi pi-sync"></i>
-          <span>Devolución de productos</span>
-        </button>
+
       </div>
     </div>
 

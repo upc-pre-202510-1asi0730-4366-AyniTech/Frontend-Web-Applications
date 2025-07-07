@@ -1,162 +1,134 @@
 <template>
   <div class="add-product-container">
-    <div class="form-header">
-      <h1 class="page-title">Añadir Producto</h1>
-    </div>
-
-    <form @submit.prevent="saveProduct" class="product-form">
-      <div class="form-group">
-        <label for="name">Nombre</label>
-        <input
-          id="name"
+    <div v-if="!showInventoryForm">
+      <h2>Añadir Nuevo Producto</h2>
+      
+      <form @submit.prevent="handleSubmit" class="product-form">
+        <div class="form-group">
+          <label for="name">Nombre</label>
+          <input
+            id="name"
             type="text"
-            v-model="product.name"
+            v-model="productForm.name"
             class="form-input"
             required
-        />
-      </div>
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="description">Descripción</label>
-        <textarea
-          id="description"
-          v-model="product.description"
-          class="form-textarea"
-          rows="3"
-        ></textarea>
-      </div>
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <textarea
+            id="description"
+            v-model="productForm.description"
+            class="form-textarea"
+            rows="3"
+          ></textarea>
+        </div>
 
-      <div class="form-row">
-        <div class="form-group half-width">
-          <label for="purchasePrice">Precio de compra</label>
-          <div class="price-input">
-            <span class="currency">$</span>
-            <input
-              id="purchasePrice"
+        <div class="form-row">
+          <div class="form-group">
+            <label for="purchasePrice">Precio de compra</label>
+            <div class="price-input">
+              <span class="currency">$</span>
+              <input
+                id="purchasePrice"
                 type="number"
                 step="0.01"
                 min="0"
-              v-model.number="product.purchasePrice"
+                v-model.number="productForm.purchasePrice"
                 class="form-input price"
-              required
-            />
+                required
+              />
+            </div>
           </div>
-        </div>
 
-        <div class="form-group half-width">
-          <label for="salePrice">Precio de venta</label>
-          <div class="price-input">
-            <span class="currency">$</span>
-            <input
-              id="salePrice"
+          <div class="form-group">
+            <label for="salePrice">Precio de venta</label>
+            <div class="price-input">
+              <span class="currency">$</span>
+              <input
+                id="salePrice"
                 type="number"
                 step="0.01"
                 min="0"
-              v-model.number="product.salePrice"
+                v-model.number="productForm.salePrice"
                 class="form-input price"
-              required
-            />
+                required
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="category">Categoría</label>
-        <div class="custom-select">
-          <select 
-            id="category"
-            v-model="product.categoryId"
-            class="form-select"
-            required
-          >
-            <option value="" disabled selected>Selecciona una categoría</option>
-            <option 
-              v-for="category in categories" 
-              :key="category.id" 
-              :value="category.id"
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Categoría</label>
+            <select 
+              id="category"
+              v-model="productForm.categoryId"
+              class="form-select"
+              required
             >
-              {{ category.name }}
-            </option>
-          </select>
-        </div>
-      </div>
+              <option value="">Selecciona una categoría</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
 
-      <div class="form-group">
-        <label for="unit">Unidad de medida</label>
-        <div class="custom-select">
-        <select
-            id="unit"
-            v-model="product.unitId"
-            class="form-select"
-            required
-        >
-            <option value="" disabled selected>Selecciona una unidad</option>
-            <option 
-              v-for="unit in units" 
-              :key="unit.id" 
-              :value="unit.id"
+          <div class="form-group">
+            <label for="unit">Unidad de medida</label>
+            <select
+              id="unit"
+              v-model="productForm.unitId"
+              class="form-select"
+              required
             >
-              {{ unit.name }} ({{ unit.abbreviation }})
-            </option>
-        </select>
+              <option value="">Selecciona una unidad</option>
+              <option v-for="unit in units" :key="unit.id" :value="unit.id">
+                {{ unit.name }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label>Etiquetas</label>
-        <div class="tags-container">
-          <div class="tags-grid">
-            <div
-              v-for="tag in availableTags"
+        <div class="form-group">
+          <label>Etiquetas</label>
+          <div class="tags-container">
+            <div 
+              v-for="tag in availableTags" 
               :key="tag.id"
-              class="tag-option"
-              :class="{ 'selected': selectedTags.includes(tag.id) }"
+              :class="['tag', { selected: isTagSelected(tag.id) }]"
               @click="toggleTag(tag.id)"
             >
               {{ tag.name }}
             </div>
           </div>
-          <div class="selected-tags" v-if="selectedTags.length > 0">
-            <p class="selected-label">Etiquetas seleccionadas:</p>
-            <div class="selected-tags-grid">
-              <span 
-                v-for="tagId in selectedTags" 
-                :key="tagId" 
-                class="tag-badge"
-              >
-                {{ getTagName(tagId) }}
-                <button 
-                  type="button" 
-                  class="remove-tag" 
-                  @click.stop="removeTag(tagId)"
-                >
-                  ×
-                </button>
-              </span>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="internalNotes">Notas internas</label>
-        <textarea
-          id="internalNotes"
-          v-model="product.internalNotes"
+        <div class="form-group">
+          <label for="internalNotes">Notas internas</label>
+          <textarea
+            id="internalNotes"
+            v-model="productForm.internalNotes"
             class="form-textarea"
-          rows="2"
-        ></textarea>
-      </div>
+            rows="2"
+          ></textarea>
+        </div>
 
-      <div class="form-actions">
-      <button type="submit" class="save-button" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Guardando...' : 'Guardar Producto' }}
-      </button>
-        <button type="button" class="cancel-button" @click="$router.back()">
-          Cancelar
+        <div class="form-actions">
+          <button type="submit" class="btn-save" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Guardando...' : 'Guardar Producto' }}
           </button>
-      </div>
-    </form>
+          <button type="button" class="btn-cancel" @click="$router.back()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <AddInventoryComponent 
+      v-if="showInventoryForm" 
+      :productData="createdProduct"
+      @skip="$router.push('/inventory')"
+    />
   </div>
 </template>
 
@@ -164,22 +136,28 @@
 import { ref, reactive, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import ProductApiService from '../../services/product-api.service.js';
+import AddInventoryComponent from './add-inventory.component.vue';
 
 export default {
-  name: 'AddProduct',
+  name: 'AddProductComponent',
+  components: {
+    AddInventoryComponent
+  },
   setup() {
     const router = useRouter();
     const isSubmitting = ref(false);
     const selectedTags = ref([]);
+    const showInventoryForm = ref(false);
+    const createdProduct = ref(null);
     
-    const product = reactive({
-        name: '',
+    const productForm = ref({
+      name: '',
       description: '',
-      purchasePrice: null,
-      salePrice: null,
+      purchasePrice: 0,
+      salePrice: 0,
+      internalNotes: '',
       categoryId: '',
       unitId: '',
-      internalNotes: '',
       tagIds: []
     });
 
@@ -222,354 +200,205 @@ export default {
       return tag ? tag.name : '';
     };
 
+    const isTagSelected = (tagId) => {
+      return productForm.value.tagIds.includes(tagId);
+    };
+
     const toggleTag = (tagId) => {
-      const index = selectedTags.value.indexOf(tagId);
-      if (index === -1) {
-        selectedTags.value.push(tagId);
+      if (isTagSelected(tagId)) {
+        productForm.value.tagIds = productForm.value.tagIds.filter(id => id !== tagId);
       } else {
-        selectedTags.value.splice(index, 1);
+        productForm.value.tagIds = [...productForm.value.tagIds, tagId];
       }
     };
 
-    const removeTag = (tagId) => {
-      selectedTags.value = selectedTags.value.filter(id => id !== tagId);
-    };
-
-    watch(selectedTags, (newTags) => {
-      product.tagIds = [...newTags];
-    });
-
-    const saveProduct = async () => {
-      if (!product.categoryId || !product.unitId) {
+    const handleSubmit = async () => {
+      if (!productForm.value.categoryId || !productForm.value.unitId) {
         alert('Por favor selecciona una categoría y una unidad de medida');
         return;
       }
 
       try {
         isSubmitting.value = true;
-        await ProductApiService.createProduct(product);
-        router.push('/inventory');
+        const response = await ProductApiService.createProduct(productForm.value);
+        
+        // Encontrar la unidad seleccionada
+        const selectedUnit = units.value.find(u => u.id === productForm.value.unitId);
+        
+        createdProduct.value = {
+          id: response.id,
+          name: response.name || productForm.value.name,
+          categoryName: categories.value.find(c => c.id === productForm.value.categoryId)?.name || '',
+          unitId: response.unitId || productForm.value.unitId,
+          unitName: selectedUnit ? selectedUnit.abbreviation : '', // Usamos la abreviación de la unidad
+          salePrice: response.salePrice || productForm.value.salePrice
+        };
+        
+        console.log('Producto creado:', createdProduct.value);
+        showInventoryForm.value = true;
       } catch (error) {
-        console.error('Error al guardar el producto:', error);
-        alert('Error al guardar el producto. Por favor intenta de nuevo.');
+        console.error('Error al crear producto:', error);
+        alert('Error al crear el producto. Por favor intenta de nuevo.');
       } finally {
         isSubmitting.value = false;
       }
     };
 
-    onMounted(() => {
-      loadUnits();
-      loadTags();
+    onMounted(async () => {
+      await Promise.all([
+        loadUnits(),
+        loadTags()
+      ]);
     });
 
     return {
-      product,
+      productForm,
+      handleSubmit,
+      showInventoryForm,
+      createdProduct,
       categories,
       units,
       availableTags,
-      selectedTags,
       isSubmitting,
       getTagName,
-      removeTag,
-      toggleTag,
-      saveProduct
+      isTagSelected,
+      toggleTag
     };
-    }
+  }
 };
 </script>
 
 <style scoped>
 .add-product-container {
-  max-width: 1000px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
-  background-color: #FFF5E0;
-  min-height: calc(100vh - 64px);
-}
-
-.form-header {
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  color: #333;
-  margin: 0;
+  padding: 20px;
 }
 
 .product-form {
   background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 }
 
 .form-row {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 20px;
 }
 
-.half-width {
+.form-row .form-group {
   flex: 1;
 }
 
 label {
   display: block;
-  margin-bottom: 0.75rem;
-  color: #333;
+  margin-bottom: 8px;
   font-weight: 500;
+  color: #333;
 }
 
 .form-input,
-.form-textarea,
-.form-select {
+.form-select,
+.form-textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s;
-  background-color: white;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-  outline: none;
-  border-color: #BC162A;
-  box-shadow: 0 0 0 3px rgba(188, 22, 42, 0.1);
-}
-
-.custom-select {
-  position: relative;
-  width: 100%;
-}
-
-.form-select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: white;
-  appearance: none;
-  cursor: pointer;
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: #BC162A;
-  box-shadow: 0 0 0 3px rgba(188, 22, 42, 0.1);
-}
-
-.custom-select::after {
-  content: '';
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid #666;
-  pointer-events: none;
-}
-
-.form-select[multiple] {
-  height: auto;
-  min-height: 150px;
-  padding: 0.5rem;
-}
-
-.form-select[multiple] option {
-  padding: 0.75rem;
-  margin: 2px 0;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  cursor: pointer;
+  font-size: 14px;
 }
 
-.form-select[multiple] option:hover {
-  background-color: #f8f9fa;
-}
-
-.form-select[multiple] option:checked {
-  background: #BC162A;
-  color: white;
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 .price-input {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .currency {
   position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 12px;
   color: #666;
 }
 
 .price {
-  padding-left: 1.75rem;
+  padding-left: 24px;
 }
 
 .tags-container {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 44px;
 }
 
-.tags-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.tag-option {
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.75rem;
-  text-align: center;
+.tag {
+  padding: 4px 12px;
+  background-color: #f0f0f0;
+  border-radius: 16px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   user-select: none;
 }
 
-.tag-option:hover {
-  border-color: #BC162A;
-  background: #FFF5F5;
+.tag:hover {
+  background-color: #e0e0e0;
 }
 
-.tag-option.selected {
-  background: #BC162A;
+.tag.selected {
+  background-color: #4CAF50;
   color: white;
-  border-color: #BC162A;
-}
-
-.selected-label {
-  font-size: 0.875rem;
-  color: #666;
-  margin-bottom: 0.5rem;
-}
-
-.selected-tags-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag-badge {
-  background: #f3f4f6;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.remove-tag {
-  background: none;
-  border: none;
-  color: #666;
-  font-size: 1.25rem;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.remove-tag:hover {
-  background: #e2e8f0;
-  color: #BC162A;
 }
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-.save-button,
-.cancel-button {
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 8px;
+.btn-save,
+.btn-cancel {
+  padding: 10px 20px;
+  border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.save-button {
-  background: #BC162A;
+.btn-save {
+  background-color: #4CAF50;
   color: white;
+  border: none;
 }
 
-.save-button:hover {
-  background: #a01223;
+.btn-save:hover {
+  background-color: #45a049;
 }
 
-.save-button:disabled {
-  background: #ccc;
+.btn-save:disabled {
+  background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.cancel-button {
-  background: #e2e8f0;
-  color: #4a5568;
+.btn-cancel {
+  background-color: #f44336;
+  color: white;
+  border: none;
 }
 
-.cancel-button:hover {
-  background: #cbd5e0;
-}
-
-.helper-text {
-  display: block;
-  margin-top: 0.5rem;
-  color: #666;
-  font-size: 0.875rem;
-}
-
-@media (max-width: 768px) {
-  .add-product-container {
-    padding: 1rem;
-  }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .half-width {
-    width: 100%;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .save-button,
-  .cancel-button {
-    width: 100%;
-  }
-
-  .tags-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
+.btn-cancel:hover {
+  background-color: #da190b;
 }
 </style>

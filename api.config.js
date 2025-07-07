@@ -4,6 +4,10 @@ export const API_CONFIG = {
         ENDPOINTS: {
             ALERTS: '/api/alerts',
             PRODUCTS: '/api/v1/products',
+            CATEGORIES: '/api/v1/categories',
+            UNITS: '/api/v1/units',
+            TAGS: '/api/v1/tags',
+            INVENTORY: '/api/v1/inventory',
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'
@@ -14,7 +18,11 @@ export const API_CONFIG = {
         BASE_URL: 'http://localhost:5159',
         ENDPOINTS: {
             ALERTS: '/api/alerts',
-            PRODUCTS: '/api/products',
+            PRODUCTS: '/api/v1/products',
+            CATEGORIES: '/api/v1/categories',
+            UNITS: '/api/v1/units',
+            TAGS: '/api/v1/tags',
+            INVENTORY: '/api/v1/inventory',
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'
