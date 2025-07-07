@@ -21,14 +21,10 @@ const navigateTo = (route) => {
     </div>
     <nav class="main-nav">
       <a @click="navigateTo('/dashboard')" class="nav-link">{{ $t('navbar.home') }}</a>
-      <a class="nav-link search">
-        <i class="pi pi-search"></i> {{ $t('navbar.search') }}
-      </a>
+ 
       <a @click="navigateTo('/alerts')" class="nav-link alerts">
         <i class="pi pi-bell"></i> {{ $t('navbar.alerts') }}
       </a>
-      <a class="nav-link">{{ $t('navbar.support') }}</a>
-
       <a @click="navigateTo('/profile')" class="nav-link user">
         {{ $t('navbar.profile') }} <i class="pi pi-user"></i>
       </a>

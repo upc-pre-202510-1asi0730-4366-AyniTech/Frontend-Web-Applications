@@ -1,44 +1,27 @@
 <template>
-  <div class="register-wrapper">
-  <div class="register-toolbar">
-    <button @click="$router.back()" class="toolbar-button">
-      &larr; {{ $t('toolbar.back') }}
-    </button>
-
-    <div class="toolbar-spacer"></div>
-    <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
-    <div class="toolbar-spacer"></div>
-
-    <div class="language-switcher">
-      <button @click="toggleLanguage" class="language-button">
-        <span class="language-icon">🌐</span>
-        <span class="language-text">{{ $t('toolbar.language') }}</span>
-      </button>
-    </div>
-  </div>
   <div class="login-container">
     <h1>{{ $t('login.login') }}</h1>
 
     <form @submit.prevent="handleLogin" class="login-form">
       <div class="form-group">
         <label for="email">{{ $t('login.email') }}</label>
-        <input
-            type="email"
-            id="email"
-            v-model="email"
-            placeholder="Ingresa tu correo electrónico"
-            required
+        <input 
+          type="email" 
+          id="email" 
+          v-model="formData.email"
+          placeholder="Ingresa tu correo electrónico"
+          required
         />
       </div>
 
       <div class="form-group">
         <label for="password">{{ $t('login.password') }}</label>
-        <input
-            type="password"
-            id="password"
-            v-model="password"
-            placeholder="Ingresa tu contraseña"
-            required
+        <input 
+          type="password" 
+          id="password" 
+          v-model="formData.password"
+          placeholder="Ingresa tu contraseña"
+          required
         />
       </div>
 
@@ -53,7 +36,13 @@
         </router-link>
       </div>
 
-      <button type="submit" class="login-button">{{ $t('login.login') }}</button>
+      <button type="submit" class="login-button" :disabled="loading">
+        {{ loading ? 'Iniciando sesión...' : $t('login.login') }}
+      </button>
+
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
 
       <div class="divider">o</div>
 
@@ -64,55 +53,65 @@
     </form>
 
     <div class="register-link">
-      {{ $t('login.account') }} <router-link to="/">{{ $t('login.submit') }}</router-link>
+      {{ $t('login.account') }} <router-link to="/register">{{ $t('login.submit') }}</router-link>
     </div>
-  </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth.js';
-import {useI18n} from "vue-i18n";
-import authApi from "@iam/services/authentication-api.service.js";
-//import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
+import { useAuthStore } from '../../services/authentication-api.service';
+import { useI18n } from "vue-i18n";
 
 export default {
+  name: 'Login',
   setup() {
-    const email = ref('');
-    const password = ref('');
-    const rememberMe = ref(false);
-    const router = useRouter();
     const authStore = useAuthStore();
-    const {locale} = useI18n()
+    const router = useRouter();
+    const loading = ref(false);
+    const error = ref('');
+    const rememberMe = ref(false);
+    const { locale } = useI18n();
+
+    const formData = ref({
+      email: '',
+      password: ''
+    });
 
     const toggleLanguage = () => {
-      locale.value = locale.value === 'es' ? 'en' : 'es'
-    }
+      locale.value = locale.value === 'es' ? 'en' : 'es';
+    };
 
     const handleLogin = async () => {
       try {
-        const res = await authApi.login({ email: email.value, password: password.value });
-        if (res.user) {
-          await router.push('/dashboard');
-        } else {
-          alert("Correo o contraseña incorrectos");
+        loading.value = true;
+        error.value = '';
+        
+        const response = await authStore.login(formData.value);
+        
+        // Redirigir según el rol del usuario
+        if (response.role === 'Admin') {
+          router.push('/admin/dashboard');
+        } else if (response.role === 'Employee') {
+          router.push('/dashboard');
         }
-      } catch (error) {
-        console.error('Error en login:', error);
-        alert("Error en login: " + (error.message || error));
+      } catch (err) {
+        error.value = err.response?.data?.message || 'Error al iniciar sesión';
+      } finally {
+        loading.value = false;
       }
     };
 
     const loginWithGoogle = () => {
-      // Redirige directamente al dashboard
-      router.push('/dashboard');
+      // Implementación pendiente
+      console.log('Login con Google pendiente de implementar');
     };
 
     return {
-      email,
-      password,
+      formData,
+      loading,
+      error,
       rememberMe,
       handleLogin,
       loginWithGoogle,
@@ -123,73 +122,6 @@ export default {
 </script>
 
 <style scoped>
-.register-wrapper {
-  min-height: 100vh;
-  background-color: #FFF5E0;
-  display: flex;
-  flex-direction: column;
-}
-
-.register-toolbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  background: #feeac5;
-  color: #000000;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  justify-content: space-between;
-}
-
-.toolbar-button {
-  background: none;
-  border: none;
-  color: #302325;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: auto;
-}
-
-.toolbar-spacer {
-  flex: 1;
-}
-
-.toolbar-title {
-  font-weight: 600;
-}
-
-.language-selector {
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
-.language-button {
-  background: none;
-  border: none;
-  color: #302325;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.5rem 0.8rem;
-  border-radius: 20px;
-  transition: all 0.3s;
-}
-
-.language-button:hover {
-  background-color: rgba(255,255,255,0.2);
-}
-
-.language-icon {
-  font-size: 1.1rem;
-}
-
 .login-container {
   max-width: 400px;
   margin: 0 auto;
@@ -205,8 +137,6 @@ export default {
 h1 {
   color: #333;
   margin-bottom: 2rem;
-  font-size: 2rem;
-  font-weight: 700;
 }
 
 .login-form {
@@ -283,6 +213,18 @@ input[type="password"]:focus {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.login-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error-message {
+  color: #dc3545;
+  margin-top: 1rem;
+  text-align: center;
+}
+
 .divider {
   position: relative;
   margin: 1rem 0;
@@ -349,28 +291,18 @@ input[type="password"]:focus {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .login-container {
-    padding: 1.5rem;
-    margin-top: 70px;
-  }
-
-  .login-form {
-    gap: 1rem;
-  }
-
-  .options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.8rem;
-  }
-
-  .forgot-password {
-    align-self: flex-end;
+    padding: 1rem;
+    margin-top: 40px;
   }
 
   h1 {
     margin-bottom: 1.5rem;
+  }
+
+  .login-button, .google-button {
+    padding: 0.8rem;
   }
 }
 </style>

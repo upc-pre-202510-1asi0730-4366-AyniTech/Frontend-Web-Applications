@@ -27,94 +27,65 @@
       </div>
 
       <div class="register-container">
-        <h1>{{ $t('register.title') }}</h1>
-
-        <form @submit.prevent="handleSubmit" class="register-form">
+        <h2>Registro de Usuario</h2>
+        <form @submit.prevent="handleRegister" class="register-form">
           <div class="form-group">
-            <label>{{ $t('register.firstName') }}</label>
-            <input
-                type="text"
-                id ="nombres"
-                v-model="formData.nombres"
-                placeholder= "Ingresa tus nombres"
-                required
-            >
-          </div>
-
-          <div class="form-group">
-            <label>{{ $t('register.lastName') }}</label>
-            <input
-                type="text"
-                id="apellidos"
-                v-model="formData.apellidos"
-                placeholder="Ingresa tus apellidos"
-                required
-            >
-          </div>
-
-          <div class="form-group">
-            <label>{{ $t('register.email') }}</label>
-            <input
-                type="email"
-                id="email"
-                v-model="formData.email"
-                placeholder="Ingresa tu correo electrónico"
-                required
-            >
-          </div>
-
-          <div class="form-group">
-            <label>{{ $t('register.password') }}</label>
-            <input
-                type="password"
-                id="password"
-                v-model="formData.password"
-                placeholder="Ingresa tu contraseña"
-                required
-            >
-          </div>
-
-          <div class="form-group">
-            <label>{{ $t('register.confirmPassword') }}</label>
-            <input
-                type="password"
-                id="confirmPassword"
-                v-model="formData.confirmPassword"
-                placeholder="Ingresa tu contraseña"
-                required
-            >
-          </div>
-
-          <div class="checkbox-group">
-            <input
-                type="checkbox"
-                id="terms"
-                v-model="formData.acceptedTerms"
-                required
-            >
-            <label>{{ $t('register.conditions') }}</label>
-          </div>
-
-          <div class="social-login">
-            <div class="divider">
-              <span class="divider-line"></span>
-              <span class="divider-text">o</span>
-              <span class="divider-line"></span>
-            </div>
-
-            <GoogleLogin
-                :callback="handleGoogleSignIn"
-                :buttonConfig="googleButtonConfig"
-                class="google-login-btn"
+            <label for="name">Nombre:</label>
+            <input 
+              type="text" 
+              id="name" 
+              v-model="formData.name" 
+              required
+              class="form-control"
             />
           </div>
 
-          <button type="submit" class="submit-btn">{{ $t('register.submit') }}
-          </button>
+          <div class="form-group">
+            <label for="lastName">Apellido:</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              v-model="formData.lastName" 
+              required
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input 
+              type="email" 
+              id="email" 
+              v-model="formData.email" 
+              required
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input 
+              type="password" 
+              id="password" 
+              v-model="formData.password" 
+              required
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-register" :disabled="loading">
+              {{ loading ? 'Registrando...' : 'Registrarse' }}
+            </button>
+          </div>
+
+          <div v-if="error" class="error-message">
+            {{ error }}
+          </div>
         </form>
 
         <div class="login-link">
-          {{ $t('register.account') }} <router-link to="/login">{{ $t('register.login') }}</router-link>
+          ¿Ya tienes una cuenta? <router-link to="/login">Inicia sesión</router-link>
         </div>
       </div>
     </div>
@@ -124,11 +95,9 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '../../services/authentication-api.service';
 import {GoogleLogin} from "vue3-google-login";
 import {useI18n} from "vue-i18n";
-import authApi from "@iam/services/authentication-api.service.js";
-//import {AuthenticationApiService} from "@iam/services/authentication-api.service.js";
 
 export default {
   components: {
@@ -137,7 +106,6 @@ export default {
   setup() {
     const router = useRouter();
     const authStore = useAuthStore();
-    //const authApi = new AuthenticationApiService();
     const {locale} = useI18n()
     const toggleLanguage = () => {
       locale.value = locale.value === 'es' ? 'en' : 'es'
@@ -153,45 +121,29 @@ export default {
       width: '300'
     });
 
+    const loading = ref(false);
+    const error = ref('');
+
     const formData = ref({
-      nombres: '',
-      apellidos: '',
+      name: '',
+      lastName: '',
       email: '',
-      password: '',
-      confirmPassword: '',
-      acceptedTerms: false,
-      googleSignup: false
+      password: ''
     });
-    const handleGoogleSignIn = async (response) => {
+
+    const handleRegister = async () => {
       try {
+        loading.value = true;
+        error.value = '';
+        
+        await authStore.register(formData.value);
+        
+        // Si el registro es exitoso, redirigir al login
         router.push('/login');
-      } catch(error) {
-        console.error('Google Sign-In error:', error);
-        alert('Error al registrarse con Google. Por favor intenta nuevamente.');
-      }
-    };
-
-    const handleSubmit = async () => {
-      if (formData.value.password !== formData.value.confirmPassword) {
-        alert('Las contraseñas no coinciden');
-        return;
-      }
-
-      try {
-        await authApi.register(
-          formData.value.nombres,
-          formData.value.apellidos,
-          formData.value.email,
-          formData.value.password
-        );
-        await router.push('/dashboard');
-      } catch (error) {
-        if (error.message && error.message.includes('Email already registered')) {
-          alert('El correo ya está registrado. Serás redirigido al login.');
-          await router.push('/login');
-        } else {
-          alert('Error en el registro. Por favor intenta nuevamente.');
-        }
+      } catch (err) {
+        error.value = err.response?.data?.message || 'Error al registrar usuario';
+      } finally {
+        loading.value = false;
       }
     };
 
@@ -201,9 +153,10 @@ export default {
 
     return {
       formData,
-      handleSubmit,
+      loading,
+      error,
+      handleRegister,
       googleButtonConfig,
-      handleGoogleSignIn,
       toggleLanguage,
       goToPlanSelector
     };
@@ -322,13 +275,14 @@ export default {
   margin: 0 auto;
 }
 
-h1 {
+h2 {
   color: #333;
   margin-bottom: 2rem;
   font-size: 2rem;
   font-weight: 700;
   text-align: left;
 }
+
 .register-form {
   max-width: 400px;
   margin: 0 auto;
@@ -346,7 +300,8 @@ label {
   font-weight: 600;
   font-size: 0.95rem;
 }
-input {
+
+.form-control {
   width: 100%;
   padding: 0.9rem;
   border: 1px solid #D9D593;
@@ -354,44 +309,18 @@ input {
   font-size: 1rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  border: 1px solid #d9d593;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-  background-color: #ffffff;
-  color: black;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
+.form-control:focus {
   border-color: #bc162a;
   box-shadow: 0 0 0 2px rgba(188, 22, 42, 0.2);
   outline: none;
 }
 
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1rem 0;
+.form-actions {
+  margin-top: 1rem;
+  text-align: center;
 }
 
-.checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #ee7f27;
-}
-.checkbox-group label {
-  font-weight: 500;
-  color: #302325;
-  font-size: 0.9rem;
-}
-
-.submit-btn {
+.btn-register {
   background-color: #c1121f;
   color: #ffffff;
   width: 100%;
@@ -402,14 +331,24 @@ input[type="password"]:focus {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  margin-top: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.submit-btn:hover {
+.btn-register:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.btn-register:hover {
   background-color: #9e1223;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.error-message {
+  color: #dc3545;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 .login-link {
@@ -477,12 +416,12 @@ input[type="password"]:focus {
     max-width: 100%;
   }
 
-  h1 {
+  h2 {
     font-size: 1.5rem;
     text-align: center;
   }
 
-  .submit-btn, .google-btn {
+  .btn-register, .google-btn {
     padding: 0.8rem;
   }
 

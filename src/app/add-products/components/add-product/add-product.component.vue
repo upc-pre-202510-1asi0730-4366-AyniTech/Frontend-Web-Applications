@@ -9,10 +9,10 @@
         <label for="name">Nombre</label>
         <input
           id="name"
-          type="text"
-          v-model="product.name"
-          class="form-input"
-          required
+            type="text"
+            v-model="product.name"
+            class="form-input"
+            required
         />
       </div>
 
@@ -33,11 +33,11 @@
             <span class="currency">$</span>
             <input
               id="purchasePrice"
-              type="number"
-              step="0.01"
-              min="0"
+                type="number"
+                step="0.01"
+                min="0"
               v-model.number="product.purchasePrice"
-              class="form-input price"
+                class="form-input price"
               required
             />
           </div>
@@ -49,11 +49,11 @@
             <span class="currency">$</span>
             <input
               id="salePrice"
-              type="number"
-              step="0.01"
-              min="0"
+                type="number"
+                step="0.01"
+                min="0"
               v-model.number="product.salePrice"
-              class="form-input price"
+                class="form-input price"
               required
             />
           </div>
@@ -84,12 +84,12 @@
       <div class="form-group">
         <label for="unit">Unidad de medida</label>
         <div class="custom-select">
-          <select 
+        <select
             id="unit"
             v-model="product.unitId"
             class="form-select"
             required
-          >
+        >
             <option value="" disabled selected>Selecciona una unidad</option>
             <option 
               v-for="unit in units" 
@@ -98,7 +98,7 @@
             >
               {{ unit.name }} ({{ unit.abbreviation }})
             </option>
-          </select>
+        </select>
         </div>
       </div>
 
@@ -143,18 +143,18 @@
         <textarea
           id="internalNotes"
           v-model="product.internalNotes"
-          class="form-textarea"
+            class="form-textarea"
           rows="2"
         ></textarea>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="save-button" :disabled="isSubmitting">
+      <button type="submit" class="save-button" :disabled="isSubmitting">
           {{ isSubmitting ? 'Guardando...' : 'Guardar Producto' }}
-        </button>
+      </button>
         <button type="button" class="cancel-button" @click="$router.back()">
           Cancelar
-        </button>
+          </button>
       </div>
     </form>
   </div>
@@ -173,7 +173,7 @@ export default {
     const selectedTags = ref([]);
     
     const product = reactive({
-      name: '',
+        name: '',
       description: '',
       purchasePrice: null,
       salePrice: null,
@@ -274,7 +274,7 @@ export default {
       toggleTag,
       saveProduct
     };
-  }
+    }
 };
 </script>
 

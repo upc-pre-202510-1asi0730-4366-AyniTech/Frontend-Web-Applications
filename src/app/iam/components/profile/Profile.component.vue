@@ -1,7 +1,6 @@
 <template>
-  <NavbarComponent />  
   <div class="profile-wrapper">
-    <!-- Contenido principal -->
+    <NavbarComponent />
     <div class="profile-content">
       <div class="profile-container">
         <div class="profile-section">
@@ -19,14 +18,15 @@
             <div class="info-row">
               <span class="info-label">{{ $t('profile.name') }}:</span>
               <template v-if="!isEditingName">
-                <span class="info-value">{{ userData.name }}</span>
+                <span class="info-value">{{ userData.name }} {{ userData.lastName }}</span>
                 <button class="edit-info-btn" @click="startEditingName">
                   <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
                 </button>
               </template>
               <template v-else>
                 <div class="edit-name-container">
-                  <input type="text" v-model="newName" @keyup.enter="saveName" class="info-input" />
+                  <input type="text" v-model="newName" placeholder="Nombre" class="info-input" />
+                  <input type="text" v-model="newLastName" placeholder="Apellido" class="info-input" />
                   <div class="edit-name-actions">
                     <button class="btn-save" @click="saveName">Guardar</button>
                     <button class="btn-cancel" @click="cancelEditingName">Cancelar</button>
@@ -35,22 +35,21 @@
               </template>
             </div>
             
+  
+
             <div class="info-row">
-              <span class="info-label">{{ $t('profile.jobTitle') }}:</span>
-              <span class="info-value">{{ userData.jobTitle }}</span>
-              <button class="edit-info-btn">
-                <img src="@/assets/edit-icon.svg" alt="Editar" class="edit-icon">
-              </button>
+              <span class="info-label">Rol:</span>
+              <span class="info-value">{{ translatedRole }}</span>
             </div>
           </div>
           
           <div class="profile-actions">
-            <button class="action-btn change-profile-btn">{{ $t('profile.changeProfile') }}</button>
+     
             <button class="action-btn change-plan-btn" @click="goToPlanSelector">{{ $t('profile.changePlan') }}</button>
             <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
           </div>
         </div>
-        
+
         <div class="settings-section">
           <div class="settings-header">
             <h2>{{ $t('profile.settings') }}</h2>
@@ -107,37 +106,89 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../services/authentication-api.service';
 import defaultAvatar from '@/assets/default-avatar.svg';
+import NavbarComponent from '../../../shared/navbar.component.vue';
 
 export default {
+  components: {
+    NavbarComponent
+  },
   setup() {
-    const { locale } = useI18n();
+    const { locale, t } = useI18n();
     const router = useRouter();
+    const authStore = useAuthStore();
     
     const toggleLanguage = () => {
       locale.value = locale.value === 'es' ? 'en' : 'es';
     };
     
     const userData = ref({
-      name: 'Jose',
-      jobTitle: 'Administrador'
+      name: '',
+      lastName: '',
+      email: '',
+      role: ''
+    });
+
+    // Traducir el rol según el idioma
+    const translatedRole = computed(() => {
+      if (!userData.value.role) return '';
+      
+      const roles = {
+        'Employee': {
+          'es': 'Empleado',
+          'en': 'Employee'
+        },
+        'Admin': {
+          'es': 'Administrador',
+          'en': 'Admin'
+        }
+      };
+
+      return roles[userData.value.role]?.[locale.value] || userData.value.role;
+    });
+    
+    onMounted(async () => {
+      // Cargar datos del usuario desde el store
+      const user = authStore.currentUser;
+      console.log('User data:', user); // Para debug
+      if (user) {
+        userData.value = {
+          name: user.name || '',
+          lastName: user.lastName || '',
+          email: user.email || '',
+          role: user.role || ''
+        };
+        // Cargar configuración guardada
+        loadSettings();
+      } else {
+        // Si no hay usuario, redirigir al login
+        router.push('/login');
+      }
     });
     
     const isEditingName = ref(false);
     const newName = ref('');
+    const newLastName = ref('');
 
     const startEditingName = () => {
       isEditingName.value = true;
       newName.value = userData.value.name;
+      newLastName.value = userData.value.lastName;
     };
 
-    const saveName = () => {
-      userData.value.name = newName.value;
-      isEditingName.value = false;
-      // Aquí se podría llamar a una API para guardar el nombre
+    const saveName = async () => {
+      try {
+        // Aquí iría la llamada a la API para actualizar el nombre
+        userData.value.name = newName.value;
+        userData.value.lastName = newLastName.value;
+        isEditingName.value = false;
+      } catch (error) {
+        console.error('Error al actualizar el nombre:', error);
+      }
     };
     
     const cancelEditingName = () => {
@@ -145,31 +196,69 @@ export default {
     };
     
     const avatarInput = ref(null);
-    const avatarUrl = ref(defaultAvatar);
+    const avatarUrl = ref(localStorage.getItem('userAvatar') || defaultAvatar);
 
     const triggerAvatarUpload = () => {
       avatarInput.value.click();
     };
 
-    const onAvatarChange = (event) => {
+    const onAvatarChange = async (event) => {
       const file = event.target.files[0];
       if (file) {
-        avatarUrl.value = URL.createObjectURL(file);
-        // Aquí se podría subir el archivo al servidor
+        try {
+          // Crear una URL temporal para la vista previa
+          const tempUrl = URL.createObjectURL(file);
+          avatarUrl.value = tempUrl;
+          
+          // Guardar en localStorage para persistencia
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64Image = e.target.result;
+            localStorage.setItem('userAvatar', base64Image);
+          };
+          reader.readAsDataURL(file);
+          
+          // Aquí iría la lógica para subir la imagen al servidor
+          // const formData = new FormData();
+          // formData.append('avatar', file);
+          // await uploadAvatar(formData);
+        } catch (error) {
+          console.error('Error al actualizar la imagen de perfil:', error);
+        }
       }
     };
 
     const settings = ref({
-      notificationPermission: true,
+      notificationPermission: false,
       automaticAlerts: false,
-      multipleFormatPermission: true,
+      multipleFormatPermission: false,
       specificAlertPermission: false,
       minorRolesPermission: false
     });
+
+    // Cargar configuración guardada
+    const loadSettings = () => {
+      const savedSettings = localStorage.getItem('userSettings');
+      if (savedSettings) {
+        settings.value = JSON.parse(savedSettings);
+      }
+    };
+
+    // Guardar configuración cuando cambie
+    const saveSettings = () => {
+      localStorage.setItem('userSettings', JSON.stringify(settings.value));
+    };
+
+    // Vigilar cambios en cada configuración
+    Object.keys(settings.value).forEach(setting => {
+      watch(() => settings.value[setting], (newVal) => {
+        saveSettings();
+      });
+    });
     
     const logout = () => {
-      // Aquí podría ir la lógica para cerrar sesión, limpiar datos, etc.
-      router.push('/');
+      authStore.logout();
+      router.push('/login');
     };
 
     const goToPlanSelector = () => {
@@ -179,18 +268,21 @@ export default {
     return {
       toggleLanguage,
       userData,
+      translatedRole,
       settings,
       logout,
       goToPlanSelector,
       isEditingName,
       newName,
+      newLastName,
       startEditingName,
       saveName,
       cancelEditingName,
       avatarInput,
       avatarUrl,
       triggerAvatarUpload,
-      onAvatarChange
+      onAvatarChange,
+      locale
     };
   }
 };
@@ -254,31 +346,38 @@ export default {
 
 .profile-avatar {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 1rem 0;
 }
 
 .avatar-image {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
-  background-color: #e0e0e0;
 }
 
 .edit-avatar-btn {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 10px;
+  right: 10px;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background-color: white;
-  border: 1px solid #ddd;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.edit-avatar-btn:hover {
+  transform: scale(1.1);
 }
 
 .edit-icon {
@@ -296,165 +395,109 @@ export default {
 .info-row {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
-  width: 100%;
-  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
 }
 
 .info-label {
-  font-weight: 500;
-  width: 150px;
-  color: #666;
-  flex: 1;
   font-weight: 600;
-  color: #333;
-  font-size: 1.1rem;
+  min-width: 100px;
 }
 
 .info-value {
   flex: 1;
-  font-weight: 600;
-  color: #333;
-  font-size: 1.1rem;
 }
 
 .edit-name-container {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .info-input {
-  width: 100%;
-  box-sizing: border-box;
-  font-weight: 600;
-  color: #333;
-  font-size: 1.1rem;
-  padding: 4px;
-  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 1rem;
 }
 
 .edit-name-actions {
   display: flex;
-  flex-direction: row;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
 .btn-save, .btn-cancel {
-  background: none;
+  padding: 0.5rem 1rem;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
   font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background-color 0.2s;
 }
 
 .btn-save {
+  background-color: #4CAF50;
   color: white;
-  background-color: #ee7f27;
-}
-
-.btn-save:hover {
-  background-color: #9e1223;
 }
 
 .btn-cancel {
-  color: #6c757d;
-  background-color: #f1f1f1;
-}
-
-.btn-cancel:hover {
-  background-color: #e0e0e0;
-}
-
-.edit-info-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.edit-info-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #f44336;
+  color: white;
 }
 
 .profile-actions {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   width: 100%;
   margin-top: 1rem;
-  flex-wrap: wrap;
 }
 
 .action-btn {
   padding: 0.8rem;
-  border-radius: 8px;
   border: none;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
-  text-align: center;
-  width: 100%;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-}
-
-.action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  transition: all 0.3s;
 }
 
 .change-profile-btn {
-  background-color: #c1121f;
+  background-color: #4CAF50;
   color: white;
-}
-
-.change-profile-btn:hover {
-  background-color: #9e1223;
 }
 
 .change-plan-btn {
-  background-color: #c1121f;
+  background-color: #2196F3;
   color: white;
-}
-
-.change-plan-btn:hover {
-  background-color: #9e1223;
 }
 
 .logout-btn {
-  background-color: #6c757d;
+  background-color: #f44336;
   color: white;
-  margin-top: 1rem;
 }
 
-.logout-btn:hover {
-  background-color: #c1121f;
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .settings-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f1f1;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.settings-header h2 {
-  font-size: 1.5rem;
-  margin: 0;
-}
-
-.settings-gear-icon {
+.settings-icon img {
   width: 24px;
   height: 24px;
 }
@@ -462,7 +505,7 @@ export default {
 .settings-list {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .setting-item {
@@ -470,27 +513,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 0;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.setting-item:last-child {
-  border-bottom: none;
-}
-
-.setting-text {
-  font-size: 1rem;
-  color: #333;
-  line-height: 1.4;
-  flex: 1;
-  padding-right: 1rem;
+  border-bottom: 1px solid #eee;
 }
 
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 56px;
-  height: 28px;
-  flex-shrink: 0;
+  width: 50px;
+  height: 24px;
 }
 
 .toggle-switch input {
@@ -506,57 +536,48 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ddd;
+  background-color: #ccc;
   transition: .4s;
-  border-radius: 34px;
+  border-radius: 24px;
 }
 
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
   left: 4px;
   bottom: 4px;
   background-color: white;
   transition: .4s;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 input:checked + .toggle-slider {
-  background-color: #c1121f;
+  background-color: #4CAF50;
 }
 
 input:checked + .toggle-slider:before {
-  transform: translateX(28px);
+  transform: translateX(26px);
 }
 
 @media (max-width: 768px) {
-  .profile-content {
-    padding: 1rem;
-  }
-
   .profile-container {
     flex-direction: column;
-    gap: 1.5rem;
   }
 
   .profile-section, .settings-section {
     min-width: 100%;
-    padding: 1.5rem;
   }
 
-  .profile-actions {
+  .info-row {
     flex-direction: column;
-  }
-
-  .action-btn {
-    margin-top: 0.5rem;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .info-label {
-    width: 120px;
+    min-width: auto;
   }
 }
 </style> 
