@@ -1,7 +1,6 @@
 import http from '@/shared/http-common';
 import axios from 'axios';
 import {authHandlers} from "../../../../server/handlers.js";
-import authApi from "@iam/services/authentication-api.service.js";
 import { API_CONFIG, CURRENT_ENV } from '../../../../api.config';
 import { defineStore } from 'pinia';
 
@@ -36,19 +35,24 @@ class AuthService {
             token: googleToken,
         });
     }
-
-    // Otros métodos de autenticación
 }
 
 export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        user: null,
-        token: localStorage.getItem('token') || null,
-        role: localStorage.getItem('role') || null
-    }),
+    state: () => {
+        // Intentar recuperar el estado de autenticación del localStorage
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('token');
+        const storedRole = localStorage.getItem('role');
+
+        return {
+            user: storedUser ? JSON.parse(storedUser) : null,
+            token: storedToken || null,
+            role: storedRole || null
+        };
+    },
 
     getters: {
-        isAuthenticated: (state) => !!state.token,
+        isAuthenticated: (state) => !!state.token && !!state.user,
         isEmployee: (state) => state.role === 'Employee',
         isAdmin: (state) => state.role === 'Admin',
         currentUser: (state) => state.user

@@ -5,19 +5,8 @@ class ProductApiService {
     this.endpoint = '/api/v1';
   }
 
-  async getProducts() {
-    try {
-      console.log('Fetching products from:', `${this.endpoint}/products`);
-      const response = await http.get(`${this.endpoint}/products`);
-      console.log('Products response:', response);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      if (error.response?.status === 0 || error.code === 'ERR_NETWORK') {
-        throw new Error('No se pudo conectar con el servidor. Por favor, verifica que el backend esté corriendo.');
-      }
-      throw error;
-    }
+  async getAllProducts() {
+    return http.get(this.endpoint);
   }
 
   async createProduct(product) {
@@ -42,15 +31,15 @@ class ProductApiService {
   }
 
   async updateProduct(id, productData) {
-    return http.put(`${this.endpoint}/products/${id}`, productData);
+    return http.put(`${this.endpoint}/${id}`, productData);
   }
 
   async deleteProduct(id) {
-    return http.delete(`${this.endpoint}/products/${id}`);
+    return http.delete(`${this.endpoint}/${id}`);
   }
 
   async getProductById(id) {
-    return http.get(`${this.endpoint}/products/${id}`);
+    return http.get(`${this.endpoint}/${id}`);
   }
 
   async getCategories() {
@@ -65,7 +54,7 @@ class ProductApiService {
 
   async getUnits() {
     try {
-      const response = await http.get(`${this.endpoint}/units`);
+      const response = await http.get('/api/v1/units');
       return response.data;
     } catch (error) {
       console.error('Error fetching units:', error);
@@ -75,10 +64,30 @@ class ProductApiService {
 
   async getTags() {
     try {
-      const response = await http.get(`${this.endpoint}/tags`);
+      const response = await http.get('/api/v1/tags');
       return response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
+      throw error;
+    }
+  }
+
+  async getProducts() {
+    try {
+      const response = await http.get('/api/v1/products');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  }
+
+  async createProduct(productData) {
+    try {
+      const response = await http.post('/api/v1/products', productData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating product:', error);
       throw error;
     }
   }

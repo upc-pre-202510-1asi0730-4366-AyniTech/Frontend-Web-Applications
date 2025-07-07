@@ -1,10 +1,34 @@
 <template>
   <div id="app-container">
-    <!-- Navbar (ya tienes este componente) -->
-    <Navbar v-if="showNavbar" />
+    <!-- Navbar principal para rutas autenticadas -->
+    <Navbar v-if="showMainNavbar" />
+    
+    <!-- Navbar simple para login/register -->
+    <nav v-if="showSimpleNavbar" class="simple-navbar">
+      <div class="navbar-brand">
+        <img src="@/assets/logo.svg" alt="Logo" class="navbar-logo" />
+        <span class="navbar-title">StockWise</span>
+      </div>
+      <div class="navbar-actions">
+        <router-link 
+          v-if="$route.path === '/login'" 
+          to="/register" 
+          class="navbar-link"
+        >
+          {{ $t('auth.register') }}
+        </router-link>
+        <router-link 
+          v-if="$route.path === '/register'" 
+          to="/login" 
+          class="navbar-link"
+        >
+          {{ $t('auth.login') }}
+        </router-link>
+      </div>
+    </nav>
 
     <!-- Contenido principal -->
-    <main class="main-content" :class="{ 'with-navbar': showNavbar }">
+    <main class="main-content" :class="{ 'with-navbar': showMainNavbar || showSimpleNavbar }">
       <router-view />
     </main>
 
@@ -40,15 +64,17 @@ export default {
       notification: {
         show: false,
         message: '',
-        type: 'info'
+        type: 'info' // 'success', 'error', 'warning', 'info'
       }
     }
   },
   computed: {
-    showNavbar() {
-      // Mostrar navbar en todas las rutas excepto login u otras específicas
+    showMainNavbar() {
       const hiddenNavbarRoutes = ['/login', '/register']
       return !hiddenNavbarRoutes.includes(this.$route.path)
+    },
+    showSimpleNavbar() {
+      return ['/login', '/register'].includes(this.$route.path)
     }
   },
   methods: {

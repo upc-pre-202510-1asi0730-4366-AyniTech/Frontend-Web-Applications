@@ -1,4 +1,3 @@
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -11,6 +10,7 @@ import PrimeVue from 'primevue/config'
 import i18n from "./i18n.js";
 import 'primeicons/primeicons.css';
 import NavbarComponent from '@/app/shared/navbar.component.vue'
+import { useAuthStore } from '@/app/iam/services/authentication-api.service'
 
 const app = createApp(App)
 
@@ -18,6 +18,11 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL
 
 const pinia = createPinia()
 app.use(pinia)
+
+// Inicializar el store de autenticación antes de montar la app
+const authStore = useAuthStore()
+authStore.initializeAuth()
+
 app.use(PrimeVue, {ripple: true})
 app.component('pv-button', Button)
 app.component('NavbarComponent', NavbarComponent)

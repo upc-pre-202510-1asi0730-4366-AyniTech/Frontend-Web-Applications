@@ -1,6 +1,5 @@
 <template>
   <div class="profile-wrapper">
-    <NavbarComponent />
     <div class="profile-content">
       <div class="profile-container">
         <div class="profile-section">
@@ -111,12 +110,9 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../services/authentication-api.service';
 import defaultAvatar from '@/assets/default-avatar.svg';
-import NavbarComponent from '../../../shared/navbar.component.vue';
 
 export default {
-  components: {
-    NavbarComponent
-  },
+  name: 'Profile',
   setup() {
     const { locale, t } = useI18n();
     const router = useRouter();
@@ -256,9 +252,13 @@ export default {
       });
     });
     
-    const logout = () => {
-      authStore.logout();
-      router.push('/login');
+    const logout = async () => {
+      try {
+        authStore.logout();
+        router.push('/login');
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
     };
 
     const goToPlanSelector = () => {
