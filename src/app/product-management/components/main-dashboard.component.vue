@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="dashboard-content">
       <div class="welcome-section">
-        <h1 class="welcome-title">Bienvenido de nuevo</h1>
+        <h1 class="welcome-title">{{ $t('dashboard.welcome') }}</h1>
         <p class="welcome-subtitle">{{ getWelcomeMessage() }}</p>
       </div>
 
@@ -12,7 +12,7 @@
             <i class="pi pi-box"></i>
           </div>
           <div class="stat-info">
-            <h3>Total de Productos</h3>
+            <h3>{{ $t('dashboard.totalProducts') }}</h3>
             <p class="stat-value">{{ totalProducts }}</p>
           </div>
         </div>
@@ -22,7 +22,7 @@
             <i class="pi pi-calendar"></i>
           </div>
           <div class="stat-info">
-            <h3>Fecha de Proveedor</h3>
+            <h3>{{ $t('dashboard.providerDate') }}</h3>
             <p class="stat-value">{{ providerDate || '00/00/00' }}</p>
           </div>
         </div>
@@ -31,25 +31,23 @@
       <div class="actions-grid">
         <button class="action-btn primary" @click="navigateTo('history')">
           <i class="pi pi-chart-line"></i>
-          <span>Historial</span>
+          <span>{{ $t('dashboard.history') }}</span>
         </button>
 
         <button class="action-btn primary" @click="navigateTo('inventory')">
           <i class="pi pi-box"></i>
-          <span>Inventario</span>
+          <span>{{ $t('dashboard.inventory') }}</span>
         </button>
 
         <button class="action-btn primary" @click="navigateTo('add-product')">
           <i class="pi pi-plus"></i>
-          <span>Añadir Productos</span>
+          <span>{{ $t('dashboard.addProducts') }}</span>
         </button>
 
         <button class="action-btn secondary" @click="navigateTo('kits')">
           <i class="pi pi-shopping-cart"></i>
-          <span>Kits</span>
+          <span>{{ $t('dashboard.kits') }}</span>
         </button>
-
-
       </div>
     </div>
 
@@ -57,7 +55,7 @@
       <div class="alerts-container">
         <h2 class="alerts-title">
           <i class="pi pi-exclamation-triangle"></i>
-          Próximos a Acabarse
+          {{ $t('dashboard.expirationTitle') }}
         </h2>
         <div class="alerts-list">
           <div v-for="alert in lowStockProducts" 
@@ -67,7 +65,7 @@
               <span class="product-name">{{ alert.productName }}</span>
               <span class="stock-info">
                 <i class="pi pi-shopping-cart"></i>
-                Stock: {{ alert.quantity }}
+                {{ $t('dashboard.stock') }}: {{ alert.quantity }}
               </span>
             </div>
           </div>
@@ -80,7 +78,9 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useStockAlertService } from '../../stock-alert/services/stockAlert-service';
+import ProductApiService from '../../add-products/services/product-api.service';
 import 'primeicons/primeicons.css';
 
 export default {
@@ -91,12 +91,14 @@ export default {
     const totalProducts = ref(0);
     const providerDate = ref(null);
     const lowStockProducts = ref([]);
+    const { t } = useI18n();
+    const error = ref('');
     
     const getWelcomeMessage = () => {
       const hour = new Date().getHours();
-      if (hour < 12) return 'Buenos días';
-      if (hour < 18) return 'Buenas tardes';
-      return 'Buenas noches';
+      if (hour < 12) return t('dashboard.welcomeMorning');
+      if (hour < 18) return t('dashboard.welcomeAfternoon');
+      return t('dashboard.welcomeEvening');
     };
     
     const navigateTo = (route) => {
@@ -107,13 +109,41 @@ export default {
       try {
         await stockAlertService.fetchAlerts();
         lowStockProducts.value = stockAlertService.alerts;
-      } catch (error) {
-        console.error('Error fetching low stock products:', error);
+      } catch (err) {
+        console.error('Error fetching low stock products:', err);
+        error.value = 'Error al cargar productos con bajo stock';
       }
     };
 
-    onMounted(() => {
-      fetchLowStockProducts();
+    const fetchTotalProducts = async () => {
+      try {
+        console.log('Fetching total products...');
+        const products = await ProductApiService.getProducts();
+        console.log('Products received:', products);
+        if (Array.isArray(products)) {
+          totalProducts.value = products.length;
+          console.log('Total products set to:', totalProducts.value);
+        } else {
+          console.error('Products response is not an array:', products);
+          totalProducts.value = 0;
+        }
+      } catch (err) {
+        console.error('Error fetching total products:', err);
+        error.value = 'Error al cargar el total de productos';
+        totalProducts.value = 0;
+      }
+    };
+
+    onMounted(async () => {
+      console.log('Dashboard mounted');
+      try {
+        await Promise.all([
+          fetchLowStockProducts(),
+          fetchTotalProducts()
+        ]);
+      } catch (err) {
+        console.error('Error in dashboard initialization:', err);
+      }
     });
 
     return {
@@ -121,7 +151,8 @@ export default {
       navigateTo,
       totalProducts,
       providerDate,
-      lowStockProducts
+      lowStockProducts,
+      error
     };
   }
 };

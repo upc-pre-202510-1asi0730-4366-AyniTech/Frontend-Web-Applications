@@ -85,7 +85,10 @@
         </form>
 
         <div class="login-link">
-          ¿Ya tienes una cuenta? <router-link to="/login">Inicia sesión</router-link>
+          {{ $t('register.account') }}
+          <router-link to="/" class="login-button">
+            {{ $t('register.login') }}
+          </router-link>
         </div>
       </div>
     </div>
@@ -352,19 +355,19 @@ label {
 }
 
 .login-link {
-  margin-top: 1.5rem;
-  color: #333;
+  margin-top: 2rem;
   text-align: center;
+  color: #666;
 }
 
-.login-link a {
+.login-button {
   color: #c1121f;
   text-decoration: none;
   font-weight: 600;
-  margin-left: 0.3rem;
+  margin-left: 0.5rem;
 }
 
-.login-link a:hover {
+.login-button:hover {
   text-decoration: underline;
 }
 

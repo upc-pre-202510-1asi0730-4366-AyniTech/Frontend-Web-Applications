@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import AuthService from '@/app/iam/services/authentication-api.service.js'
-import {useRouter} from "vue-router";
+import router from '@/router';
 
 
 export const useAuthStore = defineStore('auth', () => {
-    const router = useRouter();
     const user = ref(null);
     const isAuthenticated = ref(false);
 
@@ -15,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = response.data.user;
             isAuthenticated.value = true;
             localStorage.setItem('authUser', JSON.stringify(response.data.user));
-            router.push('/home');
+            router.push('/dashboard');
         } catch (error) {
             console.error('Registration error:', error);
             throw error;
@@ -28,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = response.data.user;
             isAuthenticated.value = true;
             localStorage.setItem('authUser', JSON.stringify(response.data.user));
-            router.push('/home');
+            router.push('/dashboard');
         } catch (error) {
             console.error('Login error:', error);
             throw error;
@@ -39,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null;
         isAuthenticated.value = false;
         localStorage.removeItem('authUser');
+        router.push('/login');
     };
 
     const registerWithGoogle = async (googleToken) => {

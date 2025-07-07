@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ProductInventoryView from "./product-inventory.view.vue";
 import LotInventory from "./lot-intentory.view.vue";
 
+const { t } = useI18n();
 const currentView = ref('product'); // 'product' o 'lot'
 </script>
 
@@ -14,13 +16,13 @@ const currentView = ref('product'); // 'product' o 'lot'
             :class="['btn-view', currentView === 'product' ? 'active' : '']"
             @click="currentView = 'product'"
         >
-          Por producto
+          {{ $t('inventory.byProduct') }}
         </button>
         <button
             :class="['btn-view', currentView === 'lot' ? 'active' : '']"
             @click="currentView = 'lot'"
         >
-          Por lote
+          {{ $t('inventory.byLot') }}
         </button>
       </div>
 

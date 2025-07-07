@@ -40,7 +40,7 @@ export default {
       notification: {
         show: false,
         message: '',
-        type: 'info' // 'success', 'error', 'warning', 'info'
+        type: 'info'
       }
     }
   },
@@ -378,5 +378,45 @@ html, body {
 }
 .add-cell button.selected {
   background: #388e3c; /* Verde si está seleccionado */
+}
+
+/* Estilos para el navbar simple */
+.simple-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-logo {
+  height: 40px;
+  width: auto;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.navbar-link {
+  text-decoration: none;
+  color: #BC162A;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.navbar-link:hover {
+  background-color: rgba(188, 22, 42, 0.1);
 }
 </style>

@@ -1,59 +1,75 @@
 <template>
-  <div class="login-container">
-    <h1>{{ $t('login.login') }}</h1>
+  <div class="login-wrapper">
+    <div class="register-toolbar">
 
-    <form @submit.prevent="handleLogin" class="login-form">
-      <div class="form-group">
-        <label for="email">{{ $t('login.email') }}</label>
-        <input 
-          type="email" 
-          id="email" 
-          v-model="formData.email"
-          placeholder="Ingresa tu correo electrónico"
-          required
-        />
+
+      <div class="language-switcher">
+        <button @click="toggleLanguage" class="language-button">
+          <span class="language-icon">🌐</span>
+          <span class="language-text">{{ $t('toolbar.language') }}</span>
+        </button>
       </div>
+    </div>
 
-      <div class="form-group">
-        <label for="password">{{ $t('login.password') }}</label>
-        <input 
-          type="password" 
-          id="password" 
-          v-model="formData.password"
-          placeholder="Ingresa tu contraseña"
-          required
-        />
-      </div>
+    <div class="login-container">
+      <h1>{{ $t('login.login') }}</h1>
 
-      <div class="options">
-        <div class="remember-me">
-          <input type="checkbox" id="remember" v-model="rememberMe" />
-          <label>{{ $t('login.remember') }}</label>
+      <form @submit.prevent="handleLogin" class="login-form">
+        <div class="form-group">
+          <label for="email">{{ $t('login.email') }}</label>
+          <input 
+            type="email" 
+            id="email" 
+            v-model="formData.email"
+            placeholder="Ingresa tu correo electrónico"
+            required
+          />
         </div>
 
-        <router-link to="/forgot-password" class="forgot-password">
-          {{ $t('login.password?') }}
+        <div class="form-group">
+          <label for="password">{{ $t('login.password') }}</label>
+          <input 
+            type="password" 
+            id="password" 
+            v-model="formData.password"
+            placeholder="Ingresa tu contraseña"
+            required
+          />
+        </div>
+
+        <div class="options">
+          <div class="remember-me">
+            <input type="checkbox" id="remember" v-model="rememberMe" />
+            <label>{{ $t('login.remember') }}</label>
+          </div>
+
+          <router-link to="/forgot-password" class="forgot-password">
+            {{ $t('login.password?') }}
+          </router-link>
+        </div>
+
+        <button type="submit" class="login-button" :disabled="loading">
+          {{ loading ? 'Iniciando sesión...' : $t('login.login') }}
+        </button>
+
+        <div v-if="error" class="error-message">
+          {{ error }}
+        </div>
+
+        <div class="divider">o</div>
+
+        <button type="button" class="google-button" @click="loginWithGoogle">
+          <img src="@/assets/google-icon.png" alt="Google Icon" />
+          {{ $t('login.google') }}
+        </button>
+      </form>
+
+      <div class="register-link">
+        {{ $t('login.account') }}
+        <router-link to="/register" class="register-button">
+          {{ $t('login.submit') }}
         </router-link>
       </div>
-
-      <button type="submit" class="login-button" :disabled="loading">
-        {{ loading ? 'Iniciando sesión...' : $t('login.login') }}
-      </button>
-
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
-
-      <div class="divider">o</div>
-
-      <button type="button" class="google-button" @click="loginWithGoogle">
-        <img src="@/assets/google-icon.png" alt="Google Icon" />
-        Iniciar con Google
-      </button>
-    </form>
-
-    <div class="register-link">
-      {{ $t('login.account') }} <router-link to="/register">{{ $t('login.submit') }}</router-link>
     </div>
   </div>
 </template>
@@ -88,16 +104,12 @@ export default {
         loading.value = true;
         error.value = '';
         
-        const response = await authStore.login(formData.value);
+        await authStore.login(formData.value);
         
-        // Redirigir según el rol del usuario
-        if (response.role === 'Admin') {
-          router.push('/admin/dashboard');
-        } else if (response.role === 'Employee') {
-          router.push('/dashboard');
-        }
+        // Redirigir al dashboard después del login exitoso
+        router.push('/dashboard');
       } catch (err) {
-        error.value = err.response?.data?.message || 'Error al iniciar sesión';
+        error.value = err.message || 'Error al iniciar sesión';
       } finally {
         loading.value = false;
       }
@@ -122,6 +134,69 @@ export default {
 </script>
 
 <style scoped>
+.login-wrapper {
+  min-height: 100vh;
+  background-color: #FFF5E0;
+  display: flex;
+  flex-direction: column;
+}
+
+.register-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: #feeac5;
+  color: #000000;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  justify-content: space-between;
+}
+
+.toolbar-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: auto;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.language-button {
+  background: none;
+  border: none;
+  color: #302325;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.language-button:hover {
+  background-color: rgba(255, 249, 231, 0.982);
+}
+
+.language-icon {
+  font-size: 1.1rem;
+}
+
 .login-container {
   max-width: 400px;
   margin: 0 auto;
@@ -220,25 +295,28 @@ input[type="password"]:focus {
 }
 
 .error-message {
-  color: #dc3545;
-  margin-top: 1rem;
+  color: #c1121f;
+  background-color: #ffe6e6;
+  padding: 0.8rem;
+  border-radius: 4px;
   text-align: center;
 }
 
 .divider {
+  margin: 1.5rem 0;
+  text-align: center;
   position: relative;
-  margin: 1rem 0;
-  color: #302325;
+  color: #666;
 }
 
 .divider::before,
 .divider::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   width: 45%;
   height: 1px;
-  background-color: #D9D593;
+  background-color: #ddd;
 }
 
 .divider::before {
@@ -253,41 +331,38 @@ input[type="password"]:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   background-color: white;
-  color: #333;
-  padding: 0.8rem;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 0.8rem;
+  border-radius: 4px;
   cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s;
 }
 
 .google-button:hover {
   background-color: #f5f5f5;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .google-button img {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 
 .register-link {
-  margin-top: 1.5rem;
-  color: #333;
+  margin-top: 2rem;
+  text-align: center;
+  color: #666;
 }
 
-.register-link a {
+.register-button {
   color: #c1121f;
   text-decoration: none;
   font-weight: 600;
+  margin-left: 0.5rem;
 }
 
-.register-link a:hover {
+.register-button:hover {
   text-decoration: underline;
 }
 

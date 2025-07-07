@@ -1,36 +1,36 @@
 <template>
   <div class="add-product-container">
     <div v-if="!showInventoryForm">
-      <h2>Añadir Nuevo Producto</h2>
-      
+      <h2>{{ $t('addProduct.title') }}</h2>
+
       <form @submit.prevent="handleSubmit" class="product-form">
-        <div class="form-group">
-          <label for="name">Nombre</label>
-          <input
+      <div class="form-group">
+          <label for="name">{{ $t('addProduct.labels.name') }}</label>
+        <input
             id="name"
             type="text"
             v-model="productForm.name"
             class="form-input"
             required
-          />
-        </div>
+        />
+      </div>
 
-        <div class="form-group">
-          <label for="description">Descripción</label>
+      <div class="form-group">
+          <label for="description">{{ $t('addProduct.labels.description') }}</label>
           <textarea
             id="description"
             v-model="productForm.description"
             class="form-textarea"
             rows="3"
           ></textarea>
-        </div>
+      </div>
 
-        <div class="form-row">
+      <div class="form-row">
           <div class="form-group">
-            <label for="purchasePrice">Precio de compra</label>
-            <div class="price-input">
-              <span class="currency">$</span>
-              <input
+            <label for="purchasePrice">{{ $t('addProduct.labels.buyPrice') }}</label>
+          <div class="price-input">
+            <span class="currency">$</span>
+            <input
                 id="purchasePrice"
                 type="number"
                 step="0.01"
@@ -38,15 +38,15 @@
                 v-model.number="productForm.purchasePrice"
                 class="form-input price"
                 required
-              />
-            </div>
+            />
           </div>
+        </div>
 
           <div class="form-group">
-            <label for="salePrice">Precio de venta</label>
-            <div class="price-input">
-              <span class="currency">$</span>
-              <input
+            <label for="salePrice">{{ $t('addProduct.labels.sellPrice') }}</label>
+          <div class="price-input">
+            <span class="currency">$</span>
+            <input
                 id="salePrice"
                 type="number"
                 step="0.01"
@@ -54,45 +54,45 @@
                 v-model.number="productForm.salePrice"
                 class="form-input price"
                 required
-              />
-            </div>
+            />
           </div>
         </div>
+      </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label for="category">Categoría</label>
+      <div class="form-group">
+            <label for="category">{{ $t('history.card.category') }}</label>
             <select 
               id="category"
               v-model="productForm.categoryId"
               class="form-select"
-              required
+            required
             >
-              <option value="">Selecciona una categoría</option>
+              <option value="">{{ $t('common.select') }}</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
                 {{ category.name }}
               </option>
             </select>
-          </div>
+      </div>
 
-          <div class="form-group">
-            <label for="unit">Unidad de medida</label>
-            <select
+      <div class="form-group">
+            <label for="unit">{{ $t('addProduct.labels.unit') }}</label>
+        <select
               id="unit"
               v-model="productForm.unitId"
-              class="form-select"
+            class="form-select"
               required
-            >
-              <option value="">Selecciona una unidad</option>
+        >
+              <option value="">{{ $t('common.select') }}</option>
               <option v-for="unit in units" :key="unit.id" :value="unit.id">
                 {{ unit.name }}
               </option>
-            </select>
+        </select>
           </div>
-        </div>
+      </div>
 
-        <div class="form-group">
-          <label>Etiquetas</label>
+      <div class="form-group">
+          <label>{{ $t('addProduct.labels.tags') }}</label>
           <div class="tags-container">
             <div 
               v-for="tag in availableTags" 
@@ -103,23 +103,23 @@
               {{ tag.name }}
             </div>
           </div>
-        </div>
+      </div>
 
-        <div class="form-group">
-          <label for="internalNotes">Notas internas</label>
-          <textarea
+      <div class="form-group">
+          <label for="internalNotes">{{ $t('addProduct.labels.notes') }}</label>
+        <textarea
             id="internalNotes"
             v-model="productForm.internalNotes"
             class="form-textarea"
             rows="2"
-          ></textarea>
+        ></textarea>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn-save" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Guardando...' : 'Guardar Producto' }}
+            {{ isSubmitting ? $t('common.saving') : $t('common.save') }}
           </button>
-          <button type="button" class="btn-cancel" @click="$router.back()">Cancelar</button>
+          <button type="button" class="btn-cancel" @click="$router.back()">{{ $t('common.cancel') }}</button>
         </div>
       </form>
     </div>
@@ -135,6 +135,7 @@
 <script>
 import { ref, reactive, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import ProductApiService from '../../services/product-api.service.js';
 import AddInventoryComponent from './add-inventory.component.vue';
 
@@ -145,13 +146,14 @@ export default {
   },
   setup() {
     const router = useRouter();
+    const { t } = useI18n();
     const isSubmitting = ref(false);
     const selectedTags = ref([]);
     const showInventoryForm = ref(false);
     const createdProduct = ref(null);
     
     const productForm = ref({
-      name: '',
+        name: '',
       description: '',
       purchasePrice: 0,
       salePrice: 0,
@@ -162,16 +164,16 @@ export default {
     });
 
     const categories = ref([
-      { id: 1, name: 'Bebidas' },
-      { id: 2, name: 'Lácteos' },
-      { id: 3, name: 'Panadería' },
-      { id: 4, name: 'Carnes' },
-      { id: 5, name: 'Frutas y Verduras' },
-      { id: 6, name: 'Abarrotes' },
-      { id: 7, name: 'Limpieza' },
-      { id: 8, name: 'Higiene Personal' },
-      { id: 9, name: 'Congelados' },
-      { id: 10, name: 'Snacks' }
+      { id: 1, name: t('categories.beverages') },
+      { id: 2, name: t('categories.dairy') },
+      { id: 3, name: t('categories.bakery') },
+      { id: 4, name: t('categories.meat') },
+      { id: 5, name: t('categories.produce') },
+      { id: 6, name: t('categories.groceries') },
+      { id: 7, name: t('categories.cleaning') },
+      { id: 8, name: t('categories.hygiene') },
+      { id: 9, name: t('categories.frozen') },
+      { id: 10, name: t('categories.snacks') }
     ]);
 
     const units = ref([]);
@@ -182,7 +184,7 @@ export default {
         const response = await ProductApiService.getUnits();
         units.value = response.data;
       } catch (error) {
-        console.error('Error al cargar unidades:', error);
+        console.error('Error loading units:', error);
       }
     };
 
@@ -191,7 +193,7 @@ export default {
         const response = await ProductApiService.getTags();
         availableTags.value = response.data;
       } catch (error) {
-        console.error('Error al cargar etiquetas:', error);
+        console.error('Error loading tags:', error);
       }
     };
 
@@ -214,7 +216,7 @@ export default {
 
     const handleSubmit = async () => {
       if (!productForm.value.categoryId || !productForm.value.unitId) {
-        alert('Por favor selecciona una categoría y una unidad de medida');
+        alert(t('addProduct.validationError'));
         return;
       }
 
@@ -222,7 +224,6 @@ export default {
         isSubmitting.value = true;
         const response = await ProductApiService.createProduct(productForm.value);
         
-        // Encontrar la unidad seleccionada
         const selectedUnit = units.value.find(u => u.id === productForm.value.unitId);
         
         createdProduct.value = {
@@ -230,15 +231,14 @@ export default {
           name: response.name || productForm.value.name,
           categoryName: categories.value.find(c => c.id === productForm.value.categoryId)?.name || '',
           unitId: response.unitId || productForm.value.unitId,
-          unitName: selectedUnit ? selectedUnit.abbreviation : '', // Usamos la abreviación de la unidad
+          unitName: selectedUnit ? selectedUnit.abbreviation : '',
           salePrice: response.salePrice || productForm.value.salePrice
         };
         
-        console.log('Producto creado:', createdProduct.value);
         showInventoryForm.value = true;
       } catch (error) {
-        console.error('Error al crear producto:', error);
-        alert('Error al crear el producto. Por favor intenta de nuevo.');
+        console.error('Error creating product:', error);
+        alert(t('addProduct.saveError'));
       } finally {
         isSubmitting.value = false;
       }
@@ -253,16 +253,16 @@ export default {
 
     return {
       productForm,
-      handleSubmit,
-      showInventoryForm,
-      createdProduct,
       categories,
       units,
       availableTags,
       isSubmitting,
-      getTagName,
+      showInventoryForm,
+      createdProduct,
+      handleSubmit,
       isTagSelected,
-      toggleTag
+      toggleTag,
+      getTagName
     };
   }
 };
@@ -272,7 +272,7 @@ export default {
 .add-product-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 5em;
 }
 
 .product-form {

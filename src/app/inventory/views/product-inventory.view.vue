@@ -1,24 +1,26 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
 import ProductApiService from '../../add-products/services/product-api.service'
 
+const { t } = useI18n();
 const products = ref([])
 const viewMode = ref('table')
 const showAddForm = ref(false)
 const selectedTags = ref([])
 const categories = ref([
-  { id: 1, name: 'Bebidas' },
-  { id: 2, name: 'Lácteos' },
-  { id: 3, name: 'Panadería' },
-  { id: 4, name: 'Carnes' },
-  { id: 5, name: 'Frutas y Verduras' },
-  { id: 6, name: 'Abarrotes' },
-  { id: 7, name: 'Limpieza' },
-  { id: 8, name: 'Higiene Personal' },
-  { id: 9, name: 'Congelados' },
-  { id: 10, name: 'Snacks' }
+  { id: 1, name: t('categories.beverages') },
+  { id: 2, name: t('categories.dairy') },
+  { id: 3, name: t('categories.bakery') },
+  { id: 4, name: t('categories.meat') },
+  { id: 5, name: t('categories.produce') },
+  { id: 6, name: t('categories.groceries') },
+  { id: 7, name: t('categories.cleaning') },
+  { id: 8, name: t('categories.hygiene') },
+  { id: 9, name: t('categories.frozen') },
+  { id: 10, name: t('categories.snacks') }
 ])
 const units = ref([])
 const availableTags = ref([])
@@ -39,7 +41,7 @@ const loadUnits = async () => {
     const response = await ProductApiService.getUnits()
     units.value = response.data
   } catch (error) {
-    console.error('Error al cargar unidades:', error)
+    console.error('Error loading units:', error)
   }
 }
 
@@ -48,7 +50,7 @@ const loadTags = async () => {
     const response = await ProductApiService.getTags()
     availableTags.value = response.data
   } catch (error) {
-    console.error('Error al cargar etiquetas:', error)
+    console.error('Error loading tags:', error)
   }
 }
 
@@ -79,8 +81,8 @@ const handleAddProduct = async () => {
     // Recargar productos
     products.value = await fetchProducts()
   } catch (error) {
-    console.error('Error al guardar el producto:', error)
-    alert('Error al guardar el producto. Por favor intenta de nuevo.')
+    console.error('Error saving product:', error)
+    alert(t('addProduct.saveError'))
   }
 }
 
@@ -93,35 +95,35 @@ onMounted(async () => {
 
 <template>
   <div class="inventory-product">
-    <h2>Inventario por producto</h2>
+    <h2>{{ $t('inventory.title') }}</h2>
 
     <div class="toolbar-background">
       <div class="toolbar">
-        <input type="text" placeholder="Categoría..." class="search-input" />
-        <input type="text" placeholder="Productos..." class="search-input" />
+        <input type="text" :placeholder="$t('inventory.searchCategory')" class="search-input" />
+        <input type="text" :placeholder="$t('inventory.searchProducts')" class="search-input" />
         <div class="date-container">
           <input type="date" class="date-input" />
           <button class="calendar-button">
             <i class="fas fa-calendar"></i>
           </button>
         </div>
-        <input type="number" placeholder="Stock Mín" class="number-input" />
+        <input type="number" :placeholder="$t('inventory.searchStock')" class="number-input" />
         <button class="btn-generate" @click="showAddForm = true">
-          Generar Nuevo Producto
+          {{ $t('inventory.generateProduct') }}
         </button>
       </div>
     </div>
 
     <div class="product-table">
       <div class="table-row header">
-        <div class="cell">Categoría</div>
-        <div class="cell">Producto</div>
-        <div class="cell">Fecha de entrada</div>
-        <div class="cell">Cantidad por unidad</div>
-        <div class="cell">Precio por unidad</div>
-        <div class="cell">Stock Mínimo</div>
-        <div class="cell">Unidad de medida</div>
-        <div class="cell actions">Acciones</div>
+        <div class="cell">{{ $t('inventory.category') }}</div>
+        <div class="cell">{{ $t('inventory.product') }}</div>
+        <div class="cell">{{ $t('inventory.entryDate') }}</div>
+        <div class="cell">{{ $t('inventory.quantity') }}</div>
+        <div class="cell">{{ $t('inventory.price') }}</div>
+        <div class="cell">{{ $t('inventory.minStock') }}</div>
+        <div class="cell">{{ $t('inventory.unit') }}</div>
+        <div class="cell actions">{{ $t('inventory.actions') }}</div>
       </div>
 
       <div v-for="product in products" :key="product.id" class="table-row-container">
