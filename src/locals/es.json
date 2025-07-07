@@ -115,7 +115,7 @@
     "select": "Seleccionar"
   },
   "addProduct": {
-    "title": "Añadir Nuevo Producto",
+    "title": "Agregar Producto",
     "labels": {
       "name": "Nombre",
       "description": "Descripción",
@@ -124,13 +124,25 @@
       "quantity": "Cantidad",
       "batch": "Lote",
       "expiryDate": "Fecha de caducidad",
-      "notes": "Notas internas",
+      "notes": "Notas",
       "unit": "Unidad de medida",
-      "tags": "Etiquetas"
+      "tags": "Etiquetas",
+      "category": "Categoría"
     },
-    "validationError": "Por favor selecciona una categoría y una unidad de medida",
+    "placeholders": {
+      "selectUnit": "Seleccionar unidad de medida",
+      "selectCategory": "Seleccionar categoría",
+      "description": "Ingrese una descripción del producto",
+      "notes": "Ingrese notas adicionales"
+    },
+    "validationError": "Por favor completa todos los campos requeridos",
     "saveError": "Error al crear el producto. Por favor intenta de nuevo.",
-    "saveSuccess": "Producto guardado exitosamente"
+    "saveSuccess": "Producto guardado exitosamente",
+    "loading": {
+      "units": "Cargando unidades...",
+      "tags": "Cargando etiquetas...",
+      "categories": "Cargando categorías..."
+    }
   },
   "navbar": {
     "home": "Inicio",

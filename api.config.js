@@ -8,6 +8,7 @@ export const API_CONFIG = {
             UNITS: '/api/v1/units',
             TAGS: '/api/v1/tags',
             INVENTORY: '/api/v1/inventory',
+            COMBOS: '/api/v1/combos',
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'
@@ -23,6 +24,7 @@ export const API_CONFIG = {
             UNITS: '/api/v1/units',
             TAGS: '/api/v1/tags',
             INVENTORY: '/api/v1/inventory',
+            COMBOS: '/api/v1/combos',
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'

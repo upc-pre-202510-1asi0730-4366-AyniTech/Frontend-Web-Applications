@@ -1,12 +1,17 @@
 import http from '@/app/shared/services/http.instance';
+import { API_CONFIG, CURRENT_ENV } from '@config/api.config';
+
+const endpoints = API_CONFIG[CURRENT_ENV].ENDPOINTS;
 
 class ProductApiService {
-  constructor() {
-    this.endpoint = '/api/v1';
-  }
-
   async getAllProducts() {
-    return http.get(this.endpoint);
+    try {
+      const response = await http.get(endpoints.PRODUCTS);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+      throw error;
+    }
   }
 
   async createProduct(product) {
@@ -22,7 +27,7 @@ class ProductApiService {
         tagIds: product.tagIds || []
       };
       
-      const response = await http.post(`${this.endpoint}/products`, formattedProduct);
+      const response = await http.post(endpoints.PRODUCTS, formattedProduct);
       return response.data;
     } catch (error) {
       console.error('Error al crear producto:', error);
@@ -31,20 +36,38 @@ class ProductApiService {
   }
 
   async updateProduct(id, productData) {
-    return http.put(`${this.endpoint}/${id}`, productData);
+    try {
+      const response = await http.put(`${endpoints.PRODUCTS}/${id}`, productData);
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      throw error;
+    }
   }
 
   async deleteProduct(id) {
-    return http.delete(`${this.endpoint}/${id}`);
+    try {
+      const response = await http.delete(`${endpoints.PRODUCTS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      throw error;
+    }
   }
 
   async getProductById(id) {
-    return http.get(`${this.endpoint}/${id}`);
+    try {
+      const response = await http.get(`${endpoints.PRODUCTS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener producto:', error);
+      throw error;
+    }
   }
 
   async getCategories() {
     try {
-      const response = await http.get(`${this.endpoint}/categories`);
+      const response = await http.get(endpoints.CATEGORIES);
       return response.data;
     } catch (error) {
       console.error('Error al obtener categorías:', error);
@@ -54,40 +77,20 @@ class ProductApiService {
 
   async getUnits() {
     try {
-      const response = await http.get('/api/v1/units');
+      const response = await http.get(endpoints.UNITS);
       return response.data;
     } catch (error) {
-      console.error('Error fetching units:', error);
+      console.error('Error al obtener unidades:', error);
       throw error;
     }
   }
 
   async getTags() {
     try {
-      const response = await http.get('/api/v1/tags');
+      const response = await http.get(endpoints.TAGS);
       return response.data;
     } catch (error) {
-      console.error('Error fetching tags:', error);
-      throw error;
-    }
-  }
-
-  async getProducts() {
-    try {
-      const response = await http.get('/api/v1/products');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  }
-
-  async createProduct(productData) {
-    try {
-      const response = await http.post('/api/v1/products', productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating product:', error);
+      console.error('Error al obtener etiquetas:', error);
       throw error;
     }
   }
