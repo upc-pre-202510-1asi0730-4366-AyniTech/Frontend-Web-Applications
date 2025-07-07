@@ -22,7 +22,6 @@
             v-model="productForm.description"
             class="form-textarea"
             rows="3"
-            :placeholder="$t('addProduct.placeholders.description')"
           ></textarea>
         </div>
 
@@ -69,12 +68,11 @@
               class="form-select"
               required
             >
-              <option value="">{{ $t('addProduct.placeholders.selectCategory') }}</option>
+              <option value="">{{ $t('addProduct.labels.category') }}</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
                 {{ $t(`categories.${category.name}`) }}
               </option>
             </select>
-            <span v-if="isLoadingCategories" class="loading-text">{{ $t('addProduct.loading.categories') }}</span>
           </div>
 
           <div class="form-group">
@@ -84,20 +82,18 @@
               v-model="productForm.unitId"
               class="form-select"
               required
-              :disabled="isLoadingUnits"
             >
-              <option value="">{{ $t('addProduct.placeholders.selectUnit') }}</option>
+              <option value="">{{ $t('addProduct.labels.unit') }}</option>
               <option v-for="unit in units" :key="unit.id" :value="unit.id">
                 {{ unit.name }}
               </option>
             </select>
-            <span v-if="isLoadingUnits" class="loading-text">{{ $t('addProduct.loading.units') }}</span>
           </div>
         </div>
 
         <div class="form-group">
           <label>{{ $t('addProduct.labels.tags') }}</label>
-          <div class="tags-container" :class="{ 'is-loading': isLoadingTags }">
+          <div class="tags-container">
             <div 
               v-for="tag in availableTags" 
               :key="tag.id"
@@ -106,11 +102,10 @@
             >
               {{ tag.name }}
             </div>
-            <div v-if="availableTags.length === 0 && !isLoadingTags" class="no-tags">
-              No hay etiquetas disponibles
+            <div v-if="availableTags.length === 0" class="no-tags">
+              {{ $t('addProduct.noTags') }}
             </div>
           </div>
-          <span v-if="isLoadingTags" class="loading-text">{{ $t('addProduct.loading.tags') }}</span>
         </div>
 
         <div class="form-group">
@@ -120,15 +115,16 @@
             v-model="productForm.internalNotes"
             class="form-textarea"
             rows="2"
-            :placeholder="$t('addProduct.placeholders.notes')"
           ></textarea>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-save" :disabled="isSubmitting || isLoading">
+          <button type="submit" class="btn-save" :disabled="isSubmitting">
             {{ isSubmitting ? $t('common.saving') : $t('common.save') }}
           </button>
-          <button type="button" class="btn-cancel" @click="$router.back()">{{ $t('common.cancel') }}</button>
+          <button type="button" class="btn-cancel" @click="$router.back()">
+            {{ $t('common.cancel') }}
+          </button>
         </div>
       </form>
     </div>
@@ -142,7 +138,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import ProductApiService from '../../services/product-api.service.js';
@@ -159,15 +155,6 @@ export default {
     const isSubmitting = ref(false);
     const showInventoryForm = ref(false);
     const createdProduct = ref(null);
-    
-    // Loading states
-    const isLoadingUnits = ref(true);
-    const isLoadingTags = ref(true);
-    const isLoadingCategories = ref(false);
-    
-    const isLoading = computed(() => {
-      return isLoadingUnits.value || isLoadingTags.value || isLoadingCategories.value;
-    });
     
     const productForm = ref({
       name: '',
@@ -199,22 +186,18 @@ export default {
     const loadUnits = async () => {
       try {
         const response = await ProductApiService.getUnits();
-        units.value = response.data || [];
+        units.value = response.data;
       } catch (error) {
-        console.error('Error loading units:', error);
-      } finally {
-        isLoadingUnits.value = false;
+        console.error('Error al cargar unidades:', error);
       }
     };
 
     const loadTags = async () => {
       try {
         const response = await ProductApiService.getTags();
-        availableTags.value = response.data || [];
+        availableTags.value = response.data;
       } catch (error) {
-        console.error('Error loading tags:', error);
-      } finally {
-        isLoadingTags.value = false;
+        console.error('Error al cargar etiquetas:', error);
       }
     };
 
@@ -254,7 +237,7 @@ export default {
         
         showInventoryForm.value = true;
       } catch (error) {
-        console.error('Error creating product:', error);
+        console.error('Error al crear producto:', error);
         alert(t('addProduct.saveError'));
       } finally {
         isSubmitting.value = false;
@@ -262,9 +245,8 @@ export default {
     };
 
     onMounted(() => {
-      Promise.all([loadUnits(), loadTags()]).catch(error => {
-        console.error('Error loading initial data:', error);
-      });
+      loadUnits();
+      loadTags();
     });
 
     return {
@@ -275,10 +257,6 @@ export default {
       isSubmitting,
       showInventoryForm,
       createdProduct,
-      isLoadingUnits,
-      isLoadingTags,
-      isLoadingCategories,
-      isLoading,
       isTagSelected,
       toggleTag,
       handleSubmit

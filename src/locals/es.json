@@ -114,36 +114,6 @@
     "export": "Exportar",
     "select": "Seleccionar"
   },
-  "addProduct": {
-    "title": "Agregar Producto",
-    "labels": {
-      "name": "Nombre",
-      "description": "Descripción",
-      "buyPrice": "Precio de compra",
-      "sellPrice": "Precio de venta",
-      "quantity": "Cantidad",
-      "batch": "Lote",
-      "expiryDate": "Fecha de caducidad",
-      "notes": "Notas",
-      "unit": "Unidad de medida",
-      "tags": "Etiquetas",
-      "category": "Categoría"
-    },
-    "placeholders": {
-      "selectUnit": "Seleccionar unidad de medida",
-      "selectCategory": "Seleccionar categoría",
-      "description": "Ingrese una descripción del producto",
-      "notes": "Ingrese notas adicionales"
-    },
-    "validationError": "Por favor completa todos los campos requeridos",
-    "saveError": "Error al crear el producto. Por favor intenta de nuevo.",
-    "saveSuccess": "Producto guardado exitosamente",
-    "loading": {
-      "units": "Cargando unidades...",
-      "tags": "Cargando etiquetas...",
-      "categories": "Cargando categorías..."
-    }
-  },
   "navbar": {
     "home": "Inicio",
     "products": "Productos",
@@ -283,6 +253,9 @@
     "title": "Agregar Producto",
     "labels": {
       "name": "Nombre",
+      "description": "Descripción",
+      "category": "Categoría",
+      "unit": "Unidad de medida",
       "tags": "Etiquetas",
       "buyPrice": "Precio de compra",
       "sellPrice": "Precio de venta",
@@ -592,5 +565,36 @@
     "semiannually": "Semianualmente",
     "quarterly": "Trimestralmente",
     "biweekly": "Quincenalmente"
+  },
+  "units": {
+    "ml": "Mililitros",
+    "L": "Litros",
+    "g": "Gramos",
+    "kg": "Kilogramos",
+    "und": "Unidades",
+    "paq": "Paquetes",
+    "bot": "Botellas",
+    "lat": "Latas",
+    "caj": "Cajas",
+    "doc": "Docenas",
+    "m": "Metros",
+    "pz": "Piezas"
+  },
+  "tags": {
+    "organic": "Orgánico",
+    "glutenFree": "Sin Gluten",
+    "vegan": "Vegano",
+    "light": "Light",
+    "premium": "Premium",
+    "promotion": "Promoción",
+    "new": "Nuevo",
+    "discontinued": "Descontinuado",
+    "seasonal": "Temporada",
+    "local": "Local",
+    "imported": "Importado",
+    "artisanal": "Artesanal",
+    "sugarFree": "Sin Azúcar",
+    "lowSodium": "Bajo en Sodio",
+    "highFiber": "Rica en Fibra"
   }
 }
