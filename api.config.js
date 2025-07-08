@@ -33,5 +33,4 @@ export const API_CONFIG = {
     }
 };
 
-// Cambia esto a 'LOCAL' para usar el servidor local o 'PROD' para usar el servidor desplegado
 export const CURRENT_ENV = 'LOCAL';
