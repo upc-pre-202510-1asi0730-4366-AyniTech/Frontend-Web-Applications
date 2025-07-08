@@ -10,6 +10,17 @@ const props = defineProps({
 const showExcelModal = ref(false)
 const showTicketModal = ref(false)
 
+function formatearFecha(fechaISO) {
+  if (!fechaISO) return ''
+  const fecha = new Date(fechaISO)
+  const dd = String(fecha.getDate()).padStart(2, '0')
+  const mm = String(fecha.getMonth() + 1).padStart(2, '0')
+  const yyyy = fecha.getFullYear()
+  return `${dd}/${mm}/${yyyy}`
+}
+
+
+
 function exportToExcel() {
   const data = [
     ['Stock Promedio', 'Categoría', 'Producto', 'Fecha de consulta', 'Stock ideal', 'Estado'],
@@ -50,7 +61,8 @@ function confirmarTicket() {
     <div class="cell"><label>Stock Promedio</label><p>{{ s.stockPromedio }}</p></div>
     <div class="cell"><label>Categoría</label><p>{{ s.categoria }}</p></div>
     <div class="cell"><label>Producto</label><p>{{ s.producto }}</p></div>
-    <div class="cell"><label>Fecha de consulta</label><p>{{ s.fechaConsulta }}</p></div>
+    <div class="cell"><label>Fecha de consulta</label><p>{{ formatearFecha(s.fechaConsulta) }}</p>
+    </div>
     <div class="cell"><label>Stock ideal</label><p>{{ s.stockIdeal }}</p></div>
     <div class="cell"><label>Estado</label><p>{{ s.estado }}</p></div>
 
