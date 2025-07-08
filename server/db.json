@@ -1,0 +1,68 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "example@mail.com",
+      "password": "password123",
+      "first_name": "Test",
+      "last_name": "User"
+    },
+    {
+      "name": "asd",
+      "lastname": "sdqwe",
+      "email": "example@mail.com",
+      "password": "123",
+      "apiId": "v1",
+      "id": 2
+    },
+    {
+      "name": "CAMILA CRISTINA",
+      "lastname": "User",
+      "email": "osaosita7@gmail.com",
+      "password": "abc",
+      "apiId": "v1",
+      "id": 3
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Galleta de Chocolate",
+      "category": "Golosina",
+      "stock": 20,
+      "quantity": 50,
+      "buyPrice": 0.50,
+      "sellPrice": 1.00,
+      "batch": "LOTE001",
+      "expiryDate": "2024-12-25",
+      "notes": "Galletas rellenas de chocolate",
+      "tags": ["Dulce", "Chocolate", "Rellenas"]
+    },
+    {
+      "id": 2,
+      "name": "Galleta de Vainilla",
+      "category": "Golosina",
+      "stock": 15,
+      "quantity": 30,
+      "buyPrice": 0.45,
+      "sellPrice": 0.90,
+      "batch": "LOTE002",
+      "expiryDate": "2025-01-20",
+      "notes": "Galletas de vainilla tradicionales",
+      "tags": ["Dulce", "Vainilla"]
+    },
+    {
+      "id": 3,
+      "name": "Galleta Salada",
+      "category": "Golosina",
+      "stock": 25,
+      "quantity": 40,
+      "buyPrice": 0.40,
+      "sellPrice": 0.80,
+      "batch": "LOTE003",
+      "expiryDate": "2025-02-15",
+      "notes": "Galletas saladas para aperitivos",
+      "tags": ["Salado", "Galletas"]
+    }
+  ]
+}
