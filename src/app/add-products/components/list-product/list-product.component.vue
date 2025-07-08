@@ -247,7 +247,7 @@
 
 <script>
 import ProductApiService from '../../services/product-api.service.js';
-import InventoryApiService from '../services/inventory-api.service';
+import InventoryApiService from '../../services/inventory-api.service.js';
 import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue';
 
 export default {
