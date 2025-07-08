@@ -42,7 +42,15 @@
     "multipleFormatPermission": "Permiso de envío de notificaciones en múltiples formatos",
     "specificAlertPermission": "Permiso de configuración específica de alerta",
     "minorRolesPermission": "Roles menores pueden recibir las alertas",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "changeRole": "Cambiar Rol de Usuario",
+    "changeRoleTitle": "Cambiar Rol de Usuario",
+    "userId": "ID del Usuario",
+    "newRole": "Nuevo Rol",
+    "roles": {
+      "employee": "Empleado",
+      "admin": "Administrador"
+    }
   },
   "dashboard": {
     "welcome": "Bienvenido de nuevo",

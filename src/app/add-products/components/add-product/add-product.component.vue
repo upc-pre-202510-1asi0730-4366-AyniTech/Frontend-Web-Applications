@@ -29,7 +29,7 @@
           <div class="form-group">
             <label for="purchasePrice">{{ $t('addProduct.labels.buyPrice') }}</label>
             <div class="price-input">
-              <span class="currency">$</span>
+              <span class="currency">S/.</span>
               <input
                 id="purchasePrice"
                 type="number"
@@ -45,7 +45,7 @@
           <div class="form-group">
             <label for="salePrice">{{ $t('addProduct.labels.sellPrice') }}</label>
             <div class="price-input">
-              <span class="currency">$</span>
+              <span class="currency">S/.</span>
               <input
                 id="salePrice"
                 type="number"
@@ -129,27 +129,58 @@
       </form>
     </div>
 
-    <div v-if="showInventoryForm">
-      <h3>Inventario inicial para el producto guardado</h3>
+    <div v-if="showInventoryForm" class="inventory-form-container">
+      <h3>{{ $t('inventory.title') }}</h3>
+      
       <div class="product-summary">
-        <p><strong>Nombre:</strong> {{ createdProduct.name }}</p>
-        <p><strong>Descripción:</strong> {{ createdProduct.description }}</p>
-        <p><strong>Precio de venta:</strong> ${{ createdProduct.salePrice }}</p>
-        <p><strong>Categoría:</strong> {{ categories.find(c => c.id === createdProduct.categoryId)?.name }}</p>
-        <p><strong>Unidad de medida:</strong> {{ units.find(u => u.id === createdProduct.unitId)?.name }}</p>
-      </div>
-      <form @submit.prevent="handleInventorySubmit" class="inventory-mini-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="stock">Stock inicial</label>
-            <input id="stock" type="number" min="0" v-model.number="inventoryForm.stock" class="form-input" required />
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">{{ $t('inventory.product') }}</span>
+            <span class="summary-value">{{ createdProduct.name }}</span>
           </div>
-          <div class="form-group">
-            <label for="minStock">Stock mínimo</label>
-            <input id="minStock" type="number" min="0" v-model.number="inventoryForm.minStock" class="form-input" required />
+          <div class="summary-item">
+            <span class="summary-label">{{ $t('inventory.category') }}</span>
+            <span class="summary-value">{{ $t(`categories.${categories.find(c => c.id === createdProduct.categoryId)?.name}`) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">{{ $t('inventory.price') }}</span>
+            <span class="summary-value">${{ createdProduct.salePrice }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">{{ $t('inventory.unit') }}</span>
+            <span class="summary-value">{{ units.find(u => u.id === createdProduct.unitId)?.name }}</span>
           </div>
         </div>
-        <button type="submit" class="btn-save">Guardar en Inventario</button>
+      </div>
+
+      <form @submit.prevent="handleInventorySubmit" class="inventory-form">
+        <div class="form-group">
+          <label for="stock">{{ $t('inventory.quantity') }}</label>
+          <input 
+            id="stock" 
+            type="number" 
+            min="0" 
+            v-model.number="inventoryForm.stock" 
+            class="form-input" 
+            required 
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="minStock">{{ $t('inventory.minStock') }}</label>
+          <input 
+            id="minStock" 
+            type="number" 
+            min="0" 
+            v-model.number="inventoryForm.minStock" 
+            class="form-input" 
+            required 
+          />
+        </div>
+
+        <button type="submit" class="btn-save">
+          {{ $t('common.save') }}
+        </button>
       </form>
     </div>
   </div>
@@ -205,7 +236,7 @@ export default {
     const loadUnits = async () => {
       try {
         const response = await ProductApiService.getUnits();
-        units.value = response; 
+        units.value = response.data; 
       } catch (error) {
         console.error('Error al cargar unidades:', error);
       }
@@ -214,7 +245,7 @@ export default {
     const loadTags = async () => {
       try {
         const response = await ProductApiService.getTags();
-        availableTags.value = response;
+        availableTags.value = response.data;
       } catch (error) {
         console.error('Error al cargar etiquetas:', error);
       }
@@ -228,11 +259,15 @@ export default {
       if (isTagSelected(tagId)) {
         productForm.value.tagIds = productForm.value.tagIds.filter(id => id !== tagId);
       } else {
-        productForm.value.tagIds = [...new Set(productForm.value.tagIds)];
+        productForm.value.tagIds.push(tagId);
       }
     };
 
     const inventoryForm = ref({ stock: 0, minStock: 0 });
+
+    onMounted(async () => {
+      await Promise.all([loadUnits(), loadTags()]);
+    });
 
     const handleSubmit = async () => {
       if (!productForm.value.categoryId || !productForm.value.unitId) {
@@ -266,27 +301,29 @@ export default {
 
     const handleInventorySubmit = async () => {
       try {
+        const categoryName = t(`categories.${categories.value.find(c => c.id === createdProduct.value.categoryId)?.name}`);
+        const unitName = units.value.find(u => u.id === createdProduct.value.unitId)?.name;
+
+        if (!categoryName || !unitName) {
+          throw new Error('Categoría o unidad de medida no encontrada');
+        }
+
         const inventoryData = {
-          categoria: categories.value.find(c => c.id === createdProduct.value.categoryId)?.name || '',
+          categoria: categoryName,
           producto: createdProduct.value.name,
-          fechaEntrada: new Date().toISOString(),
-          cantidad: { value: inventoryForm.value.stock },
-          precio: { value: createdProduct.value.salePrice },
-          stockMinimo: { value: inventoryForm.value.minStock },
-          unidadMedida: { value: units.value.find(u => u.id === createdProduct.value.unitId)?.abbreviation || '' }
+          quantity: inventoryForm.value.stock,
+          price: createdProduct.value.salePrice,
+          minStock: inventoryForm.value.minStock,
+          unitName: unitName
         };
+
         await InventoryApiService.createInventory(inventoryData);
         router.push('/inventory');
       } catch (error) {
-        alert('Error al guardar inventario');
         console.error('Error al guardar inventario:', error);
+        alert('Error al guardar el inventario: ' + error.message);
       }
     };
-
-    onMounted(() => {
-      loadUnits();
-      loadTags();
-    });
 
     return {
       productForm,
@@ -365,38 +402,38 @@ label {
 
 .currency {
   position: absolute;
-  left: 0.75rem;
+  left: 8px;
   color: #666;
+  z-index: 1;
 }
 
-.price {
-  padding-left: 1.5rem;
+.form-input.price {
+  padding-left: 28px !important;
+  width: 100%;
 }
 
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-height: 3rem;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .tag {
-  padding: 0.5rem 1rem;
-  background: #f5f5f5;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: #f0f0f0;
   cursor: pointer;
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .tag:hover {
-  background: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 .tag.selected {
-  background: #4CAF50;
+  background-color: #4CAF50;
   color: white;
 }
 
@@ -458,45 +495,87 @@ label {
   pointer-events: none;
 }
 
-.inventory-mini-form {
-  background: white;
-  padding: 1.5rem;
+.inventory-form-container {
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 20px;
 }
 
-.inventory-mini-form .form-row {
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+.product-summary {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
 }
 
-.inventory-mini-form .form-group label {
-  margin-bottom: 0.25rem;
+.product-summary h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+  font-size: 1.1em;
 }
 
-.inventory-mini-form .form-input {
-  padding: 0.5rem;
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
 }
 
-.inventory-mini-form .btn-save {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+.summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+.summary-value {
   font-weight: 500;
+  color: #2c3e50;
+}
+
+.inventory-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.form-group input {
+  padding: 8px 18px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 500;
+  margin-top: 20px;
+  width: 100%;
+  transition: background-color 0.2s;
 }
 
-.inventory-mini-form .btn-save:hover:not(:disabled) {
-  background: #43A047;
-}
-
-.inventory-mini-form .btn-save:disabled {
-  background: #9E9E9E;
-  cursor: not-allowed;
+.btn-save:hover {
+  background-color: #218838;
 }
 </style>

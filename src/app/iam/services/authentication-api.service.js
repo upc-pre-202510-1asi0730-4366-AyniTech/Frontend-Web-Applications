@@ -133,6 +133,26 @@ export const useAuthStore = defineStore('auth', {
                 this.token = localStorage.getItem('token');
                 this.role = localStorage.getItem('role');
             }
+        },
+
+        async changeUserRole(userId, newRole) {
+            try {
+                const response = await http.put('/api/v1/authentication/change-role', {
+                    userId,
+                    newRole
+                });
+                
+                if (response.data) {
+                    // Actualizar el rol en el estado si el cambio fue exitoso
+                    if (this.user && this.user.id === userId) {
+                        this.user.role = newRole;
+                    }
+                }
+                return response.data;
+            } catch (error) {
+                console.error('Error al cambiar el rol:', error);
+                throw error;
+            }
         }
     }
 });

@@ -8,11 +8,10 @@ class InventoryApiService {
 
   async createInventory(inventoryData) {
     try {
-      // Formatear los datos según el formato esperado por el API
       const formattedData = {
         categoria: inventoryData.categoria,
         producto: inventoryData.producto,
-        fechaEntrada: inventoryData.entryDate,
+        fechaEntrada: new Date().toISOString(),
         cantidad: {
           value: Number(inventoryData.quantity)
         },
@@ -26,8 +25,6 @@ class InventoryApiService {
           value: inventoryData.unitName
         }
       };
-
-      console.log('Enviando datos de inventario:', formattedData);
 
       const response = await http.post(
         API_CONFIG[CURRENT_ENV].ENDPOINTS.INVENTORY + '/by-product',

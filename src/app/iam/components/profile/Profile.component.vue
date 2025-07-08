@@ -43,17 +43,42 @@
           </div>
           
           <div class="profile-actions">
-     
-            <button class="action-btn change-plan-btn" @click="goToPlanSelector">{{ $t('profile.changePlan') }}</button>
-            <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
-          
-            <button
-              v-if="userData && userData.id"
-              @click="cambiarRol"
+            <button class="action-btn change-plan-btn" @click="navigateToPlanSelector">{{ $t('profile.changePlan') }}</button>
+            
+            <!-- Botón para cambiar rol (solo visible para administradores) -->
+            <button 
+              v-if="isAdmin"
               class="action-btn change-role-btn"
+              @click="showChangeRoleModal = true"
             >
-              {{ userData.role === 'Administrator' ? 'Cambiar a Empleado' : 'Cambiar a Administrador' }}
+              {{ $t('profile.changeRole') }}
             </button>
+
+            <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
+          </div>
+        </div>
+
+        <!-- Modal para cambiar rol -->
+        <div v-if="showChangeRoleModal" class="modal-overlay">
+          <div class="modal-content">
+            <h3>{{ $t('profile.changeRoleTitle') }}</h3>
+            <div class="modal-form">
+              <div class="form-group">
+                <label>{{ $t('profile.userId') }}:</label>
+                <input type="number" v-model="selectedUserId" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>{{ $t('profile.newRole') }}:</label>
+                <select v-model="selectedRole" class="form-select">
+                  <option value="Employee">{{ $t('profile.roles.employee') }}</option>
+                  <option value="Administrator">{{ $t('profile.roles.admin') }}</option>
+                </select>
+              </div>
+              <div class="modal-actions">
+                <button class="btn-save" @click="handleChangeRole">{{ $t('common.save') }}</button>
+                <button class="btn-cancel" @click="showChangeRoleModal = false">{{ $t('common.cancel') }}</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -112,248 +137,242 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../services/authentication-api.service';
 import defaultAvatar from '@/assets/default-avatar.svg';
 
-export default {
-  name: 'Profile',
-  setup() {
-    const { locale, t } = useI18n();
-    const router = useRouter();
-    const authStore = useAuthStore();
-    
-    const toggleLanguage = () => {
-      locale.value = locale.value === 'es' ? 'en' : 'es';
+const router = useRouter();
+const { locale, t } = useI18n();
+const authStore = useAuthStore();
+
+const toggleLanguage = () => {
+  locale.value = locale.value === 'es' ? 'en' : 'es';
+};
+
+const userData = ref({
+  name: '',
+  lastName: '',
+  email: '',
+  role: ''
+});
+
+// Traducir el rol según el idioma
+const translatedRole = computed(() => {
+  if (!userData.value.role) return '';
+  
+  const roles = {
+    'Employee': {
+      'es': 'Empleado',
+      'en': 'Employee'
+    },
+    'Admin': {
+      'es': 'Administrador',
+      'en': 'Admin'
+    }
+  };
+
+  return roles[userData.value.role]?.[locale.value] || userData.value.role;
+});
+
+onMounted(async () => {
+  // Cargar datos del usuario desde el store
+  const user = authStore.currentUser;
+  console.log('User data:', user); // Para debug
+  if (user) {
+    userData.value = {
+      name: user.name || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
+      role: user.role || ''
     };
-    
-    const userData = ref({
-      name: '',
-      lastName: '',
-      email: '',
-      role: ''
-    });
-
-    // Traducir el rol según el idioma
-    const translatedRole = computed(() => {
-      if (!userData.value.role) return '';
-      
-      const roles = {
-        'Employee': {
-          'es': 'Empleado',
-          'en': 'Employee'
-        },
-        'Admin': {
-          'es': 'Administrador',
-          'en': 'Admin'
-        }
-      };
-
-      return roles[userData.value.role]?.[locale.value] || userData.value.role;
-    });
-    
-    onMounted(async () => {
-      // Cargar datos del usuario desde el store
-      const user = authStore.currentUser;
-      console.log('User data:', user); // Para debug
-      if (user) {
-        userData.value = {
-          name: user.name || '',
-          lastName: user.lastName || '',
-          email: user.email || '',
-          role: user.role || ''
-        };
-        // Cargar configuración guardada
-        loadSettings();
-      } else {
-        // Si no hay usuario, redirigir al login
-        router.push('/login');
-      }
-    });
-    
-    const isEditingName = ref(false);
-    const newName = ref('');
-    const newLastName = ref('');
-
-    const startEditingName = () => {
-      isEditingName.value = true;
-      newName.value = userData.value.name;
-      newLastName.value = userData.value.lastName;
-    };
-
-    const saveName = async () => {
-      try {
-        // Aquí iría la llamada a la API para actualizar el nombre
-        userData.value.name = newName.value;
-        userData.value.lastName = newLastName.value;
-        isEditingName.value = false;
-      } catch (error) {
-        console.error('Error al actualizar el nombre:', error);
-      }
-    };
-    
-    const cancelEditingName = () => {
-      isEditingName.value = false;
-    };
-    
-    const avatarInput = ref(null);
-    const avatarUrl = ref(localStorage.getItem('userAvatar') || defaultAvatar);
-
-    const triggerAvatarUpload = () => {
-      avatarInput.value.click();
-    };
-
-    const onAvatarChange = async (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        try {
-          // Crear una URL temporal para la vista previa
-          const tempUrl = URL.createObjectURL(file);
-          avatarUrl.value = tempUrl;
-          
-          // Guardar en localStorage para persistencia
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const base64Image = e.target.result;
-            localStorage.setItem('userAvatar', base64Image);
-          };
-          reader.readAsDataURL(file);
-          
-          // Aquí iría la lógica para subir la imagen al servidor
-          // const formData = new FormData();
-          // formData.append('avatar', file);
-          // await uploadAvatar(formData);
-        } catch (error) {
-          console.error('Error al actualizar la imagen de perfil:', error);
-        }
-      }
-    };
-
-    const settings = ref({
-      notificationPermission: false,
-      automaticAlerts: false,
-      multipleFormatPermission: false,
-      specificAlertPermission: false,
-      minorRolesPermission: false
-    });
-
     // Cargar configuración guardada
-    const loadSettings = () => {
-      const savedSettings = localStorage.getItem('userSettings');
-      if (savedSettings) {
-        settings.value = JSON.parse(savedSettings);
-      }
-    };
+    loadSettings();
+  } else {
+    // Si no hay usuario, redirigir al login
+    router.push('/login');
+  }
+});
 
-    // Guardar configuración cuando cambie
-    const saveSettings = () => {
-      localStorage.setItem('userSettings', JSON.stringify(settings.value));
-    };
+const isEditingName = ref(false);
+const newName = ref('');
+const newLastName = ref('');
 
-    // Vigilar cambios en cada configuración
-    Object.keys(settings.value).forEach(setting => {
-      watch(() => settings.value[setting], (newVal) => {
-        saveSettings();
-      });
+const startEditingName = () => {
+  isEditingName.value = true;
+  newName.value = userData.value.name;
+  newLastName.value = userData.value.lastName;
+};
+
+const saveName = async () => {
+  try {
+    // Aquí iría la llamada a la API para actualizar el nombre
+    userData.value.name = newName.value;
+    userData.value.lastName = newLastName.value;
+    isEditingName.value = false;
+  } catch (error) {
+    console.error('Error al actualizar el nombre:', error);
+  }
+};
+
+const cancelEditingName = () => {
+  isEditingName.value = false;
+};
+
+const avatarInput = ref(null);
+const avatarUrl = ref(localStorage.getItem('userAvatar') || defaultAvatar);
+
+const triggerAvatarUpload = () => {
+  avatarInput.value.click();
+};
+
+const onAvatarChange = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    try {
+      // Crear una URL temporal para la vista previa
+      const tempUrl = URL.createObjectURL(file);
+      avatarUrl.value = tempUrl;
+      
+      // Guardar en localStorage para persistencia
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Image = e.target.result;
+        localStorage.setItem('userAvatar', base64Image);
+      };
+      reader.readAsDataURL(file);
+      
+      // Aquí iría la lógica para subir la imagen al servidor
+      // const formData = new FormData();
+      // formData.append('avatar', file);
+      // await uploadAvatar(formData);
+    } catch (error) {
+      console.error('Error al actualizar la imagen de perfil:', error);
+    }
+  }
+};
+
+const settings = ref({
+  notificationPermission: false,
+  automaticAlerts: false,
+  multipleFormatPermission: false,
+  specificAlertPermission: false,
+  minorRolesPermission: false
+});
+
+// Cargar configuración guardada
+const loadSettings = () => {
+  const savedSettings = localStorage.getItem('userSettings');
+  if (savedSettings) {
+    settings.value = JSON.parse(savedSettings);
+  }
+};
+
+// Guardar configuración cuando cambie
+const saveSettings = () => {
+  localStorage.setItem('userSettings', JSON.stringify(settings.value));
+};
+
+// Vigilar cambios en cada configuración
+Object.keys(settings.value).forEach(setting => {
+  watch(() => settings.value[setting], (newVal) => {
+    saveSettings();
+  });
+});
+
+const logout = async () => {
+  try {
+    authStore.logout();
+    router.push('/login');
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
+};
+
+const navigateToPlanSelector = () => {
+  router.push('/seleccionar-plan');
+};
+
+const cambiarRol = async () => {
+  if (!userData || !userData.role) return;
+  const token = localStorage.getItem('token');
+  const userId = userData.id;
+  const nuevoRol = userData.role === 'Administrator' ? 'Employee' : 'Administrator';
+  try {
+    const response = await fetch('http://localhost:5159/api/v1/authentication/change-role', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userId: userId,
+        newRole: nuevoRol
+      })
     });
-    
-    const logout = async () => {
-      try {
-        authStore.logout();
-        router.push('/login');
-      } catch (error) {
-        console.error('Error during logout:', error);
-      }
-    };
+    if (response.ok) {
+      alert('Rol cambiado correctamente');
+      userData.role = nuevoRol;
+      // ACTUALIZA EL STORE Y LOCALSTORAGE
+      authStore.user = { ...authStore.user, role: nuevoRol };
+      authStore.role = nuevoRol;
+      localStorage.setItem('user', JSON.stringify(authStore.user));
+      localStorage.setItem('role', nuevoRol);
+    } else {
+      alert('Error al cambiar el rol');
+    }
+  } catch (error) {
+    alert('Error de red');
+  }
+};
 
-    const goToPlanSelector = () => {
-      router.push('/seleccionar-plan');
-    };
-
-    const cambiarRol = async () => {
-      if (!userData || !userData.role) return;
-      const token = localStorage.getItem('token');
-      const userId = userData.id;
-      const nuevoRol = userData.role === "Employee" ? "Administrator" : "Employee";
-      try {
-        const response = await fetch('http://localhost:5159/api/v1/authentication/change-role', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            userId: userId,
-            newRole: nuevoRol
-          })
-        });
-        if (response.ok) {
-          alert('Rol cambiado correctamente');
-          userData.role = nuevoRol;
-          // ACTUALIZA EL STORE Y LOCALSTORAGE
-          authStore.user = { ...authStore.user, role: nuevoRol };
-          authStore.role = nuevoRol;
-          localStorage.setItem('user', JSON.stringify(authStore.user));
-          localStorage.setItem('role', nuevoRol);
-        } else {
-          alert('Error al cambiar el rol');
-        }
-      } catch (error) {
-        alert('Error de red');
+const sincronizarRol = async () => {
+  const token = localStorage.getItem('token');
+  const userId = userData.value.id;
+  try {
+    const response = await fetch(`http://localhost:5159/api/v1/users/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
-    };
+    });
+    if (response.ok) {
+      const data = await response.json();
+      userData.value.role = data.role;
+      authStore.user = { ...authStore.user, role: data.role };
+      authStore.role = data.role;
+      localStorage.setItem('user', JSON.stringify(authStore.user));
+      localStorage.setItem('role', data.role);
+      alert('Rol sincronizado correctamente');
+    } else {
+      alert('No se pudo sincronizar el rol');
+    }
+  } catch (error) {
+    alert('Error de red al sincronizar el rol');
+  }
+};
 
-    const sincronizarRol = async () => {
-      const token = localStorage.getItem('token');
-      const userId = userData.value.id;
-      try {
-        const response = await fetch(`http://localhost:5159/api/v1/users/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          userData.value.role = data.role;
-          authStore.user = { ...authStore.user, role: data.role };
-          authStore.role = data.role;
-          localStorage.setItem('user', JSON.stringify(authStore.user));
-          localStorage.setItem('role', data.role);
-          alert('Rol sincronizado correctamente');
-        } else {
-          alert('No se pudo sincronizar el rol');
-        }
-      } catch (error) {
-        alert('Error de red al sincronizar el rol');
-      }
-    };
-    
-    return {
-      toggleLanguage,
-      userData,
-      translatedRole,
-      settings,
-      logout,
-      goToPlanSelector,
-      isEditingName,
-      newName,
-      newLastName,
-      startEditingName,
-      saveName,
-      cancelEditingName,
-      avatarInput,
-      avatarUrl,
-      triggerAvatarUpload,
-      onAvatarChange,
-      locale,
-      cambiarRol,
-      sincronizarRol
-    };
+const showChangeRoleModal = ref(false);
+const selectedUserId = ref('');
+const selectedRole = ref('Employee');
+
+// Computed property para verificar si el usuario es administrador
+const isAdmin = computed(() => {
+  return userData.value.role === 'Administrator';
+});
+
+const handleChangeRole = async () => {
+  try {
+    await authStore.changeUserRole(selectedUserId.value, selectedRole.value);
+    alert('Rol actualizado exitosamente');
+    showChangeRoleModal.value = false;
+    selectedUserId.value = '';
+    selectedRole.value = 'Employee';
+  } catch (error) {
+    alert('Error al cambiar el rol: ' + error.message);
   }
 };
 </script>
@@ -632,19 +651,12 @@ input:checked + .toggle-slider:before {
 }
 
 .change-role-btn {
-  background-color: #ee7f27;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 0;
-  width: 100%;
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 1rem;
-  transition: background 0.2s;
+  background-color: #FFA726;
+  color: white;
+  transition: background-color 0.3s ease;
 }
 .change-role-btn:hover {
-  background-color: #d96e1f;
+  background-color: #FB8C00;
 }
 
 .sync-role-btn {
@@ -681,5 +693,61 @@ input:checked + .toggle-slider:before {
   .info-label {
     min-width: auto;
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-input, .form-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.change-role-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.change-role-btn:hover {
+  background-color: #1976D2;
 }
 </style> 

@@ -45,20 +45,7 @@ async function confirmDeleteBatch() {
       <p><strong>Unidad de medida:</strong> {{ lot.unidad }}</p>
     </div>
     <div class="card-actions">
-      <button
-          class="action-button"
-          title="Comentarios"
-          @click="$emit('comment', lot)"
-      >
-        <i class="fas fa-comments"></i>
-      </button>
-      <button
-          class="action-button"
-          title="Exportar"
-      >
-        <i class="fas fa-edit"></i>
-      </button>
-      <!-- Icono de eliminar -->
+
       <button
         class="action-button"
         title="Eliminar"
@@ -103,12 +90,14 @@ async function confirmDeleteBatch() {
 .card-header {
   border-bottom: 1px solid #eee;
   padding-bottom: 1rem;
+  text-align: center;
 }
 
 .card-header h3 {
   margin: 0;
   color: #333;
   font-size: 1.2rem;
+  text-align: center;
 }
 
 .provider {
@@ -119,6 +108,7 @@ async function confirmDeleteBatch() {
   font-size: 0.9rem;
   color: #666;
   margin-top: 0.5rem;
+  text-align: center;
 }
 
 .card-content {
@@ -126,41 +116,79 @@ async function confirmDeleteBatch() {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  text-align: center;
 }
 
 .card-content p {
   margin: 0;
   color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.card-content p strong {
+  color: #333;
 }
 
 .card-actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: center;
   padding-top: 1rem;
   border-top: 1px solid #eee;
 }
 
-.action-button {
-  width: 36px;
-  height: 36px;
+.action-button[title="Eliminar"] {
+  background: #ff9800;
   border: none;
   border-radius: 8px;
-  background: #2D2D2D;
-  color: white;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
+  margin-left: 0.5rem;
+}
+.action-button[title="Eliminar"] svg {
+  color: #fff;
+  fill: #fff;
+}
+.action-button[title="Eliminar"]:hover {
+  background: #dc3545;
 }
 
-.action-button:hover {
-  background: #1a1a1a;
-  transform: translateY(-2px);
+.action-button:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.tooltip {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.delete-btn:hover svg path {
+  stroke: white;
 }
 
 .action-button i {
-  font-size: 1rem;
+  font-size: 16px;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 import LotComment from '../components/lot-comment.component.vue'
 import LotCard from '../components/lot-card.component.vue'
@@ -17,6 +17,33 @@ const showDeleteModal = ref(false)
 const lotToDelete = ref(null)
 const deleteMessage = ref('')
 const lotService = new LotService()
+
+// Filtros
+const filterProduct = ref('')
+const filterProvider = ref('')
+const filterDate = ref('')
+const filterQuantity = ref('')
+const filterPrice = ref('')
+
+// Lotes filtrados
+const filteredLots = computed(() => {
+  return lots.value.filter(lot => {
+    const matchProduct = !filterProduct.value || lot.producto.toLowerCase().includes(filterProduct.value.toLowerCase())
+    const matchProvider = !filterProvider.value || lot.proveedor.toLowerCase().includes(filterProvider.value.toLowerCase())
+    const matchDate = !filterDate.value || lot.fechaEntrada.includes(filterDate.value)
+    
+    // Convertir a números para comparación
+    const lotQuantity = parseFloat(lot.cantidad)
+    const filterQuantityNum = filterQuantity.value ? parseFloat(filterQuantity.value) : null
+    const matchQuantity = !filterQuantityNum || lotQuantity === filterQuantityNum
+
+    const lotPrice = parseFloat(lot.precio)
+    const filterPriceNum = filterPrice.value ? parseFloat(filterPrice.value) : null
+    const matchPrice = !filterPriceNum || lotPrice === filterPriceNum
+
+    return matchProduct && matchProvider && matchDate && matchQuantity && matchPrice
+  })
+})
 
 async function fetchLots() {
   lots.value = await lotService.getAll()
@@ -66,31 +93,57 @@ async function confirmDeleteLot() {
 
     <div class="toolbar-container">
       <div class="toolbar">
-        <input type="text" placeholder="Productos..." class="input-field" />
-        <input type="text" placeholder="Proveedor..." class="input-field" />
+        <input 
+          type="text" 
+          v-model="filterProduct"
+          placeholder="Productos..." 
+          class="input-field" 
+        />
+        <input 
+          type="text" 
+          v-model="filterProvider"
+          placeholder="Proveedor..." 
+          class="input-field" 
+        />
         <div class="date-container">
-          <input type="date" class="date-input" />
+          <input 
+            type="date" 
+            v-model="filterDate"
+            class="date-input" 
+          />
           <button class="calendar-button">
             <i class="fas fa-calendar"></i>
           </button>
         </div>
-        <input type="number" placeholder="Cantidad" class="input-field" />
-        <input type="number" placeholder="Precio" class="input-field" />
+        <input 
+          type="number" 
+          v-model="filterQuantity"
+          placeholder="Cantidad" 
+          class="input-field" 
+        />
+        <input 
+          type="number" 
+          v-model="filterPrice"
+          placeholder="Precio" 
+          class="input-field" 
+        />
         <button class="btn-generate" @click="showAddLotForm = true">Generar Nuevo Lote</button>
         <div class="view-toggle">
           <button
               :class="['view-btn', viewMode === 'table' ? 'active' : '']"
               @click="viewMode = 'table'"
-              title="Vista de tabla"
+              title="Ver como tabla"
           >
             <i class="fas fa-table"></i>
+            <span class="view-text">Tabla</span>
           </button>
           <button
               :class="['view-btn', viewMode === 'card' ? 'active' : '']"
               @click="viewMode = 'card'"
-              title="Vista de tarjetas"
+              title="Ver como tarjetas"
           >
             <i class="fas fa-th-large"></i>
+            <span class="view-text">Tarjetas</span>
           </button>
         </div>
       </div>
@@ -110,7 +163,7 @@ async function confirmDeleteLot() {
         <div class="header-cell">Acciones</div>
       </div>
 
-      <div v-for="lot in lots" :key="lot.id" class="table-row">
+      <div v-for="lot in filteredLots" :key="lot.id" class="table-row">
         <div class="cell">{{ lot.proveedor }}</div>
         <div class="cell">{{ lot.producto }}</div>
         <div class="cell">{{ lot.fechaEntrada }}</div>
@@ -118,16 +171,6 @@ async function confirmDeleteLot() {
         <div class="cell">S/{{ lot.precio }}</div>
         <div class="cell">{{ lot.unidad }}</div>
         <div class="cell actions">
-          <button
-              class="action-button"
-              title="Comentarios"
-              @click="openCommentModal(lot)"
-          >
-            <i class="fas fa-comments"></i>
-          </button>
-          <button class="action-button" title="Editar">
-            <i class="fas fa-edit"></i>
-          </button>
           <!-- Icono de eliminar -->
           <button class="action-button" title="Eliminar" @click="openDeleteModal(lot)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +188,7 @@ async function confirmDeleteLot() {
 
     <div v-else class="cards-container">
       <LotCard
-          v-for="lot in lots"
+          v-for="lot in filteredLots"
           :key="lot.id"
           :lot="lot"
           class="card-item"
@@ -255,30 +298,45 @@ h2 {
 
 .view-toggle {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.25rem;
+  border-radius: 8px;
 }
 
 .view-btn {
-  width: 36px;
+  min-width: 100px;
   height: 36px;
   border: none;
-  border-radius: 4px;
-  background: #fff;
+  border-radius: 6px;
+  background: transparent;
   color: #666;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0 12px;
 }
 
-.view-btn.active {
-  background: #ff9800;
-  color: #fff;
+.view-text {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .view-btn:hover {
-  background: #ffb74d;
-  color: #fff;
+  background: #f3c8a5;
+  color: white;
+}
+
+.view-btn.active {
+  background: #F4A460;
+  color: white;
+}
+
+.view-btn i {
+  font-size: 16px;
 }
 
 .table-container {
@@ -305,6 +363,7 @@ h2 {
   padding: 0.75rem 1rem;
   border-top: 1px solid #eee;
   background: white;
+  align-items: center;
 }
 
 .table-row:hover {
@@ -314,6 +373,17 @@ h2 {
 .cell {
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
 }
 
 .actions {
@@ -327,17 +397,22 @@ h2 {
   height: 36px;
   border: none;
   border-radius: 8px;
-  background: #2D2D2D;
+  background: #ff9800;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s;
 }
 
 .action-button:hover {
-  background: #1a1a1a;
+  background: #dc3545;
+}
+
+.action-button svg {
+  color: #fff;
+  fill: #fff;
 }
 
 .action-button[title="Eliminar"] {
@@ -363,9 +438,9 @@ h2 {
 
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
 }
 
 .card-item {

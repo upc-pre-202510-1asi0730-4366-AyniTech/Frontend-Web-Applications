@@ -86,56 +86,44 @@ class ProductApiService {
   }
 
   async getUnits() {
-    try {
-      const response = await http.get(`/api/v1/units`);
-      return response.data;
-    } catch (error) {
-      console.error('Error al obtener unidades:', error);
-      return {
-        data: [
-          { id: 1, name: 'Mililitros', abbreviation: 'ml' },
-          { id: 2, name: 'Litros', abbreviation: 'L' },
-          { id: 3, name: 'Gramos', abbreviation: 'g' },
-          { id: 4, name: 'Kilogramos', abbreviation: 'kg' },
-          { id: 5, name: 'Unidades', abbreviation: 'und' },
-          { id: 6, name: 'Paquetes', abbreviation: 'paq' },
-          { id: 7, name: 'Botellas', abbreviation: 'bot' },
-          { id: 8, name: 'Latas', abbreviation: 'lat' },
-          { id: 9, name: 'Cajas', abbreviation: 'caj' },
-          { id: 10, name: 'Docenas', abbreviation: 'doc' },
-          { id: 11, name: 'Metros', abbreviation: 'm' },
-          { id: 12, name: 'Piezas', abbreviation: 'pz' }
-        ]
-      };
-    }
+    const hardcodedUnits = [
+      { id: 1, name: 'Mililitros', abbreviation: 'ml' },
+      { id: 2, name: 'Litros', abbreviation: 'L' },
+      { id: 3, name: 'Gramos', abbreviation: 'g' },
+      { id: 4, name: 'Kilogramos', abbreviation: 'kg' },
+      { id: 5, name: 'Unidades', abbreviation: 'und' },
+      { id: 6, name: 'Paquetes', abbreviation: 'paq' },
+      { id: 7, name: 'Botellas', abbreviation: 'bot' },
+      { id: 8, name: 'Latas', abbreviation: 'lat' },
+      { id: 9, name: 'Cajas', abbreviation: 'caj' },
+      { id: 10, name: 'Docenas', abbreviation: 'doc' },
+      { id: 11, name: 'Metros', abbreviation: 'm' },
+      { id: 12, name: 'Piezas', abbreviation: 'pz' }
+    ];
+    
+    return { data: hardcodedUnits };
   }
 
   async getTags() {
-       try {
-      const response = await http.get(`${this.endpoint}/tags`);
-      return response.data;
-    } catch (error) {
-      console.error('Error al obtener etiquetas:', error);
-      return {
-        data: [
-          { id: 1, name: 'Orgánico' },
-          { id: 2, name: 'Sin Gluten' },
-          { id: 3, name: 'Vegano' },
-          { id: 4, name: 'Light' },
-          { id: 5, name: 'Premium' },
-          { id: 6, name: 'Promoción' },
-          { id: 7, name: 'Nuevo' },
-          { id: 8, name: 'Descontinuado' },
-          { id: 9, name: 'Temporada' },
-          { id: 10, name: 'Local' },
-          { id: 11, name: 'Importado' },
-          { id: 12, name: 'Artesanal' },
-          { id: 13, name: 'Sin Azúcar' },
-          { id: 14, name: 'Bajo en Sodio' },
-          { id: 15, name: 'Rica en Fibra' }
-        ]
-      };
-    }
+    const hardcodedTags = [
+      { id: 1, name: 'Orgánico' },
+      { id: 2, name: 'Sin Gluten' },
+      { id: 3, name: 'Vegano' },
+      { id: 4, name: 'Light' },
+      { id: 5, name: 'Premium' },
+      { id: 6, name: 'Promoción' },
+      { id: 7, name: 'Nuevo' },
+      { id: 8, name: 'Descontinuado' },
+      { id: 9, name: 'Temporada' },
+      { id: 10, name: 'Local' },
+      { id: 11, name: 'Importado' },
+      { id: 12, name: 'Artesanal' },
+      { id: 13, name: 'Sin Azúcar' },
+      { id: 14, name: 'Bajo en Sodio' },
+      { id: 15, name: 'Rica en Fibra' }
+    ];
+
+    return { data: hardcodedTags };
   }
 }
 

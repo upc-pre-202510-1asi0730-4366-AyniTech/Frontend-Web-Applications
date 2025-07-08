@@ -75,7 +75,7 @@ const routes = [
         path: '/seleccionar-plan',
         name: 'PlanSelector',
         component: () => import('@/app/iam/components/register/PlanSelector.vue'),
-        meta: { requiresGuest: true }
+        meta: { requiresAuth: true }
     }
 ];
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
@@ -11,109 +11,31 @@ import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue
 const { t } = useI18n();
 const products = ref([])
 const viewMode = ref('table')
-const showAddForm = ref(false)
-const selectedTags = ref([])
-const categories = ref([
-  { id: 1, name: t('categories.beverages') },
-  { id: 2, name: t('categories.dairy') },
-  { id: 3, name: t('categories.bakery') },
-  { id: 4, name: t('categories.meat') },
-  { id: 5, name: t('categories.produce') },
-  { id: 6, name: t('categories.groceries') },
-  { id: 7, name: t('categories.cleaning') },
-  { id: 8, name: t('categories.hygiene') },
-  { id: 9, name: t('categories.frozen') },
-  { id: 10, name: t('categories.snacks') }
-])
-const units = ref([])
-const availableTags = ref([])
-
-const newProduct = ref({
-  name: '',
-  description: '',
-  purchasePrice: null,
-  salePrice: null,
-  stock: null,        // nuevo campo
-  minStock: null,     // nuevo campo
-  categoryId: '',
-  unitId: '',
-  internalNotes: '',
-  tagIds: []
-})
-
 const showDeleteModal = ref(false)
 const productToDelete = ref(null)
 const deleteMessage = ref('')
 
-const loadUnits = async () => {
-  try {
-    const response = await ProductApiService.getUnits();
-    units.value = response; 
-  } catch (error) {
-    console.error('Error loading units:', error);
-  }
-}
+// Filtros
+const filterCategory = ref('')
+const filterProduct = ref('')
+const filterDate = ref('')
+const filterStock = ref('')
 
-const loadTags = async () => {
-  try {
-    const response = await ProductApiService.getTags();
-    availableTags.value = response; 
-  } catch (error) {
-    console.error('Error loading tags:', error);
-  }
-}
+// Productos filtrados
+const filteredProducts = computed(() => {
+  return products.value.filter(product => {
+    const matchCategory = !filterCategory.value || product.categoria.toLowerCase().includes(filterCategory.value.toLowerCase())
+    const matchProduct = !filterProduct.value || product.producto.toLowerCase().includes(filterProduct.value.toLowerCase())
+    const matchDate = !filterDate.value || product.fechaEntrada.includes(filterDate.value)
+    
+    // Convertir a números para comparación
+    const productStock = parseFloat(product.stockMinimo)
+    const filterStockNum = filterStock.value ? parseFloat(filterStock.value) : null
+    const matchStock = !filterStockNum || productStock === filterStockNum
 
-const getTagName = (tagId) => {
-  const tag = availableTags.value.find(t => t.id === tagId)
-  return tag ? tag.name : ''
-}
-
-const toggleTag = (tagId) => {
-  const index = selectedTags.value.indexOf(tagId)
-  if (index === -1) {
-    selectedTags.value.push(tagId)
-  } else {
-    selectedTags.value.splice(index, 1)
-  }
-  newProduct.value.tagIds = [...selectedTags.value]
-}
-
-const removeTag = (tagId) => {
-  selectedTags.value = selectedTags.value.filter(id => id !== tagId)
-  newProduct.value.tagIds = [...selectedTags.value]
-}
-
-const handleAddProduct = async () => {
-  try {
-    // Busca el nombre de la categoría seleccionada
-    const selectedCategory = categories.value.find(cat => cat.id === newProduct.value.categoryId);
-    const selectedUnit = units.value.find(u => u.id === newProduct.value.unitId);
-
-    const inventoryBody = {
-      categoria: selectedCategory ? selectedCategory.name : '',
-      producto: newProduct.value.name,
-      fechaEntrada: new Date().toISOString(),
-      cantidad: { value: Number(newProduct.value.stock) || 0 },
-      precio: { value: Number(newProduct.value.purchasePrice) || 0 },
-      stockMinimo: { value: Number(newProduct.value.minStock) || 0 },
-      unidadMedida: { value: selectedUnit ? selectedUnit.abbreviation : '' }
-    };
-
-    console.log('Body enviado a inventario:', inventoryBody);
-
-    await createInventoryByProduct(inventoryBody);
-    showAddForm.value = false;
-    // Recargar productos
-    products.value = await fetchProducts();
-  } catch (error) {
-    console.error('Error saving inventory by product:', error);
-    if (error.response && error.response.data) {
-      alert(JSON.stringify(error.response.data, null, 2));
-    } else {
-      alert(error.message || 'Error desconocido');
-    }
-  }
-}
+    return matchCategory && matchProduct && matchDate && matchStock
+  })
+})
 
 async function fetchProductsList() {
   products.value = await fetchProducts()
@@ -124,10 +46,12 @@ function openDeleteModal(product) {
   deleteMessage.value = `¿Seguro que deseas eliminar el producto "${product.producto}"?`
   showDeleteModal.value = true
 }
+
 function closeDeleteModal() {
   showDeleteModal.value = false
   productToDelete.value = null
 }
+
 async function confirmDeleteProduct() {
   if (!productToDelete.value) return
   try {
@@ -141,8 +65,6 @@ async function confirmDeleteProduct() {
 
 onMounted(async () => {
   products.value = await fetchProducts()
-  loadUnits()
-  loadTags()
 })
 </script>
 
@@ -152,18 +74,34 @@ onMounted(async () => {
 
     <div class="toolbar-background">
       <div class="toolbar">
-        <input type="text" :placeholder="$t('inventory.searchCategory')" class="search-input" />
-        <input type="text" :placeholder="$t('inventory.searchProducts')" class="search-input" />
+        <input 
+          type="text" 
+          v-model="filterCategory"
+          :placeholder="$t('inventory.searchCategory')" 
+          class="search-input" 
+        />
+        <input 
+          type="text" 
+          v-model="filterProduct"
+          :placeholder="$t('inventory.searchProducts')" 
+          class="search-input" 
+        />
         <div class="date-container">
-          <input type="date" class="date-input" />
+          <input 
+            type="date" 
+            v-model="filterDate"
+            class="date-input" 
+          />
           <button class="calendar-button">
             <i class="fas fa-calendar"></i>
           </button>
         </div>
-        <input type="number" :placeholder="$t('inventory.searchStock')" class="number-input" />
-        <button class="btn-generate" @click="showAddForm = true">
-          {{ $t('inventory.generateProduct') }}
-        </button>
+        <input 
+          type="number" 
+          v-model="filterStock"
+          :placeholder="$t('inventory.searchStock')" 
+          class="number-input" 
+        />
       </div>
     </div>
 
@@ -179,7 +117,7 @@ onMounted(async () => {
         <div class="cell actions">{{ $t('inventory.actions') }}</div>
       </div>
 
-      <div v-for="product in products" :key="product.id" class="table-row-container">
+      <div v-for="product in filteredProducts" :key="product.id" class="table-row-container">
         <div class="table-row data">
           <div class="cell">{{ product.categoria }}</div>
           <div class="cell">{{ product.producto }}</div>
@@ -189,10 +127,6 @@ onMounted(async () => {
           <div class="cell">{{ product.stockMinimo }}</div>
           <div class="cell">{{ product.unidadMedida }}</div>
           <div class="cell actions">
-            <button class="action-button dark">
-              <i class="fas fa-edit"></i>
-            </button>
-            <!-- Icono de eliminar -->
             <button class="action-button" title="Eliminar" @click="openDeleteModal(product)">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
@@ -207,203 +141,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Modal de Añadir Producto -->
-    <div v-if="showAddForm" class="modal-overlay">
-      <div class="modal-window">
-        <h2>Añadir Producto</h2>
-        <form @submit.prevent="handleAddProduct" class="form-content">
-          <div class="form-group">
-            <label for="name">Nombre</label>
-            <input
-              id="name"
-              type="text"
-              v-model="newProduct.name"
-              class="form-input"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="description">Descripción</label>
-            <textarea
-              id="description"
-              v-model="newProduct.description"
-              class="form-textarea"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="purchasePrice">Precio de compra</label>
-              <div class="price-input">
-                <span class="currency">$</span>
-                <input
-                  id="purchasePrice"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  v-model.number="newProduct.purchasePrice"
-                  class="form-input price"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-group half">
-              <label for="salePrice">Precio de venta</label>
-              <div class="price-input">
-                <span class="currency">$</span>
-                <input
-                  id="salePrice"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  v-model.number="newProduct.salePrice"
-                  class="form-input price"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- NUEVO BLOQUE: Stock actual y Stock mínimo -->
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="stock">Stock actual</label>
-              <div class="price-input">
-                <input
-                  id="stock"
-                  v-model.number="newProduct.stock"
-                  type="number"
-                  min="0"
-                  class="form-input"
-                  placeholder="Cantidad actual"
-                  required
-                />
-              </div>
-            </div>
-            <div class="form-group half">
-              <label for="minStock">Stock mínimo</label>
-              <div class="price-input">
-                <input
-                  id="minStock"
-                  v-model.number="newProduct.minStock"
-                  type="number"
-                  min="0"
-                  class="form-input"
-                  placeholder="Cantidad mínima"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <!-- FIN BLOQUE NUEVO -->
-
-          <div class="form-group">
-            <label>Categoría</label>
-            <div class="custom-select">
-              <select 
-                v-model="newProduct.categoryId"
-                class="form-select"
-                required
-              >
-                <option value="" disabled selected>Selecciona una categoría</option>
-                <option 
-                  v-for="category in categories" 
-                  :key="category.id" 
-                  :value="category.id"
-                >
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Unidad de medida</label>
-            <div class="custom-select">
-              <select 
-                v-model="newProduct.unitId"
-                class="form-select"
-                required
-              >
-                <option value="" disabled selected>Selecciona una unidad</option>
-                <option 
-                  v-for="unit in units" 
-                  :key="unit.id" 
-                  :value="unit.id"
-                >
-                  {{ unit.name }} ({{ unit.abbreviation }})
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Etiquetas</label>
-            <div class="tags-container">
-              <div class="tags-grid">
-                <div
-                  v-for="tag in availableTags"
-                  :key="tag.id"
-                  class="tag-option"
-                  :class="{ 'selected': selectedTags.includes(tag.id) }"
-                  @click="toggleTag(tag.id)"
-                >
-                  {{ tag.name }}
-                </div>
-              </div>
-              <div class="selected-tags" v-if="selectedTags.length > 0">
-                <p class="selected-label">Etiquetas seleccionadas:</p>
-                <div class="selected-tags-grid">
-                  <span 
-                    v-for="tagId in selectedTags" 
-                    :key="tagId" 
-                    class="tag-badge"
-                  >
-                    {{ getTagName(tagId) }}
-                    <button 
-                      type="button" 
-                      class="remove-tag" 
-                      @click.stop="removeTag(tagId)"
-                    >
-                      ×
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="internalNotes">Notas internas</label>
-            <textarea
-              id="internalNotes"
-              v-model="newProduct.internalNotes"
-              class="form-textarea"
-              rows="2"
-            ></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="save-button">
-              Guardar Producto
-            </button>
-            <button type="button" class="cancel-button" @click="showAddForm = false">
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  <!-- Modal de confirmación -->
-  <ModalConfirmDeleteHistory
-    :visible="showDeleteModal"
-    :mensaje="deleteMessage"
-    @cancelar="closeDeleteModal"
-    @confirmar="confirmDeleteProduct"
-  />
+    <!-- Modal de confirmación -->
+    <ModalConfirmDeleteHistory
+      :visible="showDeleteModal"
+      :mensaje="deleteMessage"
+      @cancelar="closeDeleteModal"
+      @confirmar="confirmDeleteProduct"
+    />
   </div>
 </template>
 
@@ -520,17 +264,21 @@ h2 {
   font-weight: 600;
   color: #333;
   background: #f8f9fa;
+  text-align: center;
 }
 
 .cell {
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem;
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .action-button {

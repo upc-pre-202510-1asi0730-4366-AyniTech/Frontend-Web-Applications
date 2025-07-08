@@ -12,8 +12,18 @@
             <i class="pi pi-box"></i>
           </div>
           <div class="stat-info">
-            <h3>{{ $t('dashboard.totalProducts') }}</h3>
+            <h3>Productos Registrados</h3>
             <p class="stat-value">{{ totalProducts }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon inventory-icon">
+            <i class="pi pi-list"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Stock Total</h3>
+            <p class="stat-value">{{ totalInventory }} unidades</p>
           </div>
         </div>
 
@@ -23,7 +33,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ $t('dashboard.providerDate') }}</h3>
-            <p class="stat-value">{{ providerDate || '00/00/00' }}</p>
+            <p class="stat-value">{{ providerDate || '08/07/2025' }}</p>
           </div>
         </div>
       </div>
@@ -39,7 +49,7 @@
           <span>{{ $t('dashboard.inventory') }}</span>
         </button>
 
-        <button class="action-btn primary" @click="navigateTo('add-product')">
+        <button class="action-btn secondary" @click="navigateTo('add-product')">
           <i class="pi pi-plus"></i>
           <span>{{ $t('dashboard.addProducts') }}</span>
         </button>
@@ -81,6 +91,8 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStockAlertService } from '../../stock-alert/services/stockAlert-service';
 import ProductApiService from '../../add-products/services/product-api.service';
+import http from '@/shared/http-common';
+import { API_CONFIG, CURRENT_ENV } from '@config/api.config';
 import 'primeicons/primeicons.css';
 
 export default {
@@ -89,6 +101,7 @@ export default {
     const router = useRouter();
     const stockAlertService = useStockAlertService();
     const totalProducts = ref(0);
+    const totalInventory = ref(0);
     const providerDate = ref(null);
     const lowStockProducts = ref([]);
     const { t } = useI18n();
@@ -115,12 +128,57 @@ export default {
 
     const fetchTotalProducts = async () => {
       try {
-        const products = await ProductApiService.getProducts();
-        totalProducts.value = Array.isArray(products) ? products.length : 0;
-        console.log('Total products:', totalProducts.value);
+        const response = await http.get(API_CONFIG[CURRENT_ENV].ENDPOINTS.INVENTORY);
+        const inventory = response.data;
+        
+        // Obtener productos únicos combinando productos y lotes
+        const uniqueProducts = new Set();
+        
+        // Agregar productos
+        if (inventory.productos && Array.isArray(inventory.productos)) {
+          inventory.productos.forEach(item => {
+            if (item.producto) {
+              uniqueProducts.add(item.producto);
+            }
+          });
+        }
+        
+        // Agregar productos de lotes
+        if (inventory.lotes && Array.isArray(inventory.lotes)) {
+          inventory.lotes.forEach(item => {
+            if (item.producto) {
+              uniqueProducts.add(item.producto);
+            }
+          });
+        }
+        
+        totalProducts.value = uniqueProducts.size;
       } catch (error) {
-        console.error('Error fetching total products:', error);
+        console.error('Error al obtener total de productos:', error);
         totalProducts.value = 0;
+      }
+    };
+
+    const fetchTotalInventory = async () => {
+      try {
+        const response = await http.get(API_CONFIG[CURRENT_ENV].ENDPOINTS.INVENTORY);
+        const inventory = response.data;
+        let total = 0;
+        
+        // Sumar cantidades de productos
+        if (inventory.productos && Array.isArray(inventory.productos)) {
+          total += inventory.productos.reduce((sum, item) => sum + (item.cantidad || 0), 0);
+        }
+        
+        // Sumar cantidades de lotes
+        if (inventory.lotes && Array.isArray(inventory.lotes)) {
+          total += inventory.lotes.reduce((sum, item) => sum + (item.cantidad || 0), 0);
+        }
+        
+        totalInventory.value = total;
+      } catch (error) {
+        console.error('Error al obtener el total del inventario:', error);
+        totalInventory.value = 0;
       }
     };
 
@@ -128,7 +186,8 @@ export default {
       console.log('Dashboard mounted');
       await Promise.all([
         fetchLowStockProducts(),
-        fetchTotalProducts()
+        fetchTotalProducts(),
+        fetchTotalInventory()
       ]);
     });
 
@@ -146,6 +205,7 @@ export default {
       getWelcomeMessage,
       navigateTo,
       totalProducts,
+      totalInventory,
       providerDate,
       lowStockProducts
     };
@@ -328,6 +388,10 @@ export default {
   gap: 0.5rem;
   color: #BC162A;
   font-size: 0.9rem;
+}
+
+.inventory-icon {
+  background: #2E7D32;
 }
 
 @media (max-width: 1024px) {
