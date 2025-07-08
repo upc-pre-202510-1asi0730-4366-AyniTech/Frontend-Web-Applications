@@ -47,4 +47,4 @@ export const API_CONFIG = {
     }
 }
 
-export const CURRENT_ENV = 'LOCAL';
+export const CURRENT_ENV = 'PROD';
