@@ -5,6 +5,8 @@ import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
 import ProductApiService from '../../add-products/services/product-api.service'
 import { createInventoryByProduct } from '../services/product-api.service.js'
+import InventoryApiService from '../../add-products/services/inventory-api.service.js'
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue'
 
 const { t } = useI18n();
 const products = ref([])
@@ -38,6 +40,10 @@ const newProduct = ref({
   internalNotes: '',
   tagIds: []
 })
+
+const showDeleteModal = ref(false)
+const productToDelete = ref(null)
+const deleteMessage = ref('')
 
 const loadUnits = async () => {
   try {
@@ -109,6 +115,30 @@ const handleAddProduct = async () => {
   }
 }
 
+async function fetchProductsList() {
+  products.value = await fetchProducts()
+}
+
+function openDeleteModal(product) {
+  productToDelete.value = product
+  deleteMessage.value = `¿Seguro que deseas eliminar el producto "${product.producto}"?`
+  showDeleteModal.value = true
+}
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  productToDelete.value = null
+}
+async function confirmDeleteProduct() {
+  if (!productToDelete.value) return
+  try {
+    await InventoryApiService.deleteProductInventory(productToDelete.value.id)
+    await fetchProductsList()
+  } catch (e) {
+    alert('Error al eliminar el producto')
+  }
+  closeDeleteModal()
+}
+
 onMounted(async () => {
   products.value = await fetchProducts()
   loadUnits()
@@ -161,6 +191,16 @@ onMounted(async () => {
           <div class="cell actions">
             <button class="action-button dark">
               <i class="fas fa-edit"></i>
+            </button>
+            <!-- Icono de eliminar -->
+            <button class="action-button" title="Eliminar" @click="openDeleteModal(product)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#c0392b" stroke-width="2"/>
+                <rect x="5" y="6" width="14" height="14" rx="2" stroke="#c0392b" stroke-width="2"/>
+                <path d="M10 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+                <path d="M14 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -357,6 +397,13 @@ onMounted(async () => {
         </form>
       </div>
     </div>
+  <!-- Modal de confirmación -->
+  <ModalConfirmDeleteHistory
+    :visible="showDeleteModal"
+    :mensaje="deleteMessage"
+    @cancelar="closeDeleteModal"
+    @confirmar="confirmDeleteProduct"
+  />
   </div>
 </template>
 
@@ -855,5 +902,25 @@ label {
   .cancel-button {
     width: 100%;
   }
+}
+.action-button[title="Eliminar"] {
+  background: #ff9800;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 0.5rem;
+}
+.action-button[title="Eliminar"] svg {
+  color: #fff;
+  fill: #fff;
+}
+.action-button[title="Eliminar"]:hover {
+  background: #dc3545;
 }
 </style>

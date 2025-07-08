@@ -1,17 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 import NewLot from '../models/NewLot.entity.js'
+import { LotService } from '../services/lot-api.service.js'
 
 const props = defineProps({
   isOpen: Boolean,
+  onLotAdded: Function // para refrescar la lista tras guardar
 })
 
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close'])
 const newLot = ref(new NewLot({}))
+const lotService = new LotService()
 
-const handleSubmit = () => {
-  emit('save', newLot.value)
-  newLot.value = new NewLot({})
+const handleSubmit = async () => {
+  try {
+    await lotService.create(newLot.value)
+    if (props.onLotAdded) props.onLotAdded()
+    emit('close')
+    newLot.value = new NewLot({})
+  } catch (e) {
+    alert('Error al guardar el lote')
+  }
 }
 </script>
 

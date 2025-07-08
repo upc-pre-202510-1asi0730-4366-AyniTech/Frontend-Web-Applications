@@ -7,7 +7,7 @@ import NewLot from '../models/NewLot.entity.js'
  */
 export class LotService {
     /** @type {string} API endpoint path */
-    resourceEndpoint = import.meta.env.VITE_LOT_ENDPOINT_PATH
+    resourceEndpoint = '/api/v1/inventory/by-batch';
 
     /**
      * Retrieves all lots
@@ -34,8 +34,17 @@ export class LotService {
      * @returns {Promise<NewLot>}
      */
     async create(lot) {
-        const res = await httpInstance.post(this.resourceEndpoint, lot)
-        return new NewLot(res.data)
+        // Adaptar el formato al esperado por el backend
+        const payload = {
+            proveedor: lot.proveedor,
+            producto: lot.producto,
+            fechaEntrada: lot.fechaEntrada,
+            cantidad: { value: Number(lot.cantidad) },
+            precio: { value: Number(lot.precio) },
+            unidad: { value: lot.unidad }
+        };
+        const res = await httpInstance.post(this.resourceEndpoint, payload);
+        return new NewLot(res.data);
     }
 
     /**
@@ -55,7 +64,7 @@ export class LotService {
      * @returns {Promise<void>}
      */
     async delete(id) {
-        await httpInstance.delete(`${this.resourceEndpoint}/${id}`)
+        await httpInstance.delete(`${this.resourceEndpoint}/${id}`);
     }
 
     /**

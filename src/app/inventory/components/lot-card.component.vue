@@ -1,12 +1,35 @@
 <script setup>
+import { ref } from 'vue';
+import InventoryApiService from '@/app/add-products/services/inventory-api.service';
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue';
+
 const props = defineProps({
   lot: {
     type: Object,
     required: true
   }
 })
+const emit = defineEmits(['comment', 'deleted'])
 
-const emit = defineEmits(['comment'])
+const showDeleteModal = ref(false);
+const deleteMessage = ref('');
+
+function openDeleteModal() {
+  deleteMessage.value = `¿Seguro que deseas eliminar el lote de "${props.lot.producto}"?`;
+  showDeleteModal.value = true;
+}
+function closeDeleteModal() {
+  showDeleteModal.value = false;
+}
+async function confirmDeleteBatch() {
+  try {
+    await InventoryApiService.deleteBatchInventory(props.lot.id);
+    emit('deleted', props.lot.id);
+  } catch (e) {
+    alert('Error al eliminar el lote');
+  }
+  closeDeleteModal();
+}
 </script>
 
 <template>
@@ -35,7 +58,28 @@ const emit = defineEmits(['comment'])
       >
         <i class="fas fa-edit"></i>
       </button>
+      <!-- Icono de eliminar -->
+      <button
+        class="action-button"
+        title="Eliminar"
+        @click="openDeleteModal"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#c0392b" stroke-width="2"/>
+          <rect x="5" y="6" width="14" height="14" rx="2" stroke="#c0392b" stroke-width="2"/>
+          <path d="M10 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
+    <!-- Modal de confirmación -->
+    <modal-confirm-delete-history
+      :visible="showDeleteModal"
+      :mensaje="deleteMessage"
+      @cancelar="closeDeleteModal"
+      @confirmar="confirmDeleteBatch"
+    />
   </div>
 </template>
 
