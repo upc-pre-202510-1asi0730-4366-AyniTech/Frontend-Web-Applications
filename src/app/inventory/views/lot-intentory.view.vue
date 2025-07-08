@@ -5,15 +5,23 @@ import LotComment from '../components/lot-comment.component.vue'
 import LotCard from '../components/lot-card.component.vue'
 import NewLot from '../models/NewLot.entity.js'
 import AddLot from '../components/add-lot.component.vue'
+import { LotService } from '../services/lot-api.service.js'
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue'
 
 const lots = ref([])
 const isCommentModalOpen = ref(false)
 const selectedLot = ref(null)
 const viewMode = ref('table')
 const showAddLotForm = ref(false)
+const showDeleteModal = ref(false)
+const lotToDelete = ref(null)
+const deleteMessage = ref('')
+const lotService = new LotService()
 
-onMounted(async () => {
-})
+async function fetchLots() {
+  lots.value = await lotService.getAll()
+}
+onMounted(fetchLots)
 
 const openCommentModal = (lot) => {
   selectedLot.value = lot
@@ -25,9 +33,29 @@ const closeCommentModal = () => {
   selectedLot.value = null
 }
 
-const handleAddLot = (newLot) => {
-  console.log('Nuevo lote:', newLot)
+const handleAddLot = () => {
+  fetchLots()
   showAddLotForm.value = false
+}
+
+function openDeleteModal(lot) {
+  lotToDelete.value = lot
+  deleteMessage.value = `¿Seguro que deseas eliminar el lote de "${lot.producto}"?`
+  showDeleteModal.value = true
+}
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  lotToDelete.value = null
+}
+async function confirmDeleteLot() {
+  if (!lotToDelete.value) return
+  try {
+    await lotService.delete(lotToDelete.value.id)
+    await fetchLots()
+  } catch (e) {
+    alert('Error al eliminar el lote')
+  }
+  closeDeleteModal()
 }
 </script>
 
@@ -100,6 +128,16 @@ const handleAddLot = (newLot) => {
           <button class="action-button" title="Editar">
             <i class="fas fa-edit"></i>
           </button>
+          <!-- Icono de eliminar -->
+          <button class="action-button" title="Eliminar" @click="openDeleteModal(lot)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#c0392b" stroke-width="2"/>
+              <rect x="5" y="6" width="14" height="14" rx="2" stroke="#c0392b" stroke-width="2"/>
+              <path d="M10 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -116,10 +154,17 @@ const handleAddLot = (newLot) => {
     </div>
 
 
+    <!-- Modal de confirmación -->
+    <ModalConfirmDeleteHistory
+      :visible="showDeleteModal"
+      :mensaje="deleteMessage"
+      @cancelar="closeDeleteModal"
+      @confirmar="confirmDeleteLot"
+    />
     <AddLot
         :is-open="showAddLotForm"
+        :on-lot-added="handleAddLot"
         @close="showAddLotForm = false"
-        @save="handleAddLot"
     />
 
     <LotComment
@@ -293,6 +338,27 @@ h2 {
 
 .action-button:hover {
   background: #1a1a1a;
+}
+
+.action-button[title="Eliminar"] {
+  background: #ff9800;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 0.5rem;
+}
+.action-button[title="Eliminar"] svg {
+  color: #fff;
+  fill: #fff;
+}
+.action-button[title="Eliminar"]:hover {
+  background: #dc3545;
 }
 
 .cards-container {

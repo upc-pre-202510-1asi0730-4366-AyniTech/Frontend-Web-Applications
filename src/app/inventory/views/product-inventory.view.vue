@@ -4,6 +4,9 @@ import { useI18n } from 'vue-i18n'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
 import ProductApiService from '../../add-products/services/product-api.service'
+import { createInventoryByProduct } from '../services/product-api.service.js'
+import InventoryApiService from '../../add-products/services/inventory-api.service.js'
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue'
 
 const { t } = useI18n();
 const products = ref([])
@@ -30,27 +33,33 @@ const newProduct = ref({
   description: '',
   purchasePrice: null,
   salePrice: null,
+  stock: null,        // nuevo campo
+  minStock: null,     // nuevo campo
   categoryId: '',
   unitId: '',
   internalNotes: '',
   tagIds: []
 })
 
+const showDeleteModal = ref(false)
+const productToDelete = ref(null)
+const deleteMessage = ref('')
+
 const loadUnits = async () => {
   try {
-    const response = await ProductApiService.getUnits()
-    units.value = response.data
+    const response = await ProductApiService.getUnits();
+    units.value = response; 
   } catch (error) {
-    console.error('Error loading units:', error)
+    console.error('Error loading units:', error);
   }
 }
 
 const loadTags = async () => {
   try {
-    const response = await ProductApiService.getTags()
-    availableTags.value = response.data
+    const response = await ProductApiService.getTags();
+    availableTags.value = response; 
   } catch (error) {
-    console.error('Error loading tags:', error)
+    console.error('Error loading tags:', error);
   }
 }
 
@@ -76,14 +85,58 @@ const removeTag = (tagId) => {
 
 const handleAddProduct = async () => {
   try {
-    await ProductApiService.createProduct(newProduct.value)
-    showAddForm.value = false
+    // Busca el nombre de la categoría seleccionada
+    const selectedCategory = categories.value.find(cat => cat.id === newProduct.value.categoryId);
+    const selectedUnit = units.value.find(u => u.id === newProduct.value.unitId);
+
+    const inventoryBody = {
+      categoria: selectedCategory ? selectedCategory.name : '',
+      producto: newProduct.value.name,
+      fechaEntrada: new Date().toISOString(),
+      cantidad: { value: Number(newProduct.value.stock) || 0 },
+      precio: { value: Number(newProduct.value.purchasePrice) || 0 },
+      stockMinimo: { value: Number(newProduct.value.minStock) || 0 },
+      unidadMedida: { value: selectedUnit ? selectedUnit.abbreviation : '' }
+    };
+
+    console.log('Body enviado a inventario:', inventoryBody);
+
+    await createInventoryByProduct(inventoryBody);
+    showAddForm.value = false;
     // Recargar productos
-    products.value = await fetchProducts()
+    products.value = await fetchProducts();
   } catch (error) {
-    console.error('Error saving product:', error)
-    alert(t('addProduct.saveError'))
+    console.error('Error saving inventory by product:', error);
+    if (error.response && error.response.data) {
+      alert(JSON.stringify(error.response.data, null, 2));
+    } else {
+      alert(error.message || 'Error desconocido');
+    }
   }
+}
+
+async function fetchProductsList() {
+  products.value = await fetchProducts()
+}
+
+function openDeleteModal(product) {
+  productToDelete.value = product
+  deleteMessage.value = `¿Seguro que deseas eliminar el producto "${product.producto}"?`
+  showDeleteModal.value = true
+}
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  productToDelete.value = null
+}
+async function confirmDeleteProduct() {
+  if (!productToDelete.value) return
+  try {
+    await InventoryApiService.deleteProductInventory(productToDelete.value.id)
+    await fetchProductsList()
+  } catch (e) {
+    alert('Error al eliminar el producto')
+  }
+  closeDeleteModal()
 }
 
 onMounted(async () => {
@@ -129,15 +182,25 @@ onMounted(async () => {
       <div v-for="product in products" :key="product.id" class="table-row-container">
         <div class="table-row data">
           <div class="cell">{{ product.categoria }}</div>
-          <div class="cell">{{ product.nombre }}</div>
+          <div class="cell">{{ product.producto }}</div>
           <div class="cell">{{ product.fechaEntrada }}</div>
           <div class="cell">{{ product.cantidad }}</div>
           <div class="cell">S/{{ product.precio }}</div>
           <div class="cell">{{ product.stockMinimo }}</div>
-          <div class="cell">{{ product.unidad }}</div>
+          <div class="cell">{{ product.unidadMedida }}</div>
           <div class="cell actions">
             <button class="action-button dark">
               <i class="fas fa-edit"></i>
+            </button>
+            <!-- Icono de eliminar -->
+            <button class="action-button" title="Eliminar" @click="openDeleteModal(product)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#c0392b" stroke-width="2"/>
+                <rect x="5" y="6" width="14" height="14" rx="2" stroke="#c0392b" stroke-width="2"/>
+                <path d="M10 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+                <path d="M14 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -203,6 +266,39 @@ onMounted(async () => {
               </div>
             </div>
           </div>
+
+          <!-- NUEVO BLOQUE: Stock actual y Stock mínimo -->
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="stock">Stock actual</label>
+              <div class="price-input">
+                <input
+                  id="stock"
+                  v-model.number="newProduct.stock"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="Cantidad actual"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group half">
+              <label for="minStock">Stock mínimo</label>
+              <div class="price-input">
+                <input
+                  id="minStock"
+                  v-model.number="newProduct.minStock"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="Cantidad mínima"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- FIN BLOQUE NUEVO -->
 
           <div class="form-group">
             <label>Categoría</label>
@@ -301,6 +397,13 @@ onMounted(async () => {
         </form>
       </div>
     </div>
+  <!-- Modal de confirmación -->
+  <ModalConfirmDeleteHistory
+    :visible="showDeleteModal"
+    :mensaje="deleteMessage"
+    @cancelar="closeDeleteModal"
+    @confirmar="confirmDeleteProduct"
+  />
   </div>
 </template>
 
@@ -799,5 +902,25 @@ label {
   .cancel-button {
     width: 100%;
   }
+}
+.action-button[title="Eliminar"] {
+  background: #ff9800;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 0.5rem;
+}
+.action-button[title="Eliminar"] svg {
+  color: #fff;
+  fill: #fff;
+}
+.action-button[title="Eliminar"]:hover {
+  background: #dc3545;
 }
 </style>

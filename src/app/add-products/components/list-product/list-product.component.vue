@@ -64,6 +64,18 @@
             + {{ $t('products.detail') }}
           </button>
         </div>
+        <div class="product-actions">
+          <!-- Icono de eliminar -->
+          <button class="delete-button" @click="openDeleteModal(product)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6h18" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#c0392b" stroke-width="2"/>
+              <rect x="5" y="6" width="14" height="14" rx="2" stroke="#c0392b" stroke-width="2"/>
+              <path d="M10 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -223,14 +235,26 @@
         </div>
       </div>
     </div>
+    <!-- Modal de confirmación -->
+    <modal-confirm-delete-history
+      :visible="showDeleteModal"
+      :mensaje="deleteMessage"
+      @cancelar="closeDeleteModal"
+      @confirmar="confirmDeleteProduct"
+    />
   </div>
 </template>
 
 <script>
 import ProductApiService from '../../services/product-api.service.js';
+import InventoryApiService from '../services/inventory-api.service';
+import ModalConfirmDeleteHistory from '@/shared/modal.confirm.delete.history.vue';
 
 export default {
   name: 'ProductList',
+  components: {
+    ModalConfirmDeleteHistory
+  },
   data() {
     return {
       searchTerm: '',
@@ -246,7 +270,10 @@ export default {
         minStock: null,
         maxStock: null
       },
-      isLoading: false
+      isLoading: false,
+      showDeleteModal: false,
+      productToDelete: null,
+      deleteMessage: ''
     }
   },
   created() {
@@ -427,6 +454,26 @@ export default {
       };
       await this.loadProducts();
       this.closeFilterModal();
+    },
+    openDeleteModal(product) {
+      this.productToDelete = product;
+      this.deleteMessage = `¿Seguro que deseas eliminar el producto "${product.name}"?`;
+      this.showDeleteModal = true;
+    },
+    closeDeleteModal() {
+      this.showDeleteModal = false;
+      this.productToDelete = null;
+    },
+    async confirmDeleteProduct() {
+      if (!this.productToDelete) return;
+      try {
+        await InventoryApiService.deleteProductInventory(this.productToDelete.id);
+        // Refrescar la lista de productos (puede ser con un método ya existente)
+        await this.loadProducts();
+      } catch (e) {
+        alert('Error al eliminar el producto');
+      }
+      this.closeDeleteModal();
     }
   }
 }
@@ -534,6 +581,9 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 2px solid #f97316;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .product-card:hover {
@@ -619,6 +669,25 @@ export default {
 
 .detail-button:hover {
   background: #ea580c;
+}
+
+.product-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: opacity 0.3s;
+}
+
+.delete-button:hover {
+  opacity: 0.7;
 }
 
 /* Modal Styles */

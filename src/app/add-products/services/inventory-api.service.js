@@ -39,6 +39,30 @@ class InventoryApiService {
       throw error;
     }
   }
+
+  async deleteProductInventory(id) {
+    try {
+      const response = await http.delete(
+        API_CONFIG[CURRENT_ENV].ENDPOINTS.INVENTORY + `/by-product/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar inventario por producto:', error);
+      throw error;
+    }
+  }
+
+  async deleteBatchInventory(id) {
+    try {
+      const response = await http.delete(
+        API_CONFIG[CURRENT_ENV].ENDPOINTS.INVENTORY + `/by-batch/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar inventario por lote:', error);
+      throw error;
+    }
+  }
 }
 
 export default new InventoryApiService(); 

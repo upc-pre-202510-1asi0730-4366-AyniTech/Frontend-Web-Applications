@@ -32,4 +32,7 @@ app.use(i18n)
 app.use(GoogleSignInPlugin, {
     clientId: '151103277100-bg90frf3bb9cpcultp80btj8222ld9bn.apps.googleusercontent.com'
 })
+
+
+
 app.mount('#app')

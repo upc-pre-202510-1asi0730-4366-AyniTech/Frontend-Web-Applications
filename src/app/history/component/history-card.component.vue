@@ -10,6 +10,16 @@ const tipoAccion = ref('')
 const mensaje = ref('')
 const visible = ref(false)
 
+function formatearFecha(fechaISO) {
+  if (!fechaISO) return ''
+  const fecha = new Date(fechaISO)
+  const dd = String(fecha.getDate()).padStart(2, '0')
+  const mm = String(fecha.getMonth() + 1).padStart(2, '0')
+  const yyyy = fecha.getFullYear()
+  return `${dd}/${mm}/${yyyy}`
+}
+
+
 onMounted(() => {
   nextTick(() => {
     visible.value = true
@@ -54,7 +64,8 @@ function cancelarAccion() {
     <div v-show="visible" class="history-card">
       <div class="cell"><label>Categoría</label><p>{{ h.categoria }}</p></div>
       <div class="cell"><label>Producto</label><p>{{ h.producto }}</p></div>
-      <div class="cell"><label>Fecha de Consulta</label><p>{{ h.fechaConsulta }}</p></div>
+      <div class="cell"><label>Fecha de Consulta</label><p>{{ formatearFecha(h.fechaConsulta) }}</p>
+      </div>
       <div class="cell"><label>Precio Unitario</label><p>S/. {{ h.precio }}</p></div>
       <div class="cell"><label>Cantidad</label><p>{{ h.cantidad }}</p></div>
       <div class="cell"><label>Total</label><p>S/. {{ h.total }}</p></div>

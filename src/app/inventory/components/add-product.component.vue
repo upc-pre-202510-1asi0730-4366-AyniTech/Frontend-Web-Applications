@@ -1,7 +1,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import NewProduct from '../models/NewProduct.entity.js'
-import http from '../../../shared/http-common'
+import http from '../../shared/services/http.instance.js'
+import ProductApiService from '../../add-products/services/product-api.service.js'
 
 const product = reactive(new NewProduct())
 const emit = defineEmits(['close', 'save'])
@@ -21,38 +22,20 @@ const categories = ref([
   { id: 10, name: 'Snacks' }
 ])
 
-const units = ref([
-  { id: 1, name: 'Mililitros', abbreviation: 'ml' },
-  { id: 2, name: 'Litros', abbreviation: 'L' },
-  { id: 3, name: 'Gramos', abbreviation: 'g' },
-  { id: 4, name: 'Kilogramos', abbreviation: 'kg' },
-  { id: 5, name: 'Unidades', abbreviation: 'und' },
-  { id: 6, name: 'Paquetes', abbreviation: 'paq' },
-  { id: 7, name: 'Botellas', abbreviation: 'bot' },
-  { id: 8, name: 'Latas', abbreviation: 'lat' },
-  { id: 9, name: 'Cajas', abbreviation: 'caj' },
-  { id: 10, name: 'Docenas', abbreviation: 'doc' },
-  { id: 11, name: 'Metros', abbreviation: 'm' },
-  { id: 12, name: 'Piezas', abbreviation: 'pz' }
-])
+const units = ref([])
 
-const availableTags = ref([
-  { id: 1, name: 'Orgánico' },
-  { id: 2, name: 'Sin Gluten' },
-  { id: 3, name: 'Vegano' },
-  { id: 4, name: 'Light' },
-  { id: 5, name: 'Premium' },
-  { id: 6, name: 'Promoción' },
-  { id: 7, name: 'Nuevo' },
-  { id: 8, name: 'Descontinuado' },
-  { id: 9, name: 'Temporada' },
-  { id: 10, name: 'Local' },
-  { id: 11, name: 'Importado' },
-  { id: 12, name: 'Artesanal' },
-  { id: 13, name: 'Sin Azúcar' },
-  { id: 14, name: 'Bajo en Sodio' },
-  { id: 15, name: 'Rico en Fibra' }
-])
+onMounted(async () => {
+  try {
+    const response = await ProductApiService.getUnits();
+    units.value = response;
+    const tagsResponse = await ProductApiService.getTags();
+    availableTags.value = tagsResponse;
+  } catch (error) {
+    console.error('Error loading units or tags:', error);
+  }
+});
+
+const availableTags = ref([])
 
 const handleSubmit = async () => {
   try {

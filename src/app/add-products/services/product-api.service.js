@@ -15,18 +15,28 @@ class ProductApiService {
   }
 
   async createProduct(product) {
+    const formattedProduct = {
+      name: product.name?.trim() || '',
+      description: product.description?.trim() || '',
+      purchasePrice: Number(product.purchasePrice) || 0,
+      salePrice: Number(product.salePrice) || 0,
+      internalNotes: product.internalNotes?.trim() || '',
+      categoryId: Number(product.categoryId) || 0,
+      unitId: Number(product.unitId) || 0,
+      tagIds: Array.from(new Set((product.tagIds || []).map(Number)))
+    };
+    if (
+      !formattedProduct.name ||
+      !formattedProduct.description ||
+      !formattedProduct.purchasePrice ||
+      !formattedProduct.salePrice ||
+      !formattedProduct.categoryId ||
+      !formattedProduct.unitId
+    ) {
+      alert('Completa todos los campos obligatorios.');
+      throw new Error('Campos obligatorios incompletos');
+    }
     try {
-      const formattedProduct = {
-        name: product.name,
-        description: product.description,
-        purchasePrice: product.purchasePrice,
-        salePrice: product.salePrice,
-        internalNotes: product.internalNotes,
-        categoryId: product.categoryId,
-        unitId: product.unitId,
-        tagIds: product.tagIds || []
-      };
-      
       const response = await http.post(endpoints.PRODUCTS, formattedProduct);
       return response.data;
     } catch (error) {
@@ -77,7 +87,7 @@ class ProductApiService {
 
   async getUnits() {
     try {
-      const response = await http.get(`${this.endpoint}/units`);
+      const response = await http.get(`/api/v1/units`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener unidades:', error);

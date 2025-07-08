@@ -9,6 +9,13 @@ export const API_CONFIG = {
             TAGS: '/api/v1/tags',
             INVENTORY: '/api/v1/inventory',
             COMBOS: '/api/v1/combos',
+            REPORTS: {
+                BASE: '/api/v1/reports',
+                CATEGORY: '/api/v1/reports/category',
+                CATEGORY_BY_DATE: '/api/v1/reports/category/by-date',
+                STOCK_AVERAGE: '/api/v1/reports/stock-average',
+                STOCK_AVERAGE_BY_DATE: '/api/v1/reports/stock-average/by-date'
+            },
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'
@@ -25,12 +32,19 @@ export const API_CONFIG = {
             TAGS: '/api/v1/tags',
             INVENTORY: '/api/v1/inventory',
             COMBOS: '/api/v1/combos',
+            REPORTS: {
+                BASE: '/api/v1/reports',
+                CATEGORY: '/api/v1/reports/category',
+                CATEGORY_BY_DATE: '/api/v1/reports/category/by-date',
+                STOCK_AVERAGE: '/api/v1/reports/stock-average',
+                STOCK_AVERAGE_BY_DATE: '/api/v1/reports/stock-average/by-date'
+            },
             AUTH: {
                 SIGN_UP: '/api/v1/authentication/sign-up',
                 SIGN_IN: '/api/v1/authentication/sign-in'
             }
         }
     }
-};
+}
 
 export const CURRENT_ENV = 'LOCAL';

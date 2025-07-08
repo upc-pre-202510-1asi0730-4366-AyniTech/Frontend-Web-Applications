@@ -132,6 +132,16 @@ export default {
       ]);
     });
 
+    // Recarga el total de productos cadejemplo, al volver de otra vista)
+    if (typeof window !== 'undefined') {
+      if (typeof getCurrentInstance === 'function') {
+        const { getCurrentInstance, onActivated } = require('vue');
+        onActivated(() => {
+          fetchTotalProducts();
+        });
+      }
+    }
+
     return {
       getWelcomeMessage,
       navigateTo,
