@@ -101,6 +101,9 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
+    // Permitir acceso a /profile a cualquier usuario autenticado, sin importar el rol
+    // (No se requiere ningún cambio extra porque la ruta ya solo requiere requiresAuth)
+
     next();
 });
 

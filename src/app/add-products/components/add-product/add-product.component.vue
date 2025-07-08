@@ -64,7 +64,7 @@
             <label for="category">{{ $t('history.card.category') }}</label>
             <select 
               id="category"
-              v-model="productForm.categoryId"
+              v-model.number="productForm.categoryId"
               class="form-select"
             required
             >
@@ -79,7 +79,7 @@
             <label for="unit">{{ $t('addProduct.labels.unit') }}</label>
         <select
               id="unit"
-              v-model="productForm.unitId"
+              v-model.number="productForm.unitId"
             class="form-select"
               required
         >
@@ -182,7 +182,7 @@ export default {
     const loadUnits = async () => {
       try {
         const response = await ProductApiService.getUnits();
-        units.value = response.data;
+        units.value = response; 
       } catch (error) {
         console.error('Error loading units:', error);
       }
@@ -191,7 +191,7 @@ export default {
     const loadTags = async () => {
       try {
         const response = await ProductApiService.getTags();
-        availableTags.value = response.data;
+        availableTags.value = response;
       } catch (error) {
         console.error('Error loading tags:', error);
       }
@@ -210,7 +210,7 @@ export default {
       if (isTagSelected(tagId)) {
         productForm.value.tagIds = productForm.value.tagIds.filter(id => id !== tagId);
       } else {
-        productForm.value.tagIds = [...productForm.value.tagIds, tagId];
+        productForm.value.tagIds = [...new Set(productForm.value.tagIds)];
       }
     };
 

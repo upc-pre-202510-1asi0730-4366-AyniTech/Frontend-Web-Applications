@@ -11,6 +11,7 @@ import PrimeVue from 'primevue/config'
 import i18n from "./i18n.js";
 import 'primeicons/primeicons.css';
 import NavbarComponent from '@/app/shared/navbar.component.vue'
+import { useAuthStore } from '@/app/iam/services/authentication-api.service'
 
 const app = createApp(App)
 
@@ -27,4 +28,9 @@ app.use(i18n)
 app.use(GoogleSignInPlugin, {
     clientId: '151103277100-bg90frf3bb9cpcultp80btj8222ld9bn.apps.googleusercontent.com'
 })
+
+// Inicializa el usuario desde localStorage
+const authStore = useAuthStore();
+authStore.initializeAuth();
+
 app.mount('#app')

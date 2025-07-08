@@ -47,6 +47,14 @@
      
             <button class="action-btn change-plan-btn" @click="goToPlanSelector">{{ $t('profile.changePlan') }}</button>
             <button class="action-btn logout-btn" @click="logout">{{ $t('profile.logout') }}</button>
+          
+            <button
+              v-if="userData && userData.id"
+              @click="cambiarRol"
+              class="action-btn change-role-btn"
+            >
+              {{ userData.role === 'Administrator' ? 'Cambiar a Empleado' : 'Cambiar a Administrador' }}
+            </button>
           </div>
         </div>
 
@@ -264,6 +272,66 @@ export default {
     const goToPlanSelector = () => {
       router.push('/seleccionar-plan');
     };
+
+    const cambiarRol = async () => {
+      if (!userData || !userData.role) return;
+      const token = localStorage.getItem('token');
+      const userId = userData.id;
+      const nuevoRol = userData.role === "Employee" ? "Administrator" : "Employee";
+      try {
+        const response = await fetch('http://localhost:5159/api/v1/authentication/change-role', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            userId: userId,
+            newRole: nuevoRol
+          })
+        });
+        if (response.ok) {
+          alert('Rol cambiado correctamente');
+          userData.role = nuevoRol;
+          // ACTUALIZA EL STORE Y LOCALSTORAGE
+          authStore.user = { ...authStore.user, role: nuevoRol };
+          authStore.role = nuevoRol;
+          localStorage.setItem('user', JSON.stringify(authStore.user));
+          localStorage.setItem('role', nuevoRol);
+        } else {
+          alert('Error al cambiar el rol');
+        }
+      } catch (error) {
+        alert('Error de red');
+      }
+    };
+
+    const sincronizarRol = async () => {
+      const token = localStorage.getItem('token');
+      const userId = userData.value.id;
+      try {
+        const response = await fetch(`http://localhost:5159/api/v1/users/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          userData.value.role = data.role;
+          authStore.user = { ...authStore.user, role: data.role };
+          authStore.role = data.role;
+          localStorage.setItem('user', JSON.stringify(authStore.user));
+          localStorage.setItem('role', data.role);
+          alert('Rol sincronizado correctamente');
+        } else {
+          alert('No se pudo sincronizar el rol');
+        }
+      } catch (error) {
+        alert('Error de red al sincronizar el rol');
+      }
+    };
     
     return {
       toggleLanguage,
@@ -282,7 +350,9 @@ export default {
       avatarUrl,
       triggerAvatarUpload,
       onAvatarChange,
-      locale
+      locale,
+      cambiarRol,
+      sincronizarRol
     };
   }
 };
@@ -559,6 +629,38 @@ input:checked + .toggle-slider {
 
 input:checked + .toggle-slider:before {
   transform: translateX(26px);
+}
+
+.change-role-btn {
+  background-color: #ee7f27;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  width: 100%;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.change-role-btn:hover {
+  background-color: #d96e1f;
+}
+
+.sync-role-btn {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  width: 100%;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.sync-role-btn:hover {
+  background-color: #357ab8;
 }
 
 @media (max-width: 768px) {

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { fetchProducts } from '../services/product-api.service'
 import ProductCard from '../components/product-card.component.vue'
 import ProductApiService from '../../add-products/services/product-api.service'
+import { createInventoryByProduct } from '../services/product-api.service.js'
 
 const { t } = useI18n();
 const products = ref([])
@@ -30,6 +31,8 @@ const newProduct = ref({
   description: '',
   purchasePrice: null,
   salePrice: null,
+  stock: null,        // nuevo campo
+  minStock: null,     // nuevo campo
   categoryId: '',
   unitId: '',
   internalNotes: '',
@@ -38,19 +41,19 @@ const newProduct = ref({
 
 const loadUnits = async () => {
   try {
-    const response = await ProductApiService.getUnits()
-    units.value = response.data
+    const response = await ProductApiService.getUnits();
+    units.value = response; 
   } catch (error) {
-    console.error('Error loading units:', error)
+    console.error('Error loading units:', error);
   }
 }
 
 const loadTags = async () => {
   try {
-    const response = await ProductApiService.getTags()
-    availableTags.value = response.data
+    const response = await ProductApiService.getTags();
+    availableTags.value = response; 
   } catch (error) {
-    console.error('Error loading tags:', error)
+    console.error('Error loading tags:', error);
   }
 }
 
@@ -76,13 +79,33 @@ const removeTag = (tagId) => {
 
 const handleAddProduct = async () => {
   try {
-    await ProductApiService.createProduct(newProduct.value)
-    showAddForm.value = false
+    // Busca el nombre de la categoría seleccionada
+    const selectedCategory = categories.value.find(cat => cat.id === newProduct.value.categoryId);
+    const selectedUnit = units.value.find(u => u.id === newProduct.value.unitId);
+
+    const inventoryBody = {
+      categoria: selectedCategory ? selectedCategory.name : '',
+      producto: newProduct.value.name,
+      fechaEntrada: new Date().toISOString(),
+      cantidad: { value: Number(newProduct.value.stock) || 0 },
+      precio: { value: Number(newProduct.value.purchasePrice) || 0 },
+      stockMinimo: { value: Number(newProduct.value.minStock) || 0 },
+      unidadMedida: { value: selectedUnit ? selectedUnit.abbreviation : '' }
+    };
+
+    console.log('Body enviado a inventario:', inventoryBody);
+
+    await createInventoryByProduct(inventoryBody);
+    showAddForm.value = false;
     // Recargar productos
-    products.value = await fetchProducts()
+    products.value = await fetchProducts();
   } catch (error) {
-    console.error('Error saving product:', error)
-    alert(t('addProduct.saveError'))
+    console.error('Error saving inventory by product:', error);
+    if (error.response && error.response.data) {
+      alert(JSON.stringify(error.response.data, null, 2));
+    } else {
+      alert(error.message || 'Error desconocido');
+    }
   }
 }
 
@@ -129,12 +152,12 @@ onMounted(async () => {
       <div v-for="product in products" :key="product.id" class="table-row-container">
         <div class="table-row data">
           <div class="cell">{{ product.categoria }}</div>
-          <div class="cell">{{ product.nombre }}</div>
+          <div class="cell">{{ product.producto }}</div>
           <div class="cell">{{ product.fechaEntrada }}</div>
           <div class="cell">{{ product.cantidad }}</div>
           <div class="cell">S/{{ product.precio }}</div>
           <div class="cell">{{ product.stockMinimo }}</div>
-          <div class="cell">{{ product.unidad }}</div>
+          <div class="cell">{{ product.unidadMedida }}</div>
           <div class="cell actions">
             <button class="action-button dark">
               <i class="fas fa-edit"></i>
@@ -203,6 +226,39 @@ onMounted(async () => {
               </div>
             </div>
           </div>
+
+          <!-- NUEVO BLOQUE: Stock actual y Stock mínimo -->
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="stock">Stock actual</label>
+              <div class="price-input">
+                <input
+                  id="stock"
+                  v-model.number="newProduct.stock"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="Cantidad actual"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group half">
+              <label for="minStock">Stock mínimo</label>
+              <div class="price-input">
+                <input
+                  id="minStock"
+                  v-model.number="newProduct.minStock"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="Cantidad mínima"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- FIN BLOQUE NUEVO -->
 
           <div class="form-group">
             <label>Categoría</label>
