@@ -33,8 +33,6 @@ app.use(GoogleSignInPlugin, {
     clientId: '151103277100-bg90frf3bb9cpcultp80btj8222ld9bn.apps.googleusercontent.com'
 })
 
-// Inicializa el usuario desde localStorage
-const authStore = useAuthStore();
-authStore.initializeAuth();
+
 
 app.mount('#app')

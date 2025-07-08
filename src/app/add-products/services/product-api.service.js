@@ -37,9 +37,8 @@ class ProductApiService {
       throw new Error('Campos obligatorios incompletos');
     }
     try {
-<<<<<<< HEAD
+
       const response = await http.post(`${this.endpoint}/products`, formattedProduct);
-=======
       const formattedProduct = {
         name: product.name,
         description: product.description,
@@ -52,7 +51,7 @@ class ProductApiService {
       };
       
       const response = await http.post(endpoints.PRODUCTS, formattedProduct);
->>>>>>> ae2e6ceaf66dc36fa188ea4af8a8fd77b5caec82
+
       return response.data;
     } catch (error) {
       console.error('Error al crear producto:', error);
