@@ -4,18 +4,18 @@
       <h2>{{ $t('addProduct.title') }}</h2>
 
       <form @submit.prevent="handleSubmit" class="product-form">
-      <div class="form-group">
+        <div class="form-group">
           <label for="name">{{ $t('addProduct.labels.name') }}</label>
-        <input
+          <input
             id="name"
             type="text"
             v-model="productForm.name"
             class="form-input"
             required
-        />
-      </div>
+          />
+        </div>
 
-      <div class="form-group">
+        <div class="form-group">
           <label for="description">{{ $t('addProduct.labels.description') }}</label>
           <textarea
             id="description"
@@ -23,14 +23,14 @@
             class="form-textarea"
             rows="3"
           ></textarea>
-      </div>
+        </div>
 
-      <div class="form-row">
+        <div class="form-row">
           <div class="form-group">
             <label for="purchasePrice">{{ $t('addProduct.labels.buyPrice') }}</label>
-          <div class="price-input">
-            <span class="currency">$</span>
-            <input
+            <div class="price-input">
+              <span class="currency">$</span>
+              <input
                 id="purchasePrice"
                 type="number"
                 step="0.01"
@@ -38,15 +38,15 @@
                 v-model.number="productForm.purchasePrice"
                 class="form-input price"
                 required
-            />
+              />
+            </div>
           </div>
-        </div>
 
           <div class="form-group">
             <label for="salePrice">{{ $t('addProduct.labels.sellPrice') }}</label>
-          <div class="price-input">
-            <span class="currency">$</span>
-            <input
+            <div class="price-input">
+              <span class="currency">$</span>
+              <input
                 id="salePrice"
                 type="number"
                 step="0.01"
@@ -54,44 +54,49 @@
                 v-model.number="productForm.salePrice"
                 class="form-input price"
                 required
-            />
+              />
+            </div>
           </div>
         </div>
-      </div>
 
         <div class="form-row">
-      <div class="form-group">
-            <label for="category">{{ $t('history.card.category') }}</label>
+          <div class="form-group">
+            <label for="category">{{ $t('addProduct.labels.category') }}</label>
             <select 
               id="category"
               v-model.number="productForm.categoryId"
               class="form-select"
-            required
+              required
             >
-              <option value="">{{ $t('common.select') }}</option>
+              <option value="">{{ $t('addProduct.labels.category') }}</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
+                {{ $t(`categories.${category.name}`) }}
               </option>
             </select>
-      </div>
+          </div>
 
-      <div class="form-group">
+          <div class="form-group">
             <label for="unit">{{ $t('addProduct.labels.unit') }}</label>
-        <select
+            <select
               id="unit"
+<<<<<<< HEAD
               v-model.number="productForm.unitId"
             class="form-select"
+=======
+              v-model="productForm.unitId"
+              class="form-select"
+>>>>>>> ae2e6ceaf66dc36fa188ea4af8a8fd77b5caec82
               required
-        >
-              <option value="">{{ $t('common.select') }}</option>
+            >
+              <option value="">{{ $t('addProduct.labels.unit') }}</option>
               <option v-for="unit in units" :key="unit.id" :value="unit.id">
                 {{ unit.name }}
               </option>
-        </select>
+            </select>
           </div>
-      </div>
+        </div>
 
-      <div class="form-group">
+        <div class="form-group">
           <label>{{ $t('addProduct.labels.tags') }}</label>
           <div class="tags-container">
             <div 
@@ -102,24 +107,29 @@
             >
               {{ tag.name }}
             </div>
+            <div v-if="availableTags.length === 0" class="no-tags">
+              {{ $t('addProduct.noTags') }}
+            </div>
           </div>
-      </div>
+        </div>
 
-      <div class="form-group">
+        <div class="form-group">
           <label for="internalNotes">{{ $t('addProduct.labels.notes') }}</label>
-        <textarea
+          <textarea
             id="internalNotes"
             v-model="productForm.internalNotes"
             class="form-textarea"
             rows="2"
-        ></textarea>
+          ></textarea>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn-save" :disabled="isSubmitting">
             {{ isSubmitting ? $t('common.saving') : $t('common.save') }}
           </button>
-          <button type="button" class="btn-cancel" @click="$router.back()">{{ $t('common.cancel') }}</button>
+          <button type="button" class="btn-cancel" @click="$router.back()">
+            {{ $t('common.cancel') }}
+          </button>
         </div>
       </form>
     </div>
@@ -133,7 +143,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import ProductApiService from '../../services/product-api.service.js';
@@ -148,12 +158,11 @@ export default {
     const router = useRouter();
     const { t } = useI18n();
     const isSubmitting = ref(false);
-    const selectedTags = ref([]);
     const showInventoryForm = ref(false);
     const createdProduct = ref(null);
     
     const productForm = ref({
-        name: '',
+      name: '',
       description: '',
       purchasePrice: 0,
       salePrice: 0,
@@ -164,16 +173,16 @@ export default {
     });
 
     const categories = ref([
-      { id: 1, name: t('categories.beverages') },
-      { id: 2, name: t('categories.dairy') },
-      { id: 3, name: t('categories.bakery') },
-      { id: 4, name: t('categories.meat') },
-      { id: 5, name: t('categories.produce') },
-      { id: 6, name: t('categories.groceries') },
-      { id: 7, name: t('categories.cleaning') },
-      { id: 8, name: t('categories.hygiene') },
-      { id: 9, name: t('categories.frozen') },
-      { id: 10, name: t('categories.snacks') }
+      { id: 1, name: 'beverages' },
+      { id: 2, name: 'dairy' },
+      { id: 3, name: 'bakery' },
+      { id: 4, name: 'meat' },
+      { id: 5, name: 'produce' },
+      { id: 6, name: 'groceries' },
+      { id: 7, name: 'cleaning' },
+      { id: 8, name: 'hygiene' },
+      { id: 9, name: 'frozen' },
+      { id: 10, name: 'snacks' }
     ]);
 
     const units = ref([]);
@@ -184,7 +193,7 @@ export default {
         const response = await ProductApiService.getUnits();
         units.value = response; 
       } catch (error) {
-        console.error('Error loading units:', error);
+        console.error('Error al cargar unidades:', error);
       }
     };
 
@@ -193,13 +202,8 @@ export default {
         const response = await ProductApiService.getTags();
         availableTags.value = response;
       } catch (error) {
-        console.error('Error loading tags:', error);
+        console.error('Error al cargar etiquetas:', error);
       }
-    };
-
-    const getTagName = (tagId) => {
-      const tag = availableTags.value.find(t => t.id === tagId);
-      return tag ? tag.name : '';
     };
 
     const isTagSelected = (tagId) => {
@@ -225,30 +229,29 @@ export default {
         const response = await ProductApiService.createProduct(productForm.value);
         
         const selectedUnit = units.value.find(u => u.id === productForm.value.unitId);
+        const selectedCategory = categories.value.find(c => c.id === productForm.value.categoryId);
         
         createdProduct.value = {
           id: response.id,
           name: response.name || productForm.value.name,
-          categoryName: categories.value.find(c => c.id === productForm.value.categoryId)?.name || '',
+          categoryName: selectedCategory ? t(`categories.${selectedCategory.name}`) : '',
           unitId: response.unitId || productForm.value.unitId,
-          unitName: selectedUnit ? selectedUnit.abbreviation : '',
+          unitName: selectedUnit ? selectedUnit.name : '',
           salePrice: response.salePrice || productForm.value.salePrice
         };
         
         showInventoryForm.value = true;
       } catch (error) {
-        console.error('Error creating product:', error);
+        console.error('Error al crear producto:', error);
         alert(t('addProduct.saveError'));
       } finally {
         isSubmitting.value = false;
       }
     };
 
-    onMounted(async () => {
-      await Promise.all([
-        loadUnits(),
-        loadTags()
-      ]);
+    onMounted(() => {
+      loadUnits();
+      loadTags();
     });
 
     return {
@@ -259,10 +262,9 @@ export default {
       isSubmitting,
       showInventoryForm,
       createdProduct,
-      handleSubmit,
       isTagSelected,
       toggleTag,
-      getTagName
+      handleSubmit
     };
   }
 };
@@ -272,32 +274,30 @@ export default {
 .add-product-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 5em;
+  padding: 2rem;
 }
 
 .product-form {
   background: white;
-  padding: 20px;
+  padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
 
 .form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.form-row .form-group {
-  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   font-weight: 500;
   color: #333;
 }
@@ -306,15 +306,19 @@ label {
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+  outline: none;
 }
 
 .price-input {
@@ -325,52 +329,56 @@ label {
 
 .currency {
   position: absolute;
-  left: 12px;
+  left: 0.75rem;
   color: #666;
 }
 
 .price {
-  padding-left: 24px;
+  padding-left: 1.5rem;
 }
 
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px;
+  gap: 0.5rem;
+  padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  min-height: 44px;
+  min-height: 3rem;
 }
 
 .tag {
-  padding: 4px 12px;
-  background-color: #f0f0f0;
-  border-radius: 16px;
-  font-size: 14px;
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
-  user-select: none;
 }
 
 .tag:hover {
-  background-color: #e0e0e0;
+  background: #e0e0e0;
 }
 
 .tag.selected {
-  background-color: #4CAF50;
+  background: #4CAF50;
   color: white;
+}
+
+.no-tags {
+  color: #666;
+  font-style: italic;
+  padding: 0.5rem;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 .btn-save,
 .btn-cancel {
-  padding: 10px 20px;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
@@ -378,27 +386,39 @@ label {
 }
 
 .btn-save {
-  background-color: #4CAF50;
+  background: #4CAF50;
   color: white;
   border: none;
 }
 
-.btn-save:hover {
-  background-color: #45a049;
+.btn-save:hover:not(:disabled) {
+  background: #43A047;
 }
 
 .btn-save:disabled {
-  background-color: #cccccc;
+  background: #9E9E9E;
   cursor: not-allowed;
 }
 
 .btn-cancel {
-  background-color: #f44336;
-  color: white;
-  border: none;
+  background: white;
+  color: #666;
+  border: 1px solid #ddd;
 }
 
 .btn-cancel:hover {
-  background-color: #da190b;
+  background: #f5f5f5;
+}
+
+.loading-text {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
 }
 </style>

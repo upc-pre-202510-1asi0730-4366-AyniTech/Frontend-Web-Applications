@@ -1,4 +1,3 @@
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -19,6 +18,11 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL
 
 const pinia = createPinia()
 app.use(pinia)
+
+// Inicializar el store de autenticación antes de montar la app
+const authStore = useAuthStore()
+authStore.initializeAuth()
+
 app.use(PrimeVue, {ripple: true})
 app.component('pv-button', Button)
 app.component('NavbarComponent', NavbarComponent)

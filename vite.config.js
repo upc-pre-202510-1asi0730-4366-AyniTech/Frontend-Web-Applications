@@ -13,7 +13,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@iam': path.resolve(__dirname, './src/app/iam'),
       '@shared': path.resolve(__dirname, './src/shared'),
-      '@assets': path.resolve(__dirname, './src/assets')
+      '@assets': path.resolve(__dirname, './src/assets'),
+      '@config': path.resolve(__dirname, './'),
     }
   },
   optimizeDeps: {

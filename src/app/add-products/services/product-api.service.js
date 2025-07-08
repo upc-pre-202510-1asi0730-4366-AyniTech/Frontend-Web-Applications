@@ -1,21 +1,15 @@
 import http from '@/app/shared/services/http.instance';
+import { API_CONFIG, CURRENT_ENV } from '@config/api.config';
+
+const endpoints = API_CONFIG[CURRENT_ENV].ENDPOINTS;
 
 class ProductApiService {
-  constructor() {
-    this.endpoint = '/api/v1';
-  }
-
-  async getProducts() {
+  async getAllProducts() {
     try {
-      console.log('Fetching products from:', `${this.endpoint}/products`);
-      const response = await http.get(`${this.endpoint}/products`);
-      console.log('Products response:', response);
+      const response = await http.get(endpoints.PRODUCTS);
       return response.data;
     } catch (error) {
-      console.error('Error fetching products:', error);
-      if (error.response?.status === 0 || error.code === 'ERR_NETWORK') {
-        throw new Error('No se pudo conectar con el servidor. Por favor, verifica que el backend esté corriendo.');
-      }
+      console.error('Error al obtener productos:', error);
       throw error;
     }
   }
@@ -43,7 +37,22 @@ class ProductApiService {
       throw new Error('Campos obligatorios incompletos');
     }
     try {
+<<<<<<< HEAD
       const response = await http.post(`${this.endpoint}/products`, formattedProduct);
+=======
+      const formattedProduct = {
+        name: product.name,
+        description: product.description,
+        purchasePrice: product.purchasePrice,
+        salePrice: product.salePrice,
+        internalNotes: product.internalNotes,
+        categoryId: product.categoryId,
+        unitId: product.unitId,
+        tagIds: product.tagIds || []
+      };
+      
+      const response = await http.post(endpoints.PRODUCTS, formattedProduct);
+>>>>>>> ae2e6ceaf66dc36fa188ea4af8a8fd77b5caec82
       return response.data;
     } catch (error) {
       console.error('Error al crear producto:', error);
@@ -52,20 +61,38 @@ class ProductApiService {
   }
 
   async updateProduct(id, productData) {
-    return http.put(`${this.endpoint}/products/${id}`, productData);
+    try {
+      const response = await http.put(`${endpoints.PRODUCTS}/${id}`, productData);
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      throw error;
+    }
   }
 
   async deleteProduct(id) {
-    return http.delete(`${this.endpoint}/products/${id}`);
+    try {
+      const response = await http.delete(`${endpoints.PRODUCTS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      throw error;
+    }
   }
 
   async getProductById(id) {
-    return http.get(`${this.endpoint}/products/${id}`);
+    try {
+      const response = await http.get(`${endpoints.PRODUCTS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener producto:', error);
+      throw error;
+    }
   }
 
   async getCategories() {
     try {
-      const response = await http.get(`${this.endpoint}/categories`);
+      const response = await http.get(endpoints.CATEGORIES);
       return response.data;
     } catch (error) {
       console.error('Error al obtener categorías:', error);
@@ -78,18 +105,51 @@ class ProductApiService {
       const response = await http.get(`/api/v1/units`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching units:', error);
-      throw error;
+      console.error('Error al obtener unidades:', error);
+      return {
+        data: [
+          { id: 1, name: 'Mililitros', abbreviation: 'ml' },
+          { id: 2, name: 'Litros', abbreviation: 'L' },
+          { id: 3, name: 'Gramos', abbreviation: 'g' },
+          { id: 4, name: 'Kilogramos', abbreviation: 'kg' },
+          { id: 5, name: 'Unidades', abbreviation: 'und' },
+          { id: 6, name: 'Paquetes', abbreviation: 'paq' },
+          { id: 7, name: 'Botellas', abbreviation: 'bot' },
+          { id: 8, name: 'Latas', abbreviation: 'lat' },
+          { id: 9, name: 'Cajas', abbreviation: 'caj' },
+          { id: 10, name: 'Docenas', abbreviation: 'doc' },
+          { id: 11, name: 'Metros', abbreviation: 'm' },
+          { id: 12, name: 'Piezas', abbreviation: 'pz' }
+        ]
+      };
     }
   }
 
   async getTags() {
-    try {
+       try {
       const response = await http.get(`${this.endpoint}/tags`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching tags:', error);
-      throw error;
+      console.error('Error al obtener etiquetas:', error);
+      return {
+        data: [
+          { id: 1, name: 'Orgánico' },
+          { id: 2, name: 'Sin Gluten' },
+          { id: 3, name: 'Vegano' },
+          { id: 4, name: 'Light' },
+          { id: 5, name: 'Premium' },
+          { id: 6, name: 'Promoción' },
+          { id: 7, name: 'Nuevo' },
+          { id: 8, name: 'Descontinuado' },
+          { id: 9, name: 'Temporada' },
+          { id: 10, name: 'Local' },
+          { id: 11, name: 'Importado' },
+          { id: 12, name: 'Artesanal' },
+          { id: 13, name: 'Sin Azúcar' },
+          { id: 14, name: 'Bajo en Sodio' },
+          { id: 15, name: 'Rica en Fibra' }
+        ]
+      };
     }
   }
 }

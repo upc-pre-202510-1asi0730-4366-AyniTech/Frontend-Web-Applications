@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Register from '@/app/iam/components/register/Register.vue';
 import Login from '@/app/iam/components/login/Login.vue';
 import MainDashboardComponent from "@/app/product-management/components/main-dashboard.component.vue";
-import {Profile} from "@iam/components/profile/index.js";
+import Profile from "@/app/iam/components/profile/Profile.component.vue";
 import stockAlertView from "@/app/stock-alert/views/stockAlert.view.vue";
 import { useAuthStore } from '@/app/iam/services/authentication-api.service';
 
@@ -24,28 +24,28 @@ const routes = [
         meta: { requiresGuest: true }
     },
     {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: MainDashboardComponent,
-      meta: { requiresAuth: true }
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: MainDashboardComponent,
+        meta: { requiresAuth: true }
     },
     {
-      path: '/profile',
-      name: 'Profile',
-      component: Profile,
-      meta: { requiresAuth: true }
+        path: '/profile',
+        name: 'Profile',
+        component: Profile,
+        meta: { requiresAuth: true }
     },
     {
-      path: '/history',
-      name: 'History',
-      component: () => import('@/app/history/view/history-dashboard.vue'),
-      meta: { requiresAuth: true }
+        path: '/history',
+        name: 'History',
+        component: () => import('@/app/history/view/history-dashboard.vue'),
+        meta: { requiresAuth: true }
     },
     {
-      path: '/inventory',
-      name: 'Inventory',
-      component: () => import('@/app/inventory/views/inventory.route.vue'),
-      meta: { requiresAuth: true }
+        path: '/inventory',
+        name: 'Inventory',
+        component: () => import('@/app/inventory/views/inventory.route.vue'),
+        meta: { requiresAuth: true }
     },
     {    
         path: '/alerts',
@@ -89,13 +89,13 @@ router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
 
-    // Rutas que requieren autenticación
+    // Si la ruta requiere autenticación y el usuario no está autenticado
     if (to.meta.requiresAuth && !isAuthenticated) {
         next('/login');
         return;
     }
 
-    // Rutas que requieren NO estar autenticado (login, register)
+    // Si la ruta es para invitados (login/register) y el usuario está autenticado
     if (to.meta.requiresGuest && isAuthenticated) {
         next('/dashboard');
         return;

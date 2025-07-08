@@ -1,7 +1,13 @@
 <template>
   <div class="login-wrapper">
     <div class="register-toolbar">
+      <button @click="$router.back()" class="toolbar-button">
+        &larr; {{ $t('toolbar.back') }}
+      </button>
 
+      <div class="toolbar-spacer"></div>
+      <div class="toolbar-title">{{ $t('toolbar.soport') }}</div>
+      <div class="toolbar-spacer"></div>
 
       <div class="language-switcher">
         <button @click="toggleLanguage" class="language-button">
@@ -199,25 +205,16 @@ export default {
 
 .login-container {
   max-width: 400px;
-  margin: 0 auto;
+  margin: 80px auto 0;
   padding: 2rem;
   text-align: center;
-  margin-top: 80px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-h1 {
-  color: #333;
-  margin-bottom: 2rem;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .form-group {
@@ -238,13 +235,6 @@ input[type="password"] {
   border: 1px solid #D9D593;
   border-radius: 4px;
   background-color: #ffffff;
-  color: black;
-}
-
-input[type="email"]:focus,
-input[type="password"]:focus {
-  outline: none;
-  border-color: #ee7f27;
 }
 
 .options {
@@ -263,11 +253,6 @@ input[type="password"]:focus {
   color: #c1121f;
   text-decoration: none;
   font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.forgot-password:hover {
-  text-decoration: underline;
 }
 
 .login-button {
@@ -278,20 +263,6 @@ input[type="password"]:focus {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.login-button:hover {
-  background-color: #9e1223;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.login-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .error-message {
@@ -299,14 +270,12 @@ input[type="password"]:focus {
   background-color: #ffe6e6;
   padding: 0.8rem;
   border-radius: 4px;
-  text-align: center;
 }
 
 .divider {
   margin: 1.5rem 0;
   text-align: center;
   position: relative;
-  color: #666;
 }
 
 .divider::before,
@@ -335,23 +304,18 @@ input[type="password"]:focus {
   background-color: white;
   border: 1px solid #ddd;
   padding: 0.8rem;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.google-button:hover {
-  background-color: #f5f5f5;
+  width: 100%;
 }
 
 .google-button img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .register-link {
   margin-top: 2rem;
-  text-align: center;
   color: #666;
 }
 
@@ -364,20 +328,5 @@ input[type="password"]:focus {
 
 .register-button:hover {
   text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-  .login-container {
-    padding: 1rem;
-    margin-top: 40px;
-  }
-
-  h1 {
-    margin-bottom: 1.5rem;
-  }
-
-  .login-button, .google-button {
-    padding: 0.8rem;
-  }
 }
 </style>

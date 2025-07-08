@@ -92,7 +92,6 @@ export default {
     const providerDate = ref(null);
     const lowStockProducts = ref([]);
     const { t } = useI18n();
-    const error = ref('');
     
     const getWelcomeMessage = () => {
       const hour = new Date().getHours();
@@ -109,41 +108,28 @@ export default {
       try {
         await stockAlertService.fetchAlerts();
         lowStockProducts.value = stockAlertService.alerts;
-      } catch (err) {
-        console.error('Error fetching low stock products:', err);
-        error.value = 'Error al cargar productos con bajo stock';
+      } catch (error) {
+        console.error('Error fetching low stock products:', error);
       }
     };
 
     const fetchTotalProducts = async () => {
       try {
-        console.log('Fetching total products...');
         const products = await ProductApiService.getProducts();
-        console.log('Products received:', products);
-        if (Array.isArray(products)) {
-          totalProducts.value = products.length;
-          console.log('Total products set to:', totalProducts.value);
-        } else {
-          console.error('Products response is not an array:', products);
-          totalProducts.value = 0;
-        }
-      } catch (err) {
-        console.error('Error fetching total products:', err);
-        error.value = 'Error al cargar el total de productos';
+        totalProducts.value = Array.isArray(products) ? products.length : 0;
+        console.log('Total products:', totalProducts.value);
+      } catch (error) {
+        console.error('Error fetching total products:', error);
         totalProducts.value = 0;
       }
     };
 
     onMounted(async () => {
       console.log('Dashboard mounted');
-      try {
-        await Promise.all([
-          fetchLowStockProducts(),
-          fetchTotalProducts()
-        ]);
-      } catch (err) {
-        console.error('Error in dashboard initialization:', err);
-      }
+      await Promise.all([
+        fetchLowStockProducts(),
+        fetchTotalProducts()
+      ]);
     });
 
     // Recarga el total de productos cadejemplo, al volver de otra vista)
@@ -161,8 +147,7 @@ export default {
       navigateTo,
       totalProducts,
       providerDate,
-      lowStockProducts,
-      error
+      lowStockProducts
     };
   }
 };

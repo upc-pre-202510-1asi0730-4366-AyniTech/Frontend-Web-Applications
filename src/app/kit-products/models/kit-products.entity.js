@@ -22,3 +22,17 @@ export default class Kit {
     }
 }
 
+export class ComboItem {
+  constructor(productId, quantity = 1) {
+    this.productId = productId;
+    this.quantity = quantity;
+  }
+}
+
+export class Combo {
+  constructor(name = '', items = []) {
+    this.name = name;
+    this.items = items;
+  }
+}
+
