@@ -9,7 +9,6 @@ const httpInstance = axios.create({
     }
 })
 
-<<<<<<< HEAD
 // Interceptor para agregar el token JWT automáticamente
 httpInstance.interceptors.request.use(
     (config) => {
@@ -20,20 +19,6 @@ httpInstance.interceptors.request.use(
         return config;
     },
     (error) => Promise.reject(error)
-=======
-// Interceptor para agregar el token de autenticación
-httpInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
->>>>>>> ae2e6ceaf66dc36fa188ea4af8a8fd77b5caec82
 );
 
 export default httpInstance

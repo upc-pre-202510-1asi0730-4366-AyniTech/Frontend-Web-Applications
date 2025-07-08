@@ -37,21 +37,7 @@ class ProductApiService {
       throw new Error('Campos obligatorios incompletos');
     }
     try {
-
-      const response = await http.post(`${this.endpoint}/products`, formattedProduct);
-      const formattedProduct = {
-        name: product.name,
-        description: product.description,
-        purchasePrice: product.purchasePrice,
-        salePrice: product.salePrice,
-        internalNotes: product.internalNotes,
-        categoryId: product.categoryId,
-        unitId: product.unitId,
-        tagIds: product.tagIds || []
-      };
-      
       const response = await http.post(endpoints.PRODUCTS, formattedProduct);
-
       return response.data;
     } catch (error) {
       console.error('Error al crear producto:', error);
