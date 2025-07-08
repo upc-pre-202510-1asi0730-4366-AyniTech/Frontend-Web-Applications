@@ -79,13 +79,8 @@
             <label for="unit">{{ $t('addProduct.labels.unit') }}</label>
             <select
               id="unit"
-<<<<<<< HEAD
-              v-model.number="productForm.unitId"
-            class="form-select"
-=======
               v-model="productForm.unitId"
               class="form-select"
->>>>>>> ae2e6ceaf66dc36fa188ea4af8a8fd77b5caec82
               required
             >
               <option value="">{{ $t('addProduct.labels.unit') }}</option>
@@ -134,11 +129,29 @@
       </form>
     </div>
 
-    <AddInventoryComponent 
-      v-if="showInventoryForm" 
-      :productData="createdProduct"
-      @skip="$router.push('/inventory')"
-    />
+    <div v-if="showInventoryForm">
+      <h3>Inventario inicial para el producto guardado</h3>
+      <div class="product-summary">
+        <p><strong>Nombre:</strong> {{ createdProduct.name }}</p>
+        <p><strong>Descripción:</strong> {{ createdProduct.description }}</p>
+        <p><strong>Precio de venta:</strong> ${{ createdProduct.salePrice }}</p>
+        <p><strong>Categoría:</strong> {{ categories.find(c => c.id === createdProduct.categoryId)?.name }}</p>
+        <p><strong>Unidad de medida:</strong> {{ units.find(u => u.id === createdProduct.unitId)?.name }}</p>
+      </div>
+      <form @submit.prevent="handleInventorySubmit" class="inventory-mini-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="stock">Stock inicial</label>
+            <input id="stock" type="number" min="0" v-model.number="inventoryForm.stock" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="minStock">Stock mínimo</label>
+            <input id="minStock" type="number" min="0" v-model.number="inventoryForm.minStock" class="form-input" required />
+          </div>
+        </div>
+        <button type="submit" class="btn-save">Guardar en Inventario</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -148,6 +161,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import ProductApiService from '../../services/product-api.service.js';
 import AddInventoryComponent from './add-inventory.component.vue';
+import InventoryApiService from '../../services/inventory-api.service.js';
 
 export default {
   name: 'AddProductComponent',
@@ -218,34 +232,54 @@ export default {
       }
     };
 
+    const inventoryForm = ref({ stock: 0, minStock: 0 });
+
     const handleSubmit = async () => {
       if (!productForm.value.categoryId || !productForm.value.unitId) {
         alert(t('addProduct.validationError'));
         return;
       }
 
+      isSubmitting.value = true;
       try {
-        isSubmitting.value = true;
-        const response = await ProductApiService.createProduct(productForm.value);
-        
-        const selectedUnit = units.value.find(u => u.id === productForm.value.unitId);
-        const selectedCategory = categories.value.find(c => c.id === productForm.value.categoryId);
-        
-        createdProduct.value = {
-          id: response.id,
-          name: response.name || productForm.value.name,
-          categoryName: selectedCategory ? t(`categories.${selectedCategory.name}`) : '',
-          unitId: response.unitId || productForm.value.unitId,
-          unitName: selectedUnit ? selectedUnit.name : '',
-          salePrice: response.salePrice || productForm.value.salePrice
+        // Solo los campos del Swagger
+        const productToSend = {
+          name: productForm.value.name,
+          description: productForm.value.description,
+          purchasePrice: productForm.value.purchasePrice,
+          salePrice: productForm.value.salePrice,
+          internalNotes: productForm.value.internalNotes,
+          categoryId: productForm.value.categoryId,
+          unitId: productForm.value.unitId,
+          tagIds: productForm.value.tagIds
         };
-        
+        const created = await ProductApiService.createProduct(productToSend);
+        createdProduct.value = { ...created };
         showInventoryForm.value = true;
       } catch (error) {
-        console.error('Error al crear producto:', error);
         alert(t('addProduct.saveError'));
+        console.error('Error al guardar producto:', error);
       } finally {
         isSubmitting.value = false;
+      }
+    };
+
+    const handleInventorySubmit = async () => {
+      try {
+        const inventoryData = {
+          categoria: categories.value.find(c => c.id === createdProduct.value.categoryId)?.name || '',
+          producto: createdProduct.value.name,
+          fechaEntrada: new Date().toISOString(),
+          cantidad: { value: inventoryForm.value.stock },
+          precio: { value: createdProduct.value.salePrice },
+          stockMinimo: { value: inventoryForm.value.minStock },
+          unidadMedida: { value: units.value.find(u => u.id === createdProduct.value.unitId)?.abbreviation || '' }
+        };
+        await InventoryApiService.createInventory(inventoryData);
+        router.push('/inventory');
+      } catch (error) {
+        alert('Error al guardar inventario');
+        console.error('Error al guardar inventario:', error);
       }
     };
 
@@ -264,7 +298,9 @@ export default {
       createdProduct,
       isTagSelected,
       toggleTag,
-      handleSubmit
+      handleSubmit,
+      inventoryForm,
+      handleInventorySubmit
     };
   }
 };
@@ -420,5 +456,47 @@ label {
 .is-loading {
   opacity: 0.7;
   pointer-events: none;
+}
+
+.inventory-mini-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.inventory-mini-form .form-row {
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-mini-form .form-group label {
+  margin-bottom: 0.25rem;
+}
+
+.inventory-mini-form .form-input {
+  padding: 0.5rem;
+}
+
+.inventory-mini-form .btn-save {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-mini-form .btn-save:hover:not(:disabled) {
+  background: #43A047;
+}
+
+.inventory-mini-form .btn-save:disabled {
+  background: #9E9E9E;
+  cursor: not-allowed;
 }
 </style>
