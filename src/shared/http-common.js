@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { API_CONFIG, CURRENT_ENV } from '../../api.config';
 
+const token = localStorage.getItem('token');
+
 const http = axios.create({
     baseURL: API_CONFIG[CURRENT_ENV].BASE_URL,
     headers: {
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     },

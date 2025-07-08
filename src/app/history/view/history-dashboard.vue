@@ -1,124 +1,155 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { fetchProductHistory } from '@/app/history/services/history-api.service'
-import { fetchStockSummary } from '@/app/history/services/stock-api.service'
+import { ref } from 'vue'
+import { fetchProductHistory, fetchHistorySummaryByDate } from '@/app/history/services/history-api.service'
+import { fetchStockSummary, fetchStockSummaryByDate } from '@/app/history/services/stock-api.service'
 import HistoryCard from '@/app/history/component/history-card.component.vue'
 import StockCard from '@/app/history/component/stock-card.component.vue'
+import HistorySummary from '@/app/history/model/history.entity.js'
 
 const tipoGestion = ref('Producto')
 const fecha = ref('')
 const historial = ref([])
 const stock = ref([])
-const historialOriginal = ref([])
-const stockOriginal = ref([])
 const haBuscado = ref(false)
 
-onMounted(async () => {
-  historialOriginal.value = await fetchProductHistory()
-  stockOriginal.value = await fetchStockSummary()
-  historial.value = [...historialOriginal.value]
-  stock.value = [...stockOriginal.value]
-})
-
-function formatearFechaISOaDDMM(fechaISO) {
-  if (!fechaISO) return ''
-  const [yyyy, mm, dd] = fechaISO.split('-')
-  return `${dd}/${mm}`
+function compararFechas(fecha1, fecha2) {
+  return new Date(fecha1).toISOString().slice(0, 10) === new Date(fecha2).toISOString().slice(0, 10)
 }
 
-function filtrarResultados() {
+async function filtrarResultados() {
   haBuscado.value = true
+  historial.value = []
+  stock.value = []
 
-  const fechaFiltrada = formatearFechaISOaDDMM(fecha.value)
-  historial.value = [...historialOriginal.value]
-  stock.value = [...stockOriginal.value]
+  const fechaSeleccionada = fecha.value
 
-  // Ahora también filtra por fecha cuando es "Producto"
-  if ((tipoGestion.value === 'Producto' || tipoGestion.value === 'Categoría') && fechaFiltrada) {
-    historial.value = historial.value.filter(item =>
-        item.fechaConsulta === fechaFiltrada
-    )
+  try {
+    switch (tipoGestion.value) {
+      case 'Producto': {
+        const producto = await fetchProductHistory()
+        const productoMapeado = producto.map(p => new HistorySummary(p))
+
+        historial.value = fechaSeleccionada
+            ? productoMapeado.filter(p => compararFechas(p.fechaConsulta, fechaSeleccionada))
+            : productoMapeado
+
+        const stockData = await fetchStockSummary()
+        stock.value = fechaSeleccionada
+            ? stockData.filter(s => compararFechas(s.fechaConsulta, fechaSeleccionada))
+            : stockData
+        break
+      }
+
+      case 'Categoría': {
+        historial.value = fechaSeleccionada
+            ? await fetchHistorySummaryByDate(fechaSeleccionada)
+            : await fetchProductHistory()
+        break
+      }
+
+      case 'Stock Promedio': {
+        stock.value = fechaSeleccionada
+            ? await fetchStockSummaryByDate(fechaSeleccionada)
+            : await fetchStockSummary()
+        break
+      }
+
+      default:
+        historial.value = []
+        stock.value = []
+    }
+
+    console.log('Gestión:', tipoGestion.value)
+    console.log('Fecha:', fechaSeleccionada)
+    console.log('Historial:', historial.value)
+    console.log('Stock:', stock.value)
+
+  } catch (error) {
+    console.error('Error al filtrar:', error)
   }
-
-  if ((tipoGestion.value === 'Producto' || tipoGestion.value === 'Stock Promedio') && fechaFiltrada) {
-    stock.value = stock.value.filter(item =>
-        item.fechaConsulta === fechaFiltrada
-    )
-  }
-
-  console.log("Gestión seleccionada:", tipoGestion.value)
-  console.log("Fecha original:", fecha.value)
-  console.log("Fecha formateada:", fechaFiltrada)
-  console.log("Historial filtrado:", historial.value)
-  console.log("Stock filtrado:", stock.value)
 }
 </script>
 
 <template>
   <div class="dashboard-container">
-    <h2>Historial</h2>
+    <div class="header-section">
+      <h2>Historial</h2>
 
-    <div class="toolbar">
-      <div class="left-side">
-        <select v-model="tipoGestion" class="btnP">
-          <option value="Producto">Tipo de Gestión</option>
-          <option value="Categoría">Categoría</option>
-          <option value="Stock Promedio">Stock Promedio</option>
-        </select>
-        <input class="btnP" type="date" v-model="fecha" />
+      <div class="toolbar">
+        <div class="left-side">
+          <select v-model="tipoGestion" class="btnP">
+            <option value="Producto">Tipo de Gestión</option>
+            <option value="Categoría">Categoría</option>
+            <option value="Stock Promedio">Stock Promedio</option>
+          </select>
+          <input class="btnP" type="date" v-model="fecha" />
+        </div>
+        <button class="search-btn" @click="filtrarResultados">Buscar</button>
       </div>
-      <button class="search-btn" @click="filtrarResultados">Buscar</button>
     </div>
 
-    <div class="card-list" v-if="haBuscado">
-      <HistoryCard
-          v-if="tipoGestion === 'Producto' || tipoGestion === 'Categoría'"
-          v-for="h in historial"
-          :key="h.id"
-          :h="h"
-      />
-
-      <StockCard
-          v-if="tipoGestion === 'Producto' || tipoGestion === 'Stock Promedio'"
-          v-for="s in stock"
-          :key="s.id"
-          :s="s"
-      />
+    <div class="scrollable-content">
+      <div class="card-list" v-if="haBuscado">
+        <HistoryCard
+            v-if="tipoGestion === 'Producto' || tipoGestion === 'Categoría'"
+            v-for="h in historial"
+            :key="h.id"
+            :h="h"
+        />
+        <StockCard
+            v-if="tipoGestion === 'Producto' || tipoGestion === 'Stock Promedio'"
+            v-for="s in stock"
+            :key="s.id"
+            :s="s"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.left-side {
+.dashboard-container {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden; /* Evita el scroll general */
 }
 
-.dashboard-container {
-  width: 100%;
-  font-family: 'Arial', sans-serif;
-  min-height: calc(100vh - 70px);
-  padding: 3em; /* Espacio para el navbar global */
+.header-section {
+  padding: 1rem 3rem 0;
+  background: #fbeccf;
+  z-index: 10;
+}
+
+h2 {
+  margin: 2rem 0 1rem 0; /* Aumenté el margen superior a 2rem */
+  color: #333;
+  text-align: center;
+  font-size: 2rem;
+  padding-top: 20px; /* Añadí padding superior adicional */
 }
 
 .toolbar {
-  position: sticky;
-  top: 70px;        /* sigue pegado justo debajo del navbar */
-  z-index: 10;
   background-color: #EE7F27;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Compensa los 3em de padding horizontal del padre */
-  margin: 0 -3em;
   gap: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0 0 8px 8px;
 }
 
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto; /* Solo este contenedor hace scroll */
+  padding: 0 3rem 1rem;
+}
 
-h2 {
-  margin-bottom: 1rem;
-  color: #333;
+.left-side {
+  display: flex;
+  gap: 1rem;
 }
 
 select,
@@ -139,7 +170,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  margin-right: 2rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .btnP {
@@ -156,6 +189,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
+  padding-top: 0.5rem;
 }
 </style>
